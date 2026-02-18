@@ -1,0 +1,1506 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strongman Uruguay | A.C.A.F</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #000000;
+            --secondary: #1a1a1a;
+            --accent: #0066cc;
+            --accent-light: #0088ff;
+            --gold: #ffd700;
+            --text: #ffffff;
+            --text-muted: #cccccc;
+            --danger: #dc3545;
+            --success: #28a745;
+            --warning: #ffc107;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Roboto', sans-serif; background: var(--primary); color: var(--text); overflow-x: hidden; }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 2px; }
+        
+        .hero { position: relative; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .hero-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
+        .hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: -1; }
+        .hero-content { text-align: center; z-index: 1; padding: 2rem; animation: fadeInUp 1s ease; }
+        .logo-container { width: 250px; height: 250px; margin: 0 auto 2rem; background: rgba(255, 255, 255, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 4px solid var(--accent); box-shadow: 0 0 50px rgba(0, 102, 204, 0.5); animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .hero h1 { font-size: 4rem; margin-bottom: 1rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); background: linear-gradient(45deg, #fff, var(--accent-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero p { font-size: 1.5rem; color: var(--text-muted); margin-bottom: 2rem; }
+        .btn { display: inline-block; padding: 1rem 2.5rem; background: var(--accent); color: white; text-decoration: none; border-radius: 50px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s; border: none; cursor: pointer; font-size: 1rem; margin: 0.5rem; }
+        .btn:hover { background: var(--accent-light); transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0, 102, 204, 0.4); }
+        .btn-outline { background: transparent; border: 2px solid var(--accent); }
+        .btn-outline:hover { background: var(--accent); }
+        .btn-danger { background: var(--danger); }
+        .btn-success { background: var(--success); }
+        
+        nav { position: fixed; top: 0; width: 100%; background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(10px); z-index: 1000; padding: 1rem 0; transition: all 0.3s; }
+        nav.scrolled { padding: 0.5rem 0; background: rgba(0, 0, 0, 0.98); }
+        .nav-container { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 2rem; }
+        .nav-logo { display: flex; align-items: center; gap: 1rem; }
+        .nav-logo img { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--accent); }
+        .nav-logo span { font-family: 'Oswald', sans-serif; font-size: 1.5rem; font-weight: 700; }
+        .nav-links { display: flex; gap: 2rem; list-style: none; }
+        .nav-links a { color: var(--text); text-decoration: none; font-weight: 500; transition: color 0.3s; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; }
+        .nav-links a:hover { color: var(--accent-light); }
+        .admin-btn { background: var(--gold); color: var(--primary) !important; padding: 0.5rem 1rem; border-radius: 20px; font-weight: 700 !important; }
+        
+        section { padding: 5rem 2rem; max-width: 1400px; margin: 0 auto; }
+        .section-title { text-align: center; font-size: 3rem; margin-bottom: 3rem; position: relative; display: inline-block; width: 100%; }
+        .section-title::after { content: ''; display: block; width: 100px; height: 4px; background: var(--accent); margin: 1rem auto; border-radius: 2px; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+        .card { background: var(--secondary); border-radius: 15px; overflow: hidden; transition: transform 0.3s, box-shadow 0.3s; border: 1px solid rgba(255, 255, 255, 0.1); }
+        .card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0, 102, 204, 0.2); }
+        .card-image { width: 100%; height: 200px; object-fit: cover; background: linear-gradient(45deg, #1a1a1a, #2a2a2a); }
+        .card-content { padding: 1.5rem; }
+        .card-title { font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--accent-light); }
+        .card-meta { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.3rem; }
+        .card-meta i { color: var(--accent); margin-right: 0.5rem; width: 20px; }
+        .price-tag { display: inline-block; background: var(--gold); color: var(--primary); padding: 0.3rem 1rem; border-radius: 20px; font-weight: 700; margin-top: 0.5rem; }
+        
+        .profile-card { background: var(--secondary); border-radius: 15px; padding: 2rem; text-align: center; border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s; }
+        .profile-card:hover { border-color: var(--accent); transform: translateY(-5px); }
+        .profile-image { width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 4px solid var(--accent); margin-bottom: 1rem; background: #333; }
+        .profile-number { background: var(--accent); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; margin: -20px auto 10px; position: relative; z-index: 2; border: 3px solid var(--primary); }
+        .profile-name { font-size: 1.3rem; margin-bottom: 0.5rem; }
+        .profile-details { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem; }
+        .badge { display: inline-block; padding: 0.2rem 0.8rem; border-radius: 15px; font-size: 0.8rem; font-weight: 600; margin: 0.2rem; }
+        .badge-success { background: rgba(40, 167, 69, 0.2); color: var(--success); border: 1px solid var(--success); }
+        .badge-warning { background: rgba(255, 193, 7, 0.2); color: var(--warning); border: 1px solid var(--warning); }
+        .records-list { text-align: left; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); }
+        .record-item { display: flex; justify-content: space-between; padding: 0.3rem 0; font-size: 0.9rem; }
+        .record-value { color: var(--gold); font-weight: 600; }
+        
+        .record-card { background: linear-gradient(135deg, var(--secondary) 0%, #0a0a0a 100%); border: 2px solid var(--gold); border-radius: 15px; padding: 2rem; text-align: center; position: relative; overflow: hidden; }
+        .record-card::before { content: '🏆'; position: absolute; top: 10px; right: 10px; font-size: 2rem; opacity: 0.3; }
+        .record-title { color: var(--gold); font-size: 1.3rem; margin-bottom: 1rem; }
+        .record-holder { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .record-weight { font-size: 2.5rem; color: var(--accent-light); font-weight: 700; font-family: 'Oswald', sans-serif; }
+        
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; }
+        .gallery-item { position: relative; overflow: hidden; border-radius: 10px; cursor: pointer; aspect-ratio: 1; }
+        .gallery-item img, .gallery-item video { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
+        .gallery-item:hover img, .gallery-item:hover video { transform: scale(1.1); }
+        .gallery-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); padding: 1rem; transform: translateY(100%); transition: transform 0.3s; }
+        .gallery-item:hover .gallery-overlay { transform: translateY(0); }
+        
+        .rules-container { background: var(--secondary); border-radius: 15px; padding: 2rem; }
+        .rule-category { margin-bottom: 2rem; border-left: 4px solid var(--accent); padding-left: 1rem; }
+        .rule-category h3 { color: var(--accent-light); margin-bottom: 1rem; font-size: 1.5rem; }
+        .rule-item { margin-bottom: 1rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px; }
+        .rule-item h4 { color: var(--gold); margin-bottom: 0.5rem; font-size: 1.1rem; }
+        .rule-item p { color: var(--text-muted); line-height: 1.6; }
+        
+        .sponsors-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 3rem; align-items: center; }
+        .sponsor-item { filter: grayscale(100%); opacity: 0.7; transition: all 0.3s; max-width: 150px; }
+        .sponsor-item:hover { filter: grayscale(0%); opacity: 1; transform: scale(1.1); }
+        .sponsor-item img { width: 100%; height: auto; }
+        
+        footer { background: var(--secondary); padding: 3rem 2rem 1rem; margin-top: 5rem; border-top: 1px solid rgba(255,255,255,0.1); }
+        .footer-content { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 3rem; margin-bottom: 2rem; }
+        .footer-section h3 { color: var(--accent-light); margin-bottom: 1rem; }
+        .footer-section p, .footer-section a { color: var(--text-muted); text-decoration: none; line-height: 1.8; }
+        .footer-section a:hover { color: var(--accent-light); }
+        .social-links { display: flex; gap: 1rem; margin-top: 1rem; }
+        .social-links a { width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
+        .social-links a:hover { background: var(--accent); transform: translateY(-3px); }
+        .footer-bottom { text-align: center; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; overflow-y: auto; }
+        .modal.active { display: flex; align-items: center; justify-content: center; padding: 2rem; }
+        .modal-content { background: var(--secondary); border-radius: 20px; width: 100%; max-width: 900px; max-height: 90vh; overflow-y: auto; position: relative; border: 1px solid rgba(255,255,255,0.1); }
+        .modal-header { background: var(--accent); padding: 1.5rem; border-radius: 20px 20px 0 0; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h2 { margin: 0; font-size: 1.5rem; }
+        .close-btn { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.3s; }
+        .close-btn:hover { background: rgba(255,255,255,0.2); }
+        .modal-body { padding: 2rem; }
+        
+        .login-form { max-width: 400px; margin: 0 auto; text-align: center; }
+        .login-form h3 { margin-bottom: 2rem; color: var(--accent-light); }
+        .form-group { margin-bottom: 1.5rem; text-align: left; }
+        .form-group label { display: block; margin-bottom: 0.5rem; color: var(--text-muted); font-weight: 500; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.8rem 1rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 1rem; transition: all 0.3s; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--accent); background: rgba(255,255,255,0.15); }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        
+        .admin-tabs { display: flex; gap: 0.5rem; margin-bottom: 2rem; flex-wrap: wrap; border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 1rem; }
+        .admin-tab { padding: 0.8rem 1.5rem; background: transparent; border: 2px solid var(--accent); color: var(--accent); border-radius: 25px; cursor: pointer; transition: all 0.3s; font-weight: 600; }
+        .admin-tab:hover, .admin-tab.active { background: var(--accent); color: white; }
+        .admin-panel { display: none; }
+        .admin-panel.active { display: block; }
+        .admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+        .admin-card { background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); }
+        .admin-card h4 { margin-bottom: 1rem; color: var(--accent-light); }
+        .list-item { background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
+        .list-item:hover { border-color: var(--accent); }
+        .list-item-info { flex: 1; }
+        .list-item-title { font-weight: 600; margin-bottom: 0.2rem; }
+        .list-item-subtitle { font-size: 0.85rem; color: var(--text-muted); }
+        .list-item-actions { display: flex; gap: 0.5rem; }
+        .btn-small { padding: 0.4rem 0.8rem; font-size: 0.85rem; border-radius: 5px; }
+        .btn-icon { width: 35px; height: 35px; padding: 0; display: flex; align-items: center; justify-content: center; }
+        
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .nav-links { display: none; }
+            .section-title { font-size: 2rem; }
+            .form-row { grid-template-columns: 1fr; }
+            .admin-tabs { justify-content: center; }
+        }
+        
+        .empty-state { text-align: center; padding: 3rem; color: var(--text-muted); }
+        .empty-state i { font-size: 3rem; margin-bottom: 1rem; opacity: 0.5; }
+        
+        .checkbox-group { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; }
+        .checkbox-group input[type="checkbox"] { width: auto; width: 20px; height: 20px; accent-color: var(--accent); }
+    </style>
+</head>
+<body>
+    <nav id="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="https://via.placeholder.com/50/0066cc/ffffff?text=ACAF" alt="ACAF">
+                <span>STRONGMAN URUGUAY</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#inicio">Inicio</a></li>
+                <li><a href="#eventos">Eventos</a></li>
+                <li><a href="#atletas">Atletas</a></li>
+                <li><a href="#records">Récords</a></li>
+                <li><a href="#galeria">Galería</a></li>
+                <li><a href="#reglas">Reglas</a></li>
+                <li><a href="#cursos">Cursos</a></li>
+                <li><a href="#jueces">Jueces</a></li>
+                <li><a href="#" class="admin-btn" onclick="openAdminModal(); return false;"><i class="fas fa-lock"></i> Admin</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="hero" id="inicio">
+        <video class="hero-bg" autoplay muted loop id="heroVideo">
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-man-lifting-weights-in-a-gym-4027-large.mp4" type="video/mp4">
+        </video>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <div class="logo-container">
+                <img src="https://via.placeholder.com/250/0066cc/ffffff?text=STRONGMAN+URUGUAY" alt="Logo">
+            </div>
+            <h1>Asociación Civil de Atletismo de Fuerza</h1>
+            <p>La máxima competencia de fuerza en Uruguay</p>
+            <a href="#eventos" class="btn">Ver Próximos Eventos</a>
+            <a href="#atletas" class="btn btn-outline">Conoce a los Atletas</a>
+        </div>
+    </section>
+
+    <section id="eventos">
+        <h2 class="section-title">Próximos Eventos</h2>
+        <div class="grid" id="eventsContainer"></div>
+    </section>
+
+    <section id="atletas" style="background: rgba(255,255,255,0.02);">
+        <h2 class="section-title">Nuestros Atletas</h2>
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <button class="btn" onclick="filterAthletes('all')">Todos</button>
+            <button class="btn btn-outline" onclick="filterAthletes('male')">Hombres</button>
+            <button class="btn btn-outline" onclick="filterAthletes('female')">Mujeres</button>
+        </div>
+        <div class="grid" id="athletesContainer"></div>
+    </section>
+
+    <section id="records">
+        <h2 class="section-title">Récords Nacionales</h2>
+        <div class="grid" id="recordsContainer"></div>
+    </section>
+
+    <section id="galeria" style="background: rgba(255,255,255,0.02);">
+        <h2 class="section-title">Galería de Eventos</h2>
+        <div class="gallery-grid" id="galleryContainer"></div>
+    </section>
+
+    <section id="reglas">
+        <h2 class="section-title">Reglas Oficiales Strongman</h2>
+        <div class="rules-container" id="rulesContainer"></div>
+    </section>
+
+    <section id="cursos" style="background: rgba(255,255,255,0.02);">
+        <h2 class="section-title">Cursos y Seminarios</h2>
+        <div class="grid" id="coursesContainer"></div>
+    </section>
+
+    <section id="jueces">
+        <h2 class="section-title">Cuerpo de Jueces</h2>
+        <div class="grid" id="judgesContainer"></div>
+    </section>
+
+    <section id="sponsors" style="background: rgba(255,255,255,0.02);">
+        <h2 class="section-title">Sponsors</h2>
+        <div class="sponsors-grid" id="sponsorsContainer"></div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Strongman Uruguay</h3>
+                <p>Asociación Civil de Atletismo de Fuerza</p>
+                <p>Promoviendo el deporte de la fuerza en Uruguay</p>
+            </div>
+            <div class="footer-section">
+                <h3>Contacto</h3>
+                <p><i class="fas fa-envelope"></i> info@strongmanuruguay.com</p>
+                <p><i class="fas fa-phone"></i> +598 99 123 456</p>
+                <p><i class="fas fa-map-marker-alt"></i> Montevideo, Uruguay</p>
+            </div>
+            <div class="footer-section">
+                <h3>Redes Sociales</h3>
+                <div class="social-links">
+                    <a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+                    <a href="#" target="_blank"><i class="fab fa-youtube"></i></a>
+                    <a href="#" target="_blank"><i class="fab fa-tiktok"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Strongman Uruguay - A.C.A.F. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+    <div id="adminModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-cog"></i> Panel de Administración</h2>
+                <button class="close-btn" onclick="closeAdminModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="loginForm" class="login-form">
+                    <h3>Acceso Administrativo</h3>
+                    <div class="form-group">
+                        <label>Contraseña</label>
+                        <input type="password" id="adminPassword" placeholder="Ingrese contraseña">
+                    </div>
+                    <button class="btn" onclick="login()" style="width: 100%;">Ingresar</button>
+                    <p id="loginError" style="color: var(--danger); margin-top: 1rem; display: none;">Contraseña incorrecta</p>
+                </div>
+
+                <div id="adminDashboard" style="display: none;">
+                    <div class="admin-tabs">
+                        <button class="admin-tab active" onclick="switchTab('events')">Eventos</button>
+                        <button class="admin-tab" onclick="switchTab('athletes')">Atletas</button>
+                        <button class="admin-tab" onclick="switchTab('records')">Récords</button>
+                        <button class="admin-tab" onclick="switchTab('gallery')">Galería</button>
+                        <button class="admin-tab" onclick="switchTab('rules')">Reglas</button>
+                        <button class="admin-tab" onclick="switchTab('courses')">Cursos</button>
+                        <button class="admin-tab" onclick="switchTab('judges')">Jueces</button>
+                        <button class="admin-tab" onclick="switchTab('sponsors')">Sponsors</button>
+                        <button class="admin-tab" onclick="switchTab('settings')">Apariencia</button>
+                    </div>
+
+                    <div id="panel-events" class="admin-panel active">
+                        <h3>Gestionar Eventos</h3>
+                        <form id="eventForm" onsubmit="saveEvent(event)">
+                            <input type="hidden" id="eventId">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Nombre del Evento</label>
+                                    <input type="text" id="eventName" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Fecha</label>
+                                    <input type="date" id="eventDate" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Hora</label>
+                                    <input type="time" id="eventTime" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Costo Inscripción ($)</label>
+                                    <input type="number" id="eventCost" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Lugar</label>
+                                <input type="text" id="eventLocation" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Descripción</label>
+                                <textarea id="eventDesc" rows="3"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Imagen del Evento</label>
+                                <input type="file" id="eventImage" accept="image/*">
+                            </div>
+                            <button type="submit" class="btn btn-success">Guardar Evento</button>
+                            <button type="button" class="btn btn-outline" onclick="resetEventForm()">Cancelar</button>
+                        </form>
+                        <div id="eventsList" style="margin-top: 2rem;"></div>
+                    </div>
+
+                    <div id="panel-athletes" class="admin-panel">
+                        <h3>Gestionar Atletas</h3>
+                        <form id="athleteForm" onsubmit="saveAthlete(event)">
+                            <input type="hidden" id="athleteId">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Nombre</label>
+                                    <input type="text" id="athleteName" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Apellido</label>
+                                    <input type="text" id="athleteLastName" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Documento</label>
+                                    <input type="text" id="athleteDoc" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Teléfono</label>
+                                    <input type="tel" id="athletePhone" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Género</label>
+                                    <select id="athleteGender" required>
+                                        <option value="male">Masculino</option>
+                                        <option value="female">Femenino</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Años Compitiendo</label>
+                                    <input type="number" id="athleteYears" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Número de Atleta</label>
+                                <input type="number" id="athleteNumber" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Foto</label>
+                                <input type="file" id="athletePhoto" accept="image/*">
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="athleteCard">
+                                <label for="athleteCard">Carné de deportista al día</label>
+                            </div>
+                            <h4 style="margin: 1.5rem 0 1rem; color: var(--accent-light);">Marcas Personales</h4>
+                            <div id="personalRecords"></div>
+                            <button type="button" class="btn btn-outline" onclick="addRecordField()">+ Agregar Prueba</button>
+                            <br><br>
+                            <button type="submit" class="btn btn-success">Guardar Atleta</button>
+                            <button type="button" class="btn btn-outline" onclick="resetAthleteForm()">Cancelar</button>
+                        </form>
+                        <div id="athletesList" style="margin-top: 2rem;"></div>
+                    </div>
+
+                    <div id="panel-records" class="admin-panel">
+                        <h3>Gestionar Récords</h3>
+                        <form id="recordForm" onsubmit="saveRecord(event)">
+                            <input type="hidden" id="recordId">
+                            <div class="form-group">
+                                <label>Prueba</label>
+                                <input type="text" id="recordTest" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Titular</label>
+                                <input type="text" id="recordHolder" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Marca</label>
+                                <input type="text" id="recordMark" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Fecha</label>
+                                <input type="date" id="recordDate">
+                            </div>
+                            <button type="submit" class="btn btn-success">Guardar Récord</button>
+                            <button type="button" class="btn btn-outline" onclick="resetRecordForm()">Cancelar</button>
+                        </form>
+                        <div id="recordsListAdmin" style="margin-top: 2rem;"></div>
+                    </div>
+
+                    <div id="panel-gallery" class="admin-panel">
+                        <h3>Gestionar Galería</h3>
+                        <form id="galleryForm" onsubmit="saveGalleryItem(event)">
+                            <div class="form-group">
+                                <label>Tipo</label>
+                                <select id="galleryType">
+                                    <option value="image">Imagen</option>
+                                    <option value="video">Video</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Archivo</label>
+                                <input type="file" id="galleryFile" accept="image/*,video/*" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Título</label>
+                                <input type="text" id="galleryTitle">
+                            </div>
+                            <button type="submit" class="btn btn-success">Agregar</button>
+                        </form>
+                        <div id="galleryListAdmin" style="margin-top: 2rem;"></div>
+                    </div>
+
+                    <div id="panel-rules" class="admin-panel">
+                        <h3>Gestionar Reglas</h3>
+                        <form id="ruleForm" onsubmit="saveRule(event)">
+                            <input type="hidden" id="ruleId">
+                            <div class="form-group">
+                                <label>Categoría</label>
+                                <input type="text" id="ruleCategory" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Prueba</label>
+                                <input type="text" id="ruleName" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Regla</label>
+                                <textarea id="ruleDesc" rows="4" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-success">Guardar</button>
+                            <button type="button" class="btn btn-outline" onclick="resetRuleForm()">Cancelar</button>
+                        </form>
+                        <div id="rulesListAdmin" style="margin-top: 2rem;"></div>
+                    </div>
+
+                    <div id="panel-courses" class="admin-panel">
+                        <h3>Gestionar Cursos</h3>
+                        <form id="courseForm" onsubmit="saveCourse(event)">
+                            <input type="hidden" id="courseId">
+                            <div class="form-group">
+                                <label>Título</label>
+                                <input type="text" id="courseTitle" required>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Fecha</label>
+                                    <input type="date" id="courseDate" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Hora</label>
+                                    <input type="time" id="courseTime" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Ubicación</label>
+                                <input type="text" id="courseLocation" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Costo ($)</label>
+                                <input type="number" id="courseCost" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Descripción</label>
+                                <textarea id="courseDesc" rows="3"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-success">Guardar</button>
+                            <button type="button" class="btn btn-outline" onclick="resetCourseForm()">Cancelar</button>
+                        </form>
+                        <div id="coursesListAdmin" style="margin-top: 2rem;"></div>
+                    </div>
+
+                    <div id="panel-judges" class="admin-panel">
+                        <h3>Gestionar Jueces</h3>
+                        <form id="judgeForm" onsubmit="saveJudge(event)">
+                            <input type="hidden" id="judgeId">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Nombre</label>
+                                    <input type="text" id="judgeName" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Apellido</label>
+                                    <input type="text" id="judgeLastName" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Documento</label>
+                                    <input type="text" id="judgeDoc" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Teléfono</label>
+                                    <input type="tel" id="judgePhone" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Nivel</label>
+                                <select id="judgeLevel">
+                                    <option value="Nacional">Nacional</option>
+                                    <option value="Internacional">Internacional</option>
+                                    <option value="En Formación">En Formación</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Foto</label>
+                                <input type="file" id="judgePhoto" accept="image/*">
+                            </div>
+                            <button type="submit" class="btn btn-success">Guardar</button>
+                            <button type="button" class="btn btn-outline" onclick="resetJudgeForm()">Cancelar</button>
+                        </form>
+                        <div id="judgesListAdmin" style="margin-top: 2rem;"></div>
+                    </div>
+
+                    <div id="panel-sponsors" class="admin-panel">
+                        <h3>Gestionar Sponsors</h3>
+                        <form id="sponsorForm" onsubmit="saveSponsor(event)">
+                            <input type="hidden" id="sponsorId">
+                            <div class="form-group">
+                                <label>Nombre</label>
+                                <input type="text" id="sponsorName" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Web/Link</label>
+                                <input type="url" id="sponsorLink" placeholder="https://...">
+                            </div>
+                            <div class="form-group">
+                                <label>Logo</label>
+                                <input type="file" id="sponsorLogo" accept="image/*" required>
+                            </div>
+                            <button type="submit" class="btn btn-success">Guardar</button>
+                            <button type="button" class="btn btn-outline" onclick="resetSponsorForm()">Cancelar</button>
+                        </form>
+                        <div id="sponsorsListAdmin" style="margin-top: 2rem;"></div>
+                    </div>
+
+                    <div id="panel-settings" class="admin-panel">
+                        <h3>Configuración</h3>
+                        <div class="admin-grid">
+                            <div class="admin-card">
+                                <h4>Fondo Hero</h4>
+                                <div id="heroPreview"></div>
+                                <input type="file" id="heroBgFile" accept="video/*,image/*" style="margin-bottom: 1rem;">
+                                <button class="btn btn-success" onclick="updateHeroBg()">Actualizar</button>
+                            </div>
+                            <div class="admin-card">
+                                <h4>Redes Sociales</h4>
+                                <div class="form-group">
+                                    <label>Facebook</label>
+                                    <input type="url" id="socialFacebook" placeholder="https://facebook.com/...">
+                                </div>
+                                <div class="form-group">
+                                    <label>Instagram</label>
+                                    <input type="url" id="socialInstagram" placeholder="https://instagram.com/...">
+                                </div>
+                                <div class="form-group">
+                                    <label>YouTube</label>
+                                    <input type="url" id="socialYoutube" placeholder="https://youtube.com/...">
+                                </div>
+                                <div class="form-group">
+                                    <label>TikTok</label>
+                                    <input type="url" id="socialTiktok" placeholder="https://tiktok.com/...">
+                                </div>
+                                <button class="btn btn-success" onclick="updateSocialLinks()">Guardar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let data = {
+            events: JSON.parse(localStorage.getItem('acaf_events')) || [],
+            athletes: JSON.parse(localStorage.getItem('acaf_athletes')) || [],
+            records: JSON.parse(localStorage.getItem('acaf_records')) || [],
+            gallery: JSON.parse(localStorage.getItem('acaf_gallery')) || [],
+            rules: JSON.parse(localStorage.getItem('acaf_rules')) || [],
+            courses: JSON.parse(localStorage.getItem('acaf_courses')) || [],
+            judges: JSON.parse(localStorage.getItem('acaf_judges')) || [],
+            sponsors: JSON.parse(localStorage.getItem('acaf_sponsors')) || [],
+            settings: JSON.parse(localStorage.getItem('acaf_settings')) || { heroBg: null, social: {} }
+        };
+
+        let isAdmin = false;
+        let currentAthleteFilter = 'all';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAllData();
+            setupNavbar();
+            if (data.events.length === 0) loadSampleData();
+        });
+
+        function setupNavbar() {
+            window.addEventListener('scroll', () => {
+                const navbar = document.getElementById('navbar');
+                if (window.scrollY > 50) navbar.classList.add('scrolled');
+                else navbar.classList.remove('scrolled');
+            });
+        }
+
+        function loadSampleData() {
+            data.events = [
+                { id: 1, name: "Campeonato Nacional 2024", date: "2024-03-15", time: "10:00", cost: 1500, location: "Estadio Centenario, Montevideo", description: "El evento más importante del año.", image: null },
+                { id: 2, name: "Torneo Regional Norte", date: "2024-04-20", time: "09:00", cost: 1000, location: "Salto, Uruguay", description: "Competencia regional.", image: null }
+            ];
+            data.athletes = [
+                { id: 1, name: "Juan", lastName: "Pérez", doc: "3.456.789-0", phone: "099 123 456", gender: "male", years: 5, number: 101, hasCard: true, photo: null, personalRecords: [{test: "Peso Muerto", value: "320kg"}, {test: "Sentadilla", value: "280kg"}] },
+                { id: 2, name: "María", lastName: "González", doc: "4.567.890-1", phone: "098 765 432", gender: "female", years: 3, number: 201, hasCard: true, photo: null, personalRecords: [{test: "Peso Muerto", value: "180kg"}, {test: "Press Banca", value: "95kg"}] }
+            ];
+            data.records = [
+                { id: 1, test: "Peso Muerto", holder: "Carlos Rodríguez", mark: "360kg", date: "2023-11-15" },
+                { id: 2, test: "Sentadilla", holder: "Juan Pérez", mark: "300kg", date: "2023-10-20" },
+                { id: 3, test: "Press Banca", holder: "Luis Silva", mark: "220kg", date: "2023-12-05" },
+                { id: 4, test: "Atlas Stones", holder: "Carlos Rodríguez", mark: "180kg", date: "2023-11-15" }
+            ];
+            data.rules = [
+                { id: 1, category: "Levantamiento", name: "Peso Muerto", description: "Levantar la barra desde el suelo hasta extensión completa. No straps permitidos." },
+                { id: 2, category: "Levantamiento", name: "Sentadilla", description: "La cadera debe pasar debajo de la rodilla. Juez principal + 2 laterales." },
+                { id: 3, category: "Implementos", name: "Atlas Stones", description: "Colocar la piedra sobre plataforma. Tacky permitido." }
+            ];
+            data.courses = [
+                { id: 1, title: "Curso Jueces Nivel 1", date: "2024-02-10", time: "14:00", location: "Gimnasio Municipal, Montevideo", cost: 2000, description: "Certificación inicial para jueces." }
+            ];
+            data.judges = [
+                { id: 1, name: "Roberto", lastName: "Fernández", doc: "2.345.678-9", phone: "091 234 567", level: "Internacional", photo: null }
+            ];
+            saveAllData();
+        }
+
+        function saveAllData() {
+            localStorage.setItem('acaf_events', JSON.stringify(data.events));
+            localStorage.setItem('acaf_athletes', JSON.stringify(data.athletes));
+            localStorage.setItem('acaf_records', JSON.stringify(data.records));
+            localStorage.setItem('acaf_gallery', JSON.stringify(data.gallery));
+            localStorage.setItem('acaf_rules', JSON.stringify(data.rules));
+            localStorage.setItem('acaf_courses', JSON.stringify(data.courses));
+            localStorage.setItem('acaf_judges', JSON.stringify(data.judges));
+            localStorage.setItem('acaf_sponsors', JSON.stringify(data.sponsors));
+            localStorage.setItem('acaf_settings', JSON.stringify(data.settings));
+        }
+
+        function loadAllData() {
+            renderEvents();
+            renderAthletes();
+            renderRecords();
+            renderGallery();
+            renderRules();
+            renderCourses();
+            renderJudges();
+            renderSponsors();
+            applySettings();
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('es-UY', { day: 'numeric', month: 'long', year: 'numeric' });
+        }
+
+        function renderEvents() {
+            const container = document.getElementById('eventsContainer');
+            if (data.events.length === 0) {
+                container.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;"><i class="fas fa-calendar-times"></i><p>No hay eventos programados</p></div>';
+                return;
+            }
+            container.innerHTML = data.events.map(event => `
+                <div class="card">
+                    <div class="card-image" style="background: linear-gradient(45deg, #1a1a1a, #2a2a2a); display: flex; align-items: center; justify-content: center;">
+                        ${event.image ? `<img src="${event.image}" style="width: 100%; height: 100%; object-fit: cover;">` : '<i class="fas fa-trophy" style="font-size: 4rem; color: var(--accent);"></i>'}
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">${event.name}</h3>
+                        <div class="card-meta">
+                            <span><i class="fas fa-calendar"></i> ${formatDate(event.date)}</span>
+                            <span><i class="fas fa-clock"></i> ${event.time} hs</span>
+                            <span><i class="fas fa-map-marker-alt"></i> ${event.location}</span>
+                        </div>
+                        <p style="color: var(--text-muted); margin-bottom: 1rem;">${event.description || ''}</p>
+                        <span class="price-tag">$${event.cost} UYU</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderAthletes() {
+            const container = document.getElementById('athletesContainer');
+            let athletes = data.athletes;
+            if (currentAthleteFilter !== 'all') athletes = athletes.filter(a => a.gender === currentAthleteFilter);
+            
+            if (athletes.length === 0) {
+                container.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;"><i class="fas fa-users"></i><p>No hay atletas registrados</p></div>';
+                return;
+            }
+            container.innerHTML = athletes.map(athlete => `
+                <div class="profile-card">
+                    <div class="profile-image" style="display: flex; align-items: center; justify-content: center; margin: 0 auto; overflow: hidden;">
+                        ${athlete.photo ? `<img src="${athlete.photo}" style="width: 100%; height: 100%; object-fit: cover;">` : '<i class="fas fa-user" style="font-size: 3rem; color: #666;"></i>'}
+                    </div>
+                    <div class="profile-number">${athlete.number}</div>
+                    <h3 class="profile-name">${athlete.name} ${athlete.lastName}</h3>
+                    <p class="profile-details">
+                        <i class="fas fa-venus-mars" style="color: ${athlete.gender === 'male' ? '#0066cc' : '#ff69b4'}"></i> 
+                        ${athlete.gender === 'male' ? 'Masculino' : 'Femenino'} | 
+                        <i class="fas fa-calendar-alt"></i> ${athlete.years} años
+                    </p>
+                    <div>
+                        ${athlete.hasCard ? '<span class="badge badge-success"><i class="fas fa-check-circle"></i> Carné al día</span>' : '<span class="badge badge-warning"><i class="fas fa-exclamation-circle"></i> Sin carné</span>'}
+                    </div>
+                    ${athlete.personalRecords && athlete.personalRecords.length > 0 ? `
+                        <div class="records-list">
+                            <h4 style="color: var(--accent-light); margin-bottom: 0.5rem; font-size: 0.9rem;">MARCAS PERSONALES</h4>
+                            ${athlete.personalRecords.map(r => `
+                                <div class="record-item"><span>${r.test}</span><span class="record-value">${r.value}</span></div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        function filterAthletes(gender) {
+            currentAthleteFilter = gender;
+            renderAthletes();
+        }
+
+        function renderRecords() {
+            const container = document.getElementById('recordsContainer');
+            if (data.records.length === 0) {
+                container.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;"><i class="fas fa-trophy"></i><p>No hay récords registrados</p></div>';
+                return;
+            }
+            container.innerHTML = data.records.map(record => `
+                <div class="record-card">
+                    <h3 class="record-title">${record.test}</h3>
+                    <p class="record-holder">${record.holder}</p>
+                    <p class="record-weight">${record.mark}</p>
+                    ${record.date ? `<p style="color: var(--text-muted); font-size: 0.9rem;">${formatDate(record.date)}</p>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function renderGallery() {
+            const container = document.getElementById('galleryContainer');
+            if (data.gallery.length === 0) {
+                container.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;"><i class="fas fa-images"></i><p>No hay contenido en la galería</p></div>';
+                return;
+            }
+            container.innerHTML = data.gallery.map((item, index) => `
+                <div class="gallery-item">
+                    ${item.type === 'video' 
+                        ? `<video src="${item.src}" muted loop></video>`
+                        : `<img src="${item.src}" alt="${item.title}">`
+                    }
+                    <div class="gallery-overlay">
+                        <p>${item.title || 'Sin título'}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderRules() {
+            const container = document.getElementById('rulesContainer');
+            if (data.rules.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-book"></i><p>No hay reglas cargadas</p></div>';
+                return;
+            }
+            const categories = {};
+            data.rules.forEach(rule => {
+                if (!categories[rule.category]) categories[rule.category] = [];
+                categories[rule.category].push(rule);
+            });
+            
+            container.innerHTML = Object.entries(categories).map(([category, rules]) => `
+                <div class="rule-category">
+                    <h3>${category}</h3>
+                    ${rules.map(rule => `
+                        <div class="rule-item">
+                            <h4>${rule.name}</h4>
+                            <p>${rule.description}</p>
+                        </div>
+                    `).join('')}
+                </div>
+            `).join('');
+        }
+
+        function renderCourses() {
+            const container = document.getElementById('coursesContainer');
+            if (data.courses.length === 0) {
+                container.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;"><i class="fas fa-graduation-cap"></i><p>No hay cursos programados</p></div>';
+                return;
+            }
+            container.innerHTML = data.courses.map(course => `
+                <div class="card">
+                    <div class="card-content">
+                        <h3 class="card-title">${course.title}</h3>
+                        <div class="card-meta">
+                            <span><i class="fas fa-calendar"></i> ${formatDate(course.date)}</span>
+                            <span><i class="fas fa-clock"></i> ${course.time} hs</span>
+                            <span><i class="fas fa-map-marker-alt"></i> ${course.location}</span>
+                        </div>
+                        <p style="color: var(--text-muted); margin-bottom: 1rem;">${course.description || ''}</p>
+                        <span class="price-tag">$${course.cost} UYU</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderJudges() {
+            const container = document.getElementById('judgesContainer');
+            if (data.judges.length === 0) {
+                container.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;"><i class="fas fa-gavel"></i><p>No hay jueces registrados</p></div>';
+                return;
+            }
+            container.innerHTML = data.judges.map(judge => `
+                <div class="profile-card">
+                    <div class="profile-image" style="display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                        ${judge.photo ? `<img src="${judge.photo}" style="width: 100%; height: 100%; object-fit: cover;">` : '<i class="fas fa-user-tie" style="font-size: 3rem; color: #666;"></i>'}
+                    </div>
+                    <h3 class="profile-name">${judge.name} ${judge.lastName}</h3>
+                    <p class="profile-details">
+                        <span class="badge badge-success">${judge.level}</span>
+                    </p>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">
+                        <i class="fas fa-id-card"></i> ${judge.doc}<br>
+                        <i class="fas fa-phone"></i> ${judge.phone}
+                    </p>
+                </div>
+            `).join('');
+        }
+
+        function renderSponsors() {
+            const container = document.getElementById('sponsorsContainer');
+            if (data.sponsors.length === 0) {
+                container.innerHTML = '<div class="empty-state" style="width: 100%;"><i class="fas fa-handshake"></i><p>No hay sponsors registrados</p></div>';
+                return;
+            }
+            container.innerHTML = data.sponsors.map(sponsor => `
+                <a href="${sponsor.link || '#'}" target="_blank" class="sponsor-item">
+                    ${sponsor.logo ? `<img src="${sponsor.logo}" alt="${sponsor.name}">` : `<div style="text-align: center; color: white;"><i class="fas fa-building" style="font-size: 2rem;"></i><p>${sponsor.name}</p></div>`}
+                </a>
+            `).join('');
+        }
+
+        function applySettings() {
+            if (data.settings.heroBg) {
+                const heroVideo = document.getElementById('heroVideo');
+                if (data.settings.heroBg.type === 'video') {
+                    heroVideo.src = data.settings.heroBg.src;
+                    heroVideo.style.display = 'block';
+                } else {
+                    heroVideo.style.display = 'none';
+                    document.querySelector('.hero').style.backgroundImage = `url(${data.settings.heroBg.src})`;
+                    document.querySelector('.hero').style.backgroundSize = 'cover';
+                }
+            }
+            if (data.settings.social) {
+                const socialLinks = document.querySelectorAll('.social-links a');
+                if (data.settings.social.facebook) socialLinks[0].href = data.settings.social.facebook;
+                if (data.settings.social.instagram) socialLinks[1].href = data.settings.social.instagram;
+                if (data.settings.social.youtube) socialLinks[2].href = data.settings.social.youtube;
+                if (data.settings.social.tiktok) socialLinks[3].href = data.settings.social.tiktok;
+            }
+        }
+
+        function openAdminModal() {
+            document.getElementById('adminModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAdminModal() {
+            document.getElementById('adminModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+            isAdmin = false;
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('adminDashboard').style.display = 'none';
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('loginError').style.display = 'none';
+        }
+
+        function login() {
+            const password = document.getElementById('adminPassword').value;
+            if (password === 'DiegoBeto2026') {
+                isAdmin = true;
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('adminDashboard').style.display = 'block';
+                loadAdminData();
+            } else {
+                document.getElementById('loginError').style.display = 'block';
+            }
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(`panel-${tab}`).classList.add('active');
+            loadAdminList(tab);
+        }
+
+        function loadAdminData() {
+            loadAdminList('events');
+        }
+
+        function loadAdminList(type) {
+            const lists = {
+                events: 'eventsList',
+                athletes: 'athletesList', 
+                records: 'recordsListAdmin',
+                gallery: 'galleryListAdmin',
+                rules: 'rulesListAdmin',
+                courses: 'coursesListAdmin',
+                judges: 'judgesListAdmin',
+                sponsors: 'sponsorsListAdmin'
+            };
+            
+            if (!lists[type]) return;
+            
+            const container = document.getElementById(lists[type]);
+            const items = data[type] || [];
+            
+            if (items.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted); text-align: center;">No hay items registrados</p>';
+                return;
+            }
+            
+            container.innerHTML = items.map(item => `
+                <div class="list-item">
+                    <div class="list-item-info">
+                        <div class="list-item-title">${item.name || item.title || item.test || `${item.name || ''} ${item.lastName || ''}`}</div>
+                        <div class="list-item-subtitle">${item.date || item.location || item.holder || item.level || ''}</div>
+                    </div>
+                    <div class="list-item-actions">
+                        <button class="btn btn-small btn-icon" onclick="edit${type.charAt(0).toUpperCase() + type.slice(1)}(${item.id})"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-small btn-icon btn-danger" onclick="delete${type.charAt(0).toUpperCase() + type.slice(1)}(${item.id})"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function saveEvent(e) {
+            e.preventDefault();
+            const id = document.getElementById('eventId').value;
+            const eventData = {
+                id: id ? parseInt(id) : Date.now(),
+                name: document.getElementById('eventName').value,
+                date: document.getElementById('eventDate').value,
+                time: document.getElementById('eventTime').value,
+                cost: document.getElementById('eventCost').value,
+                location: document.getElementById('eventLocation').value,
+                description: document.getElementById('eventDesc').value,
+                image: null
+            };
+            
+            const fileInput = document.getElementById('eventImage');
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    eventData.image = e.target.result;
+                    finishSaveEvent(eventData, id);
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                if (id) {
+                    const existing = data.events.find(ev => ev.id === parseInt(id));
+                    if (existing) eventData.image = existing.image;
+                }
+                finishSaveEvent(eventData, id);
+            }
+        }
+
+        function finishSaveEvent(eventData, id) {
+            if (id) {
+                const index = data.events.findIndex(e => e.id === parseInt(id));
+                if (index !== -1) data.events[index] = eventData;
+            } else {
+                data.events.push(eventData);
+            }
+            saveAllData();
+            renderEvents();
+            loadAdminList('events');
+            resetEventForm();
+            alert('Evento guardado correctamente');
+        }
+
+        function editEvents(id) {
+            const event = data.events.find(e => e.id === id);
+            if (!event) return;
+            document.getElementById('eventId').value = event.id;
+            document.getElementById('eventName').value = event.name;
+            document.getElementById('eventDate').value = event.date;
+            document.getElementById('eventTime').value = event.time;
+            document.getElementById('eventCost').value = event.cost;
+            document.getElementById('eventLocation').value = event.location;
+            document.getElementById('eventDesc').value = event.description || '';
+        }
+
+        function deleteEvents(id) {
+            if (!confirm('¿Eliminar este evento?')) return;
+            data.events = data.events.filter(e => e.id !== id);
+            saveAllData();
+            renderEvents();
+            loadAdminList('events');
+        }
+
+        function resetEventForm() {
+            document.getElementById('eventForm').reset();
+            document.getElementById('eventId').value = '';
+        }
+
+        function saveAthlete(e) {
+            e.preventDefault();
+            const id = document.getElementById('athleteId').value;
+            const athleteData = {
+                id: id ? parseInt(id) : Date.now(),
+                name: document.getElementById('athleteName').value,
+                lastName: document.getElementById('athleteLastName').value,
+                doc: document.getElementById('athleteDoc').value,
+                phone: document.getElementById('athletePhone').value,
+                gender: document.getElementById('athleteGender').value,
+                years: parseInt(document.getElementById('athleteYears').value),
+                number: parseInt(document.getElementById('athleteNumber').value),
+                hasCard: document.getElementById('athleteCard').checked,
+                photo: null,
+                personalRecords: []
+            };
+            
+            const recordNames = document.querySelectorAll('.record-name');
+            const recordValues = document.querySelectorAll('.record-value');
+            for (let i = 0; i < recordNames.length; i++) {
+                if (recordNames[i].value && recordValues[i].value) {
+                    athleteData.personalRecords.push({
+                        test: recordNames[i].value,
+                        value: recordValues[i].value
+                    });
+                }
+            }
+            
+            const fileInput = document.getElementById('athletePhoto');
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    athleteData.photo = e.target.result;
+                    finishSaveAthlete(athleteData, id);
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                if (id) {
+                    const existing = data.athletes.find(a => a.id === parseInt(id));
+                    if (existing) athleteData.photo = existing.photo;
+                }
+                finishSaveAthlete(athleteData, id);
+            }
+        }
+
+        function finishSaveAthlete(athleteData, id) {
+            if (id) {
+                const index = data.athletes.findIndex(a => a.id === parseInt(id));
+                if (index !== -1) data.athletes[index] = athleteData;
+            } else {
+                data.athletes.push(athleteData);
+            }
+            saveAllData();
+            renderAthletes();
+            loadAdminList('athletes');
+            resetAthleteForm();
+            alert('Atleta guardado correctamente');
+        }
+
+        function addRecordField() {
+            const container = document.getElementById('personalRecords');
+            const div = document.createElement('div');
+            div.className = 'form-row';
+            div.innerHTML = `
+                <div class="form-group">
+                    <input type="text" placeholder="Prueba" class="record-name">
+                </div>
+                <div class="form-group">
+                    <input type="text" placeholder="Marca" class="record-value">
+                </div>
+            `;
+            container.appendChild(div);
+        }
+
+        function editAthletes(id) {
+            const athlete = data.athletes.find(a => a.id === id);
+            if (!athlete) return;
+            document.getElementById('athleteId').value = athlete.id;
+            document.getElementById('athleteName').value = athlete.name;
+            document.getElementById('athleteLastName').value = athlete.lastName;
+            document.getElementById('athleteDoc').value = athlete.doc;
+            document.getElementById('athletePhone').value = athlete.phone;
+            document.getElementById('athleteGender').value = athlete.gender;
+            document.getElementById('athleteYears').value = athlete.years;
+            document.getElementById('athleteNumber').value = athlete.number;
+            document.getElementById('athleteCard').checked = athlete.hasCard;
+            
+            const container = document.getElementById('personalRecords');
+            container.innerHTML = '';
+            if (athlete.personalRecords) {
+                athlete.personalRecords.forEach(r => {
+                    const div = document.createElement('div');
+                    div.className = 'form-row';
+                    div.innerHTML = `
+                        <div class="form-group">
+                            <input type="text" placeholder="Prueba" class="record-name" value="${r.test}">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" placeholder="Marca" class="record-value" value="${r.value}">
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+        }
+
+        function deleteAthletes(id) {
+            if (!confirm('¿Eliminar este atleta?')) return;
+            data.athletes = data.athletes.filter(a => a.id !== id);
+            saveAllData();
+            renderAthletes();
+            loadAdminList('athletes');
+        }
+
+        function resetAthleteForm() {
+            document.getElementById('athleteForm').reset();
+            document.getElementById('athleteId').value = '';
+            document.getElementById('personalRecords').innerHTML = '';
+        }
+
+        function saveRecord(e) {
+            e.preventDefault();
+            const id = document.getElementById('recordId').value;
+            const recordData = {
+                id: id ? parseInt(id) : Date.now(),
+                test: document.getElementById('recordTest').value,
+                holder: document.getElementById('recordHolder').value,
+                mark: document.getElementById('recordMark').value,
+                date: document.getElementById('recordDate').value
+            };
+            
+            if (id) {
+                const index = data.records.findIndex(r => r.id === parseInt(id));
+                if (index !== -1) data.records[index] = recordData;
+            } else {
+                data.records.push(recordData);
+            }
+            saveAllData();
+            renderRecords();
+            loadAdminList('records');
+            resetRecordForm();
+            alert('Récord guardado correctamente');
+        }
+
+        function editRecords(id) {
+            const record = data.records.find(r => r.id === id);
+            if (!record) return;
+            document.getElementById('recordId').value = record.id;
+            document.getElementById('recordTest').value = record.test;
+            document.getElementById('recordHolder').value = record.holder;
+            document.getElementById('recordMark').value = record.mark;
+            document.getElementById('recordDate').value = record.date || '';
+        }
+
+        function deleteRecords(id) {
+            if (!confirm('¿Eliminar este récord?')) return;
+            data.records = data.records.filter(r => r.id !== id);
+            saveAllData();
+            renderRecords();
+            loadAdminList('records');
+        }
+
+        function resetRecordForm() {
+            document.getElementById('recordForm').reset();
+            document.getElementById('recordId').value = '';
+        }
+
+        function saveGalleryItem(e) {
+            e.preventDefault();
+            const fileInput = document.getElementById('galleryFile');
+            if (!fileInput.files || !fileInput.files[0]) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const item = {
+                    id: Date.now(),
+                    type: document.getElementById('galleryType').value,
+                    src: e.target.result,
+                    title: document.getElementById('galleryTitle').value
+                };
+                data.gallery.push(item);
+                saveAllData();
+                renderGallery();
+                loadAdminList('gallery');
+                document.getElementById('galleryForm').reset();
+                alert('Item agregado a la galería');
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+        }
+
+        function deleteGallery(id) {
+            if (!confirm('¿Eliminar este item?')) return;
+            data.gallery = data.gallery.filter(g => g.id !== id);
+            saveAllData();
+            renderGallery();
+            loadAdminList('gallery');
+        }
+
+        function saveRule(e) {
+            e.preventDefault();
+            const id = document.getElementById('ruleId').value;
+            const ruleData = {
+                id: id ? parseInt(id) : Date.now(),
+                category: document.getElementById('ruleCategory').value,
+                name: document.getElementById('ruleName').value,
+                description: document.getElementById('ruleDesc').value
+            };
+            
+            if (id) {
+                const index = data.rules.findIndex(r => r.id === parseInt(id));
+                if (index !== -1) data.rules[index] = ruleData;
+            } else {
+                data.rules.push(ruleData);
+            }
+            saveAllData();
+            renderRules();
+            loadAdminList('rules');
+            resetRuleForm();
+            alert('Regla guardada correctamente');
+        }
+
+        function editRules(id) {
+            const rule = data.rules.find(r => r.id === id);
+            if (!rule) return;
+            document.getElementById('ruleId').value = rule.id;
+            document.getElementById('ruleCategory').value = rule.category;
+            document.getElementById('ruleName').value = rule.name;
+            document.getElementById('ruleDesc').value = rule.description;
+        }
+
+        function deleteRules(id) {
+            if (!confirm('¿Eliminar esta regla?')) return;
+            data.rules = data.rules.filter(r => r.id !== id);
+            saveAllData();
+            renderRules();
+            loadAdminList('rules');
+        }
+
+        function resetRuleForm() {
+            document.getElementById('ruleForm').reset();
+            document.getElementById('ruleId').value = '';
+        }
+
+        function saveCourse(e) {
+            e.preventDefault();
+            const id = document.getElementById('courseId').value;
+            const courseData = {
+                id: id ? parseInt(id) : Date.now(),
+                title: document.getElementById('courseTitle').value,
+                date: document.getElementById('courseDate').value,
+                time: document.getElementById('courseTime').value,
+                location: document.getElementById('courseLocation').value,
+                cost: document.getElementById('courseCost').value,
+                description: document.getElementById('courseDesc').value
+            };
+            
+            if (id) {
+                const index = data.courses.findIndex(c => c.id === parseInt(id));
+                if (index !== -1) data.courses[index] = courseData;
+            } else {
+                data.courses.push(courseData);
+            }
+            saveAllData();
+            renderCourses();
+            loadAdminList('courses');
+            resetCourseForm();
+            alert('Curso guardado correctamente');
+        }
+
+        function editCourses(id) {
+            const course = data.courses.find(c => c.id === id);
+            if (!course) return;
+            document.getElementById('courseId').value = course.id;
+            document.getElementById('courseTitle').value = course.title;
+            document.getElementById('courseDate').value = course.date;
+            document.getElementById('courseTime').value = course.time;
+            document.getElementById('courseLocation').value = course.location;
+            document.getElementById('courseCost').value = course.cost;
+            document.getElementById('courseDesc').value = course.description || '';
+        }
+
+        function deleteCourses(id) {
+            if (!confirm('¿Eliminar este curso?')) return;
+            data.courses = data.courses.filter(c => c.id !== id);
+            saveAllData();
+            renderCourses();
+            loadAdminList('courses');
+        }
+
+        function resetCourseForm() {
+            document.getElementById('courseForm').reset();
+            document.getElementById('courseId').value = '';
+        }
+
+        function saveJudge(e) {
+            e.preventDefault();
+            const id = document.getElementById('judgeId').value;
+            const judgeData = {
+                id: id ? parseInt(id) : Date.now(),
+                name: document.getElementById('judgeName').value,
+                lastName: document.getElementById('judgeLastName').value,
+                doc: document.getElementById('judgeDoc').value,
+                phone: document.getElementById('judgePhone').value,
+                level: document.getElementById('judgeLevel').value,
+                photo: null
+            };
+            
+            const fileInput = document.getElementById('judgePhoto');
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    judgeData.photo = e.target.result;
+                    finishSaveJudge(judgeData, id);
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                if (id) {
+                    const existing = data.judges.find(j => j.id === parseInt(id));
+                    if (existing) judgeData.photo = existing.photo;
+                }
+                finishSaveJudge(judgeData, id);
+            }
+        }
+
+        function finishSaveJudge(judgeData, id) {
+            if (id) {
+                const index = data.judges.findIndex(j => j.id === parseInt(id));
+                if (index !== -1) data.judges[index] = judgeData;
+            } else {
+                data.judges.push(judgeData);
+            }
+            saveAllData();
+            renderJudges();
+            loadAdminList('judges');
+            resetJudgeForm();
+            alert('Juez guardado correctamente');
+        }
+
+        function editJudges(id) {
+            const judge = data.judges.find(j => j.id === id);
+            if (!judge) return;
+            document.getElementById('judgeId').value = judge.id;
+            document.getElementById('judgeName').value = judge.name;
+            document.getElementById('judgeLastName').value = judge.lastName;
+            document.getElementById('judgeDoc').value = judge.doc;
+            document.getElementById('judgePhone').value = judge.phone;
+            document.getElementById('judgeLevel').value = judge.level;
+        }
+
+        function deleteJudges(id) {
+            if (!confirm('¿Eliminar este juez?')) return;
+            data.judges = data.judges.filter(j => j.id !== id);
+            saveAllData();
+            renderJudges();
+            loadAdminList('judges');
+        }
+
+        function resetJudgeForm() {
+            document.getElementById('judgeForm').reset();
+            document.getElementById('judgeId').value = '';
+        }
+
+        function saveSponsor(e) {
+            e.preventDefault();
+            const id = document.getElementById('sponsorId').value;
+            const sponsorData = {
+                id: id ? parseInt(id) : Date.now(),
+                name: document.getElementById('sponsorName').value,
+                link: document.getElementById('sponsorLink').value,
+                logo: null
+            };
+            
+            const fileInput = document.getElementById('sponsorLogo');
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    sponsorData.logo = e.target.result;
+                    finishSaveSponsor(sponsorData, id);
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                if (id) {
+                    const existing = data.sponsors.find(s => s.id === parseInt(id));
+                    if (existing) sponsorData.logo = existing.logo;
+                }
+                finishSaveSponsor(sponsorData, id);
+            }
+        }
+
+        function finishSaveSponsor(sponsorData, id) {
+            if (id) {
+                const index = data.sponsors.findIndex(s => s.id === parseInt(id));
+                if (index !== -1) data.sponsors[index] = sponsorData;
+            } else {
+                data.sponsors.push(sponsorData);
+            }
+            saveAllData();
+            renderSponsors();
+            loadAdminList('sponsors');
+            resetSponsorForm();
+            alert('Sponsor guardado correctamente');
+        }
+
+        function editSponsors(id) {
+            const sponsor = data.sponsors.find(s => s.id === id);
+            if (!sponsor) return;
+            document.getElementById('sponsorId').value = sponsor.id;
+            document.getElementById('sponsorName').value = sponsor.name;
+            document.getElementById('sponsorLink').value = sponsor.link || '';
+        }
+
+        function deleteSponsors(id) {
+            if (!confirm('¿Eliminar este sponsor?')) return;
+            data.sponsors = data.sponsors.filter(s => s.id !== id);
+            saveAllData();
+            renderSponsors();
+            loadAdminList('sponsors');
+        }
+
+        function resetSponsorForm() {
+            document.getElementById('sponsorForm').reset();
+            document.getElementById('sponsorId').value = '';
+        }
+
+        function updateHeroBg() {
+            const fileInput = document.getElementById('heroBgFile');
+            if (!fileInput.files || !fileInput.files[0]) {
+                alert('Seleccione un archivo');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const isVideo = fileInput.files[0].type.startsWith('video/');
+                data.settings.heroBg = {
+                    type: isVideo ? 'video' : 'image',
+                    src: e.target.result
+                };
+                saveAllData();
+                applySettings();
+                alert('Fondo actualizado correctamente');
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+        }
+
+        function updateSocialLinks() {
+            data.settings.social = {
+                facebook: document.getElementById('socialFacebook').value,
+                instagram: document.getElementById('socialInstagram').value,
+                youtube: document.getElementById('socialYoutube').value,
+                tiktok: document.getElementById('socialTiktok').value
+            };
+            saveAllData();
+            applySettings();
+            alert('Redes sociales actualizadas');
+        }
+    </script>
+</body>
+</html>
