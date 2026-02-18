@@ -159,9 +159,43 @@
         
         .checkbox-group { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; }
         .checkbox-group input[type="checkbox"] { width: auto; width: 20px; height: 20px; accent-color: var(--accent); }
-    </style>
+    /* BOTÓN ADMIN FLOTANTE */
+.admin-float-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    background: #ffd700;
+    color: #000;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+    z-index: 9999;
+    border: 3px solid #000;
+}
+.admin-float-btn:hover {
+    transform: scale(1.1);
+}
+@media (max-width: 768px) {
+    .admin-float-btn {
+        width: 55px;
+        height: 55px;
+        font-size: 1.3rem;
+        bottom: 15px;
+        right: 15px;
+    }
+}
+</style>
 </head>
 <body>
+<div class="admin-float-btn" onclick="openAdminModal()" title="Panel de Administración">
+    <i class="fas fa-lock"></i>
+</div>
     <nav id="navbar">
         <div class="nav-container">
             <div class="nav-logo">
