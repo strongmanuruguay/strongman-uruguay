@@ -1126,29 +1126,67 @@
 
                     <!-- PANEL CONTACTOS -->
                     <div id="panel-contacts" class="admin-panel">
-                        <h3>Gestionar Contactos</h3>
-                        <form id="contactForm" onsubmit="saveContact(event)">
-                            <div class="form-group">
-                                <label>Tipo</label>
-                                <select id="contactType">
-                                    <option value="phone">Teléfono</option>
-                                    <option value="email">Email</option>
-                                    <option value="address">Dirección</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Valor</label>
-                                <input type="text" id="contactValue" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Etiqueta (opcional)</label>
-                                <input type="text" id="contactLabel" placeholder="Ej: Secretaría, Presidente, etc.">
-                            </div>
-                            <button type="submit" class="btn btn-success">Agregar Contacto</button>
-                        </form>
-                        <div id="contactsListAdmin" style="margin-top: 2rem;"></div>
-                    </div>
-
+    <h3>📞 Gestionar Contactos de la Asociación</h3>
+    <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+        Estos contactos aparecerán en el pie de página de la web para que los visitantes puedan comunicarse.
+    </p>
+    
+    <div class="admin-grid">
+        <div class="admin-card">
+            <h4>Agregar Teléfono</h4>
+            <form onsubmit="saveContactSimple(event, 'phone')">
+                <div class="form-group">
+                    <label>Número de teléfono</label>
+                    <input type="tel" class="contact-phone-input" placeholder="Ej: +598 99 123 456" required>
+                </div>
+                <div class="form-group">
+                    <label>¿A quién pertenece? (opcional)</label>
+                    <input type="text" class="contact-phone-label" placeholder="Ej: Presidente, Secretaría">
+                </div>
+                <button type="submit" class="btn btn-success" style="width: 100%;">
+                    <i class="fas fa-plus"></i> Agregar Teléfono
+                </button>
+            </form>
+        </div>
+        
+        <div class="admin-card">
+            <h4>Agregar Email</h4>
+            <form onsubmit="saveContactSimple(event, 'email')">
+                <div class="form-group">
+                    <label>Correo electrónico</label>
+                    <input type="email" class="contact-email-input" placeholder="Ej: info@strongmanuruguay.com" required>
+                </div>
+                <div class="form-group">
+                    <label>¿A quién pertenece? (opcional)</label>
+                    <input type="text" class="contact-email-label" placeholder="Ej: Inscripciones, Consultas">
+                </div>
+                <button type="submit" class="btn btn-success" style="width: 100%;">
+                    <i class="fas fa-plus"></i> Agregar Email
+                </button>
+            </form>
+        </div>
+        
+        <div class="admin-card">
+            <h4>Agregar Dirección</h4>
+            <form onsubmit="saveContactSimple(event, 'address')">
+                <div class="form-group">
+                    <label>Dirección completa</label>
+                    <input type="text" class="contact-address-input" placeholder="Ej: Av. Italia 1234, Montevideo" required>
+                </div>
+                <div class="form-group">
+                    <label>Lugar (opcional)</label>
+                    <input type="text" class="contact-address-label" placeholder="Ej: Sede Central, Gimnasio Oficial">
+                </div>
+                <button type="submit" class="btn btn-success" style="width: 100%;">
+                    <i class="fas fa-plus"></i> Agregar Dirección
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <h4 style="margin-top: 2rem; margin-bottom: 1rem;">Contactos Actuales</h4>
+    <div id="contactsListAdmin"></div>
+</div>
                     <!-- PANEL CONFIGURACIÓN -->
                     <div id="panel-settings" class="admin-panel">
                         <h3>Configuración de Apariencia</h3>
@@ -1192,6 +1230,79 @@
                                 <button class="btn btn-success" onclick="updateSocialLinks()">Guardar Redes</button>
                             </div>
                         </div>
+
+        <div class="admin-card" style="grid-column: 1 / -1;">
+            <h4>🎨 Fondos de Secciones</h4>
+            <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                Personaliza el fondo de cada sección. Se recomiendan imágenes oscuras.
+            </p>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                <div class="form-group">
+                    <label>Atletas</label>
+                    <input type="file" id="bgAthletes" accept="image/*" onchange="updateSectionBg('athletes', this)">
+                    <div id="previewBgAthletes" class="bg-preview" style="margin-top: 0.5rem; height: 100px;">
+                        <span>Sin fondo</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Ranking</label>
+                    <input type="file" id="bgRanking" accept="image/*" onchange="updateSectionBg('ranking', this)">
+                    <div id="previewBgRanking" class="bg-preview" style="margin-top: 0.5rem; height: 100px;">
+                        <span>Sin fondo</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Eventos</label>
+                    <input type="file" id="bgEvents" accept="image/*" onchange="updateSectionBg('eventos', this)">
+                    <div id="previewBgEventos" class="bg-preview" style="margin-top: 0.5rem; height: 100px;">
+                        <span>Sin fondo</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Gimnasios</label>
+                    <input type="file" id="bgGyms" accept="image/*" onchange="updateSectionBg('gimnasios', this)">
+                    <div id="previewBgGimnasios" class="bg-preview" style="margin-top: 0.5rem; height: 100px;">
+                        <span>Sin fondo</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Galería</label>
+                    <input type="file" id="bgGallery" accept="image/*" onchange="updateSectionBg('galeria', this)">
+                    <div id="previewBgGaleria" class="bg-preview" style="margin-top: 0.5rem; height: 100px;">
+                        <span>Sin fondo</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Reglas</label>
+                    <input type="file" id="bgRules" accept="image/*" onchange="updateSectionBg('reglas', this)">
+                    <div id="previewBgReglas" class="bg-preview" style="margin-top: 0.5rem; height: 100px;">
+                        <span>Sin fondo</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Cursos</label>
+                    <input type="file" id="bgCourses" accept="image/*" onchange="updateSectionBg('cursos', this)">
+                    <div id="previewBgCursos" class="bg-preview" style="margin-top: 0.5rem; height: 100px;">
+                        <span>Sin fondo</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Jueces</label>
+                    <input type="file" id="bgJudges" accept="image/*" onchange="updateSectionBg('jueces', this)">
+                    <div id="previewBgJueces" class="bg-preview" style="margin-top: 0.5rem; height: 100px;">
+                        <span>Sin fondo</span>
+                    </div>
+                </div>
+            </div>
+        </div>
                     </div>
                 </div>
             </div>
@@ -2576,6 +2687,35 @@
             applySettings();
             alert('Redes sociales actualizadas');
         }
+function saveContactSimple(e, type) {
+    e.preventDefault();
+    
+    let value, label;
+    
+    if (type === 'phone') {
+        value = e.target.querySelector('.contact-phone-input').value;
+        label = e.target.querySelector('.contact-phone-label').value;
+    } else if (type === 'email') {
+        value = e.target.querySelector('.contact-email-input').value;
+        label = e.target.querySelector('.contact-email-label').value;
+    } else if (type === 'address') {
+        value = e.target.querySelector('.contact-address-input').value;
+        label = e.target.querySelector('.contact-address-label').value;
+    }
+    
+    const contactData = {
+        type: type,
+        value: value,
+        label: label
+    };
+    
+    data.contacts.push(contactData);
+    saveAllData();
+    renderContacts();
+    loadAdminList('contacts');
+    e.target.reset();
+    alert('Contacto agregado correctamente');
+}
 
 
 function showHomeSections() {
