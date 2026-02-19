@@ -27,7 +27,29 @@
         .hero-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
         .hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: -1; }
         .hero-content { text-align: center; z-index: 1; padding: 2rem; animation: fadeInUp 1s ease; }
-        .logo-container { width: 250px; height: 250px; margin: 0 auto 2rem; background: rgba(255, 255, 255, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 4px solid var(--accent); box-shadow: 0 0 50px rgba(0, 102, 204, 0.5); animation: pulse 2s infinite; }
+        
+        /* LOGO CONTAINER - AHORA EDITABLE POR ADMIN */
+        .logo-container { 
+            width: 250px; 
+            height: 250px; 
+            margin: 0 auto 2rem; 
+            background: rgba(255, 255, 255, 0.1); 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            border: 4px solid var(--accent); 
+            box-shadow: 0 0 50px rgba(0, 102, 204, 0.5); 
+            animation: pulse 2s infinite; 
+            overflow: hidden;
+            position: relative;
+        }
+        .logo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         .hero h1 { font-size: 4rem; margin-bottom: 1rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); background: linear-gradient(45deg, #fff, var(--accent-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -38,6 +60,96 @@
         .btn-outline:hover { background: var(--accent); }
         .btn-danger { background: var(--danger); }
         .btn-success { background: var(--success); }
+        .btn-gold { background: var(--gold); color: #000; }
+        .btn-gold:hover { background: #ffed4e; }
+        
+        /* MENÚ PRINCIPAL DE SECCIONES */
+        .main-menu {
+            padding: 5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        .menu-item {
+            background: var(--secondary);
+            border: 2px solid var(--accent);
+            border-radius: 15px;
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        .menu-item:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 102, 204, 0.3);
+            background: rgba(0, 102, 204, 0.1);
+        }
+        .menu-item i {
+            font-size: 3rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+        .menu-item h3 {
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+        .menu-item p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        /* SECCIONES OCULTAS POR DEFECTO */
+        .content-section {
+            display: none;
+            padding: 5rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            animation: fadeInUp 0.5s ease;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .back-btn {
+            margin-bottom: 2rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        /* CONTADORES */
+        .stats-bar {
+            background: var(--secondary);
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem auto;
+            max-width: 800px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 2rem;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--accent-light);
+            font-family: 'Oswald', sans-serif;
+        }
+        .stat-label {
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
         
         nav { position: fixed; top: 0; width: 100%; background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(10px); z-index: 1000; padding: 1rem 0; transition: all 0.3s; }
         nav.scrolled { padding: 0.5rem 0; background: rgba(0, 0, 0, 0.98); }
@@ -46,11 +158,10 @@
         .nav-logo img { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--accent); }
         .nav-logo span { font-family: 'Oswald', sans-serif; font-size: 1.5rem; font-weight: 700; }
         .nav-links { display: flex; gap: 2rem; list-style: none; }
-        .nav-links a { color: var(--text); text-decoration: none; font-weight: 500; transition: color 0.3s; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; }
+        .nav-links a { color: var(--text); text-decoration: none; font-weight: 500; transition: color 0.3s; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; cursor: pointer; }
         .nav-links a:hover { color: var(--accent-light); }
         .admin-btn { background: var(--gold); color: var(--primary) !important; padding: 0.5rem 1rem; border-radius: 20px; font-weight: 700 !important; }
         
-        section { padding: 5rem 2rem; max-width: 1400px; margin: 0 auto; }
         .section-title { text-align: center; font-size: 3rem; margin-bottom: 3rem; position: relative; display: inline-block; width: 100%; }
         .section-title::after { content: ''; display: block; width: 100px; height: 4px; background: var(--accent); margin: 1rem auto; border-radius: 2px; }
         
@@ -64,6 +175,116 @@
         .card-meta i { color: var(--accent); margin-right: 0.5rem; width: 20px; }
         .price-tag { display: inline-block; background: var(--gold); color: var(--primary); padding: 0.3rem 1rem; border-radius: 20px; font-weight: 700; margin-top: 0.5rem; }
         
+        /* RANKING STYLES */
+        .ranking-filters {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+        .ranking-category {
+            background: var(--secondary);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .ranking-category h3 {
+            color: var(--gold);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-size: 1.8rem;
+        }
+        .ranking-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .ranking-table th,
+        .ranking-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .ranking-table th {
+            color: var(--accent-light);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+        .ranking-table tr:hover {
+            background: rgba(255,255,255,0.05);
+        }
+        .rank-position {
+            font-weight: 700;
+            color: var(--gold);
+            font-size: 1.2rem;
+        }
+        .rank-athlete {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .rank-athlete img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--accent);
+        }
+        .rank-athlete-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .rank-athlete-name {
+            font-weight: 600;
+            color: var(--text);
+        }
+        .rank-athlete-category {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        .rank-points {
+            font-weight: 700;
+            color: var(--accent-light);
+            font-size: 1.1rem;
+        }
+        
+        /* GIMNASIOS STYLES */
+        .gym-card {
+            background: var(--secondary);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+        .gym-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 102, 204, 0.2);
+        }
+        .gym-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .gym-content {
+            padding: 1.5rem;
+        }
+        .gym-name {
+            font-size: 1.3rem;
+            color: var(--accent-light);
+            margin-bottom: 1rem;
+        }
+        .gym-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            color: var(--text-muted);
+        }
+        .gym-info i {
+            color: var(--accent);
+            width: 20px;
+        }
+        
         .profile-card { background: var(--secondary); border-radius: 15px; padding: 2rem; text-align: center; border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s; }
         .profile-card:hover { border-color: var(--accent); transform: translateY(-5px); }
         .profile-image { width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 4px solid var(--accent); margin-bottom: 1rem; background: #333; }
@@ -73,9 +294,6 @@
         .badge { display: inline-block; padding: 0.2rem 0.8rem; border-radius: 15px; font-size: 0.8rem; font-weight: 600; margin: 0.2rem; }
         .badge-success { background: rgba(40, 167, 69, 0.2); color: var(--success); border: 1px solid var(--success); }
         .badge-warning { background: rgba(255, 193, 7, 0.2); color: var(--warning); border: 1px solid var(--warning); }
-        .records-list { text-align: left; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); }
-        .record-item { display: flex; justify-content: space-between; padding: 0.3rem 0; font-size: 0.9rem; }
-        .record-value { color: var(--gold); font-weight: 600; }
         
         .record-card { background: linear-gradient(135deg, var(--secondary) 0%, #0a0a0a 100%); border: 2px solid var(--gold); border-radius: 15px; padding: 2rem; text-align: center; position: relative; overflow: hidden; }
         .record-card::before { content: '🏆'; position: absolute; top: 10px; right: 10px; font-size: 2rem; opacity: 0.3; }
@@ -111,6 +329,22 @@
         .social-links a { width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
         .social-links a:hover { background: var(--accent); transform: translateY(-3px); }
         .footer-bottom { text-align: center; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); }
+        
+        .contact-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+        }
+        .contact-item i {
+            color: var(--accent);
+            width: 20px;
+        }
         
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; overflow-y: auto; }
         .modal.active { display: flex; align-items: center; justify-content: center; padding: 2rem; }
@@ -152,6 +386,9 @@
             .section-title { font-size: 2rem; }
             .form-row { grid-template-columns: 1fr; }
             .admin-tabs { justify-content: center; }
+            .menu-grid { grid-template-columns: 1fr; }
+            .ranking-table { font-size: 0.9rem; }
+            .rank-athlete img { width: 40px; height: 40px; }
         }
         
         .empty-state { text-align: center; padding: 3rem; color: var(--text-muted); }
@@ -159,43 +396,65 @@
         
         .checkbox-group { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; }
         .checkbox-group input[type="checkbox"] { width: auto; width: 20px; height: 20px; accent-color: var(--accent); }
-    /* BOTÓN ADMIN FLOTANTE */
-.admin-float-btn {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 60px;
-    height: 60px;
-    background: #ffd700;
-    color: #000;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
-    z-index: 9999;
-    border: 3px solid #000;
-}
-.admin-float-btn:hover {
-    transform: scale(1.1);
-}
-@media (max-width: 768px) {
-    .admin-float-btn {
-        width: 55px;
-        height: 55px;
-        font-size: 1.3rem;
-        bottom: 15px;
-        right: 15px;
-    }
-}
-</style>
+        
+        .admin-float-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: #ffd700;
+            color: #000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+            z-index: 9999;
+            border: 3px solid #000;
+        }
+        .admin-float-btn:hover {
+            transform: scale(1.1);
+        }
+        @media (max-width: 768px) {
+            .admin-float-btn {
+                width: 55px;
+                height: 55px;
+                font-size: 1.3rem;
+                bottom: 15px;
+                right: 15px;
+            }
+        }
+        
+        /* Preview de fondos en admin */
+        .bg-preview {
+            width: 100%;
+            height: 150px;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            background-size: cover;
+            background-position: center;
+            border: 2px solid rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+        }
+        .bg-preview img, .bg-preview video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+    </style>
 </head>
 <body>
-<div class="admin-float-btn" onclick="openAdminModal()" title="Panel de Administración">
-    <i class="fas fa-lock"></i>
-</div>
+    <div class="admin-float-btn" onclick="openAdminModal()" title="Panel de Administración">
+        <i class="fas fa-lock"></i>
+    </div>
+    
     <nav id="navbar">
         <div class="nav-container">
             <div class="nav-logo">
@@ -203,41 +462,119 @@
                 <span>STRONGMAN URUGUAY</span>
             </div>
             <ul class="nav-links">
-                <li><a href="#inicio">Inicio</a></li>
-                <li><a href="#eventos">Eventos</a></li>
-                <li><a href="#atletas">Atletas</a></li>
-                <li><a href="#records">Récords</a></li>
-                <li><a href="#galeria">Galería</a></li>
-                <li><a href="#reglas">Reglas</a></li>
-                <li><a href="#cursos">Cursos</a></li>
-                <li><a href="#jueces">Jueces</a></li>
-                <li><a href="#" class="admin-btn" onclick="openAdminModal(); return false;"><i class="fas fa-lock"></i> Admin</a></li>
+                <li><a onclick="showHome()">Inicio</a></li>
+                <li><a onclick="showSection('ranking')">Ranking</a></li>
+                <li><a onclick="showSection('atletas')">Atletas</a></li>
+                <li><a onclick="showSection('eventos')">Eventos</a></li>
+                <li><a onclick="showSection('gimnasios')">Gimnasios</a></li>
+                <li><a onclick="showSection('galeria')">Galería</a></li>
+                <li><a onclick="showSection('reglas')">Reglas</a></li>
+                <li><a onclick="showSection('cursos')">Cursos</a></li>
+                <li><a onclick="showSection('jueces')">Jueces</a></li>
+                <li><a onclick="openAdminModal(); return false;" class="admin-btn"><i class="fas fa-lock"></i> Admin</a></li>
             </ul>
         </div>
     </nav>
 
+    <!-- HERO / HOME -->
     <section class="hero" id="inicio">
         <video class="hero-bg" autoplay muted loop id="heroVideo">
             <source src="https://assets.mixkit.co/videos/preview/mixkit-man-lifting-weights-in-a-gym-4027-large.mp4" type="video/mp4">
         </video>
         <div class="hero-overlay"></div>
         <div class="hero-content">
-            <div class="logo-container">
-                <img src="https://via.placeholder.com/250/0066cc/ffffff?text=STRONGMAN+URUGUAY" alt="Logo">
+            <div class="logo-container" id="heroLogoContainer">
+                <img src="https://via.placeholder.com/250/0066cc/ffffff?text=STRONGMAN+URUGUAY" alt="Logo" id="heroLogoImg">
             </div>
             <h1>Asociación Civil de Atletismo de Fuerza</h1>
             <p>La máxima competencia de fuerza en Uruguay</p>
-            <a href="#eventos" class="btn">Ver Próximos Eventos</a>
-            <a href="#atletas" class="btn btn-outline">Conoce a los Atletas</a>
+            
+            <!-- CONTADORES -->
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-number" id="visitCounter">0</div>
+                    <div class="stat-label">Visitas</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="athleteCounter">0</div>
+                    <div class="stat-label">Atletas Registrados</div>
+                </div>
+            </div>
+            
+            <a onclick="showSection('eventos')" class="btn">Ver Próximos Eventos</a>
+            <a onclick="showSection('atletas')" class="btn btn-outline">Conoce a los Atletas</a>
         </div>
     </section>
 
-    <section id="eventos">
-        <h2 class="section-title">Próximos Eventos</h2>
-        <div class="grid" id="eventsContainer"></div>
+    <!-- MENÚ PRINCIPAL DE SECCIONES -->
+    <section class="main-menu" id="mainMenu" style="display: none;">
+        <h2 class="section-title">Explora Strongman Uruguay</h2>
+        <div class="menu-grid">
+            <div class="menu-item" onclick="showSection('ranking')">
+                <i class="fas fa-trophy"></i>
+                <h3>Ranking Nacional</h3>
+                <p>Ver posiciones de atletas hombres y mujeres por categoría</p>
+            </div>
+            <div class="menu-item" onclick="showSection('atletas')">
+                <i class="fas fa-users"></i>
+                <h3>Atletas</h3>
+                <p>Conoce a nuestros atletas registrados</p>
+            </div>
+            <div class="menu-item" onclick="showSection('eventos')">
+                <i class="fas fa-calendar-alt"></i>
+                <h3>Eventos</h3>
+                <p>Próximas competencias y eventos</p>
+            </div>
+            <div class="menu-item" onclick="showSection('gimnasios')">
+                <i class="fas fa-dumbbell"></i>
+                <h3>Gimnasios Afiliados</h3>
+                <p>Encuentra dónde entrenar strongman</p>
+            </div>
+            <div class="menu-item" onclick="showSection('galeria')">
+                <i class="fas fa-images"></i>
+                <h3>Galería</h3>
+                <p>Fotos y videos de eventos</p>
+            </div>
+            <div class="menu-item" onclick="showSection('reglas')">
+                <i class="fas fa-book"></i>
+                <h3>Reglas</h3>
+                <p>Reglamento oficial de competencias</p>
+            </div>
+            <div class="menu-item" onclick="showSection('cursos')">
+                <i class="fas fa-graduation-cap"></i>
+                <h3>Cursos</h3>
+                <p>Capacitaciones y seminarios</p>
+            </div>
+            <div class="menu-item" onclick="showSection('jueces')">
+                <i class="fas fa-gavel"></i>
+                <h3>Jueces</h3>
+                <p>Cuerpo de jueces certificados</p>
+            </div>
+        </div>
     </section>
 
-    <section id="atletas" style="background: rgba(255,255,255,0.02);">
+    <!-- SECCIÓN RANKING -->
+    <section id="ranking" class="content-section">
+        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-arrow-left"></i> Volver al Inicio</button>
+        <h2 class="section-title">Ranking Nacional Strongman</h2>
+        
+        <div class="ranking-filters">
+            <button class="btn btn-gold" onclick="filterRanking('male')">Masculino</button>
+            <button class="btn btn-gold" onclick="filterRanking('female')">Femenino</button>
+            <button class="btn btn-outline" onclick="filterRanking('all')">Ver Todos</button>
+        </div>
+        
+        <div id="rankingContainer">
+            <div class="empty-state">
+                <i class="fas fa-trophy"></i>
+                <p>Selecciona una categoría para ver el ranking</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN ATLETAS -->
+    <section id="atletas" class="content-section" style="background: rgba(255,255,255,0.02);">
+        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-arrow-left"></i> Volver al Inicio</button>
         <h2 class="section-title">Nuestros Atletas</h2>
         <div style="text-align: center; margin-bottom: 2rem;">
             <button class="btn" onclick="filterAthletes('all')">Todos</button>
@@ -247,32 +584,51 @@
         <div class="grid" id="athletesContainer"></div>
     </section>
 
-    <section id="records">
-        <h2 class="section-title">Récords Nacionales</h2>
-        <div class="grid" id="recordsContainer"></div>
+    <!-- SECCIÓN EVENTOS -->
+    <section id="eventos" class="content-section">
+        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-arrow-left"></i> Volver al Inicio</button>
+        <h2 class="section-title">Próximos Eventos</h2>
+        <div class="grid" id="eventsContainer"></div>
     </section>
 
-    <section id="galeria" style="background: rgba(255,255,255,0.02);">
+    <!-- SECCIÓN GIMNASIOS -->
+    <section id="gimnasios" class="content-section" style="background: rgba(255,255,255,0.02);">
+        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-arrow-left"></i> Volver al Inicio</button>
+        <h2 class="section-title">Gimnasios Afiliados</h2>
+        <div class="grid" id="gymsContainer"></div>
+    </section>
+
+    <!-- SECCIÓN GALERÍA -->
+    <section id="galeria" class="content-section">
+        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-arrow-left"></i> Volver al Inicio</button>
         <h2 class="section-title">Galería de Eventos</h2>
         <div class="gallery-grid" id="galleryContainer"></div>
     </section>
 
-    <section id="reglas">
+    <!-- SECCIÓN REGLAS -->
+    <section id="reglas" class="content-section" style="background: rgba(255,255,255,0.02);">
+        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-arrow-left"></i> Volver al Inicio</button>
         <h2 class="section-title">Reglas Oficiales Strongman</h2>
         <div class="rules-container" id="rulesContainer"></div>
     </section>
 
-    <section id="cursos" style="background: rgba(255,255,255,0.02);">
+    <!-- SECCIÓN CURSOS -->
+    <section id="cursos" class="content-section">
+        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-arrow-left"></i> Volver al Inicio</button>
         <h2 class="section-title">Cursos y Seminarios</h2>
         <div class="grid" id="coursesContainer"></div>
     </section>
 
-    <section id="jueces">
+    <!-- SECCIÓN JUECES -->
+    <section id="jueces" class="content-section" style="background: rgba(255,255,255,0.02);">
+        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-arrow-left"></i> Volver al Inicio</button>
         <h2 class="section-title">Cuerpo de Jueces</h2>
         <div class="grid" id="judgesContainer"></div>
     </section>
 
-    <section id="sponsors" style="background: rgba(255,255,255,0.02);">
+    <!-- SECCIÓN SPONSORS -->
+    <section id="sponsors" class="content-section">
+        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-arrow-left"></i> Volver al Inicio</button>
         <h2 class="section-title">Sponsors</h2>
         <div class="sponsors-grid" id="sponsorsContainer"></div>
     </section>
@@ -286,9 +642,20 @@
             </div>
             <div class="footer-section">
                 <h3>Contacto</h3>
-                <p><i class="fas fa-envelope"></i> info@strongmanuruguay.com</p>
-                <p><i class="fas fa-phone"></i> +598 99 123 456</p>
-                <p><i class="fas fa-map-marker-alt"></i> Montevideo, Uruguay</p>
+                <div id="footerContacts" class="contact-list">
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>info@strongmanuruguay.com</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <span>+598 99 123 456</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>Montevideo, Uruguay</span>
+                    </div>
+                </div>
             </div>
             <div class="footer-section">
                 <h3>Redes Sociales</h3>
@@ -304,6 +671,8 @@
             <p>&copy; 2024 Strongman Uruguay - A.C.A.F. Todos los derechos reservados.</p>
         </div>
     </footer>
+
+    <!-- MODAL ADMIN -->
     <div id="adminModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -325,15 +694,19 @@
                     <div class="admin-tabs">
                         <button class="admin-tab active" onclick="switchTab('events')">Eventos</button>
                         <button class="admin-tab" onclick="switchTab('athletes')">Atletas</button>
+                        <button class="admin-tab" onclick="switchTab('ranking')">Ranking</button>
+                        <button class="admin-tab" onclick="switchTab('gyms')">Gimnasios</button>
                         <button class="admin-tab" onclick="switchTab('records')">Récords</button>
                         <button class="admin-tab" onclick="switchTab('gallery')">Galería</button>
                         <button class="admin-tab" onclick="switchTab('rules')">Reglas</button>
                         <button class="admin-tab" onclick="switchTab('courses')">Cursos</button>
                         <button class="admin-tab" onclick="switchTab('judges')">Jueces</button>
                         <button class="admin-tab" onclick="switchTab('sponsors')">Sponsors</button>
+                        <button class="admin-tab" onclick="switchTab('contacts')">Contactos</button>
                         <button class="admin-tab" onclick="switchTab('settings')">Apariencia</button>
                     </div>
 
+                    <!-- PANEL EVENTOS -->
                     <div id="panel-events" class="admin-panel active">
                         <h3>Gestionar Eventos</h3>
                         <form id="eventForm" onsubmit="saveEvent(event)">
@@ -376,6 +749,7 @@
                         <div id="eventsList" style="margin-top: 2rem;"></div>
                     </div>
 
+                    <!-- PANEL ATLETAS -->
                     <div id="panel-athletes" class="admin-panel">
                         <h3>Gestionar Atletas</h3>
                         <form id="athleteForm" onsubmit="saveAthlete(event)">
@@ -435,6 +809,74 @@
                         <div id="athletesList" style="margin-top: 2rem;"></div>
                     </div>
 
+                    <!-- PANEL RANKING -->
+                    <div id="panel-ranking" class="admin-panel">
+                        <h3>Gestionar Ranking Nacional</h3>
+                        <form id="rankingForm" onsubmit="saveRanking(event)">
+                            <input type="hidden" id="rankingId">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Atleta</label>
+                                    <select id="rankingAthlete" required>
+                                        <option value="">Seleccionar atleta...</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Género</label>
+                                    <select id="rankingGender" required onchange="updateRankingCategories()">
+                                        <option value="male">Masculino</option>
+                                        <option value="female">Femenino</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Categoría de Peso</label>
+                                <select id="rankingCategory" required>
+                                    <option value="">Seleccionar...</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Posición</label>
+                                <input type="number" id="rankingPosition" min="1" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Puntos</label>
+                                <input type="number" id="rankingPoints" required>
+                            </div>
+                            <button type="submit" class="btn btn-success">Guardar Ranking</button>
+                            <button type="button" class="btn btn-outline" onclick="resetRankingForm()">Cancelar</button>
+                        </form>
+                        <div id="rankingListAdmin" style="margin-top: 2rem;"></div>
+                    </div>
+
+                    <!-- PANEL GIMNASIOS -->
+                    <div id="panel-gyms" class="admin-panel">
+                        <h3>Gestionar Gimnasios Afiliados</h3>
+                        <form id="gymForm" onsubmit="saveGym(event)">
+                            <input type="hidden" id="gymId">
+                            <div class="form-group">
+                                <label>Nombre del Gimnasio</label>
+                                <input type="text" id="gymName" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Dirección</label>
+                                <input type="text" id="gymAddress" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Teléfono</label>
+                                <input type="tel" id="gymPhone" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Foto</label>
+                                <input type="file" id="gymPhoto" accept="image/*">
+                            </div>
+                            <button type="submit" class="btn btn-success">Guardar Gimnasio</button>
+                            <button type="button" class="btn btn-outline" onclick="resetGymForm()">Cancelar</button>
+                        </form>
+                        <div id="gymsListAdmin" style="margin-top: 2rem;"></div>
+                    </div>
+
+                    <!-- PANEL RÉCORDS -->
                     <div id="panel-records" class="admin-panel">
                         <h3>Gestionar Récords</h3>
                         <form id="recordForm" onsubmit="saveRecord(event)">
@@ -461,6 +903,7 @@
                         <div id="recordsListAdmin" style="margin-top: 2rem;"></div>
                     </div>
 
+                    <!-- PANEL GALERÍA -->
                     <div id="panel-gallery" class="admin-panel">
                         <h3>Gestionar Galería</h3>
                         <form id="galleryForm" onsubmit="saveGalleryItem(event)">
@@ -484,6 +927,7 @@
                         <div id="galleryListAdmin" style="margin-top: 2rem;"></div>
                     </div>
 
+                    <!-- PANEL REGLAS -->
                     <div id="panel-rules" class="admin-panel">
                         <h3>Gestionar Reglas</h3>
                         <form id="ruleForm" onsubmit="saveRule(event)">
@@ -506,6 +950,7 @@
                         <div id="rulesListAdmin" style="margin-top: 2rem;"></div>
                     </div>
 
+                    <!-- PANEL CURSOS -->
                     <div id="panel-courses" class="admin-panel">
                         <h3>Gestionar Cursos</h3>
                         <form id="courseForm" onsubmit="saveCourse(event)">
@@ -542,6 +987,7 @@
                         <div id="coursesListAdmin" style="margin-top: 2rem;"></div>
                     </div>
 
+                    <!-- PANEL JUECES -->
                     <div id="panel-judges" class="admin-panel">
                         <h3>Gestionar Jueces</h3>
                         <form id="judgeForm" onsubmit="saveJudge(event)">
@@ -584,6 +1030,7 @@
                         <div id="judgesListAdmin" style="margin-top: 2rem;"></div>
                     </div>
 
+                    <!-- PANEL SPONSORS -->
                     <div id="panel-sponsors" class="admin-panel">
                         <h3>Gestionar Sponsors</h3>
                         <form id="sponsorForm" onsubmit="saveSponsor(event)">
@@ -606,15 +1053,53 @@
                         <div id="sponsorsListAdmin" style="margin-top: 2rem;"></div>
                     </div>
 
+                    <!-- PANEL CONTACTOS -->
+                    <div id="panel-contacts" class="admin-panel">
+                        <h3>Gestionar Contactos</h3>
+                        <form id="contactForm" onsubmit="saveContact(event)">
+                            <div class="form-group">
+                                <label>Tipo</label>
+                                <select id="contactType">
+                                    <option value="phone">Teléfono</option>
+                                    <option value="email">Email</option>
+                                    <option value="address">Dirección</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Valor</label>
+                                <input type="text" id="contactValue" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Etiqueta (opcional)</label>
+                                <input type="text" id="contactLabel" placeholder="Ej: Secretaría, Presidente, etc.">
+                            </div>
+                            <button type="submit" class="btn btn-success">Agregar Contacto</button>
+                        </form>
+                        <div id="contactsListAdmin" style="margin-top: 2rem;"></div>
+                    </div>
+
+                    <!-- PANEL CONFIGURACIÓN -->
                     <div id="panel-settings" class="admin-panel">
-                        <h3>Configuración</h3>
+                        <h3>Configuración de Apariencia</h3>
                         <div class="admin-grid">
                             <div class="admin-card">
-                                <h4>Fondo Hero</h4>
-                                <div id="heroPreview"></div>
+                                <h4>Fondo Hero (Video o Imagen)</h4>
+                                <div id="heroBgPreview" class="bg-preview">
+                                    <span>Vista previa</span>
+                                </div>
                                 <input type="file" id="heroBgFile" accept="video/*,image/*" style="margin-bottom: 1rem;">
-                                <button class="btn btn-success" onclick="updateHeroBg()">Actualizar</button>
+                                <button class="btn btn-success" onclick="updateHeroBg()">Actualizar Fondo</button>
                             </div>
+                            
+                            <div class="admin-card">
+                                <h4>Logo Principal (Círculo)</h4>
+                                <div id="logoPreview" class="bg-preview">
+                                    <span>Vista previa</span>
+                                </div>
+                                <input type="file" id="logoFile" accept="image/*" style="margin-bottom: 1rem;">
+                                <button class="btn btn-success" onclick="updateLogo()">Actualizar Logo</button>
+                            </div>
+                            
                             <div class="admin-card">
                                 <h4>Redes Sociales</h4>
                                 <div class="form-group">
@@ -633,7 +1118,7 @@
                                     <label>TikTok</label>
                                     <input type="url" id="socialTiktok" placeholder="https://tiktok.com/...">
                                 </div>
-                                <button class="btn btn-success" onclick="updateSocialLinks()">Guardar</button>
+                                <button class="btn btn-success" onclick="updateSocialLinks()">Guardar Redes</button>
                             </div>
                         </div>
                     </div>
@@ -641,25 +1126,60 @@
             </div>
         </div>
     </div>
+
     <script>
+        // DATOS
         let data = {
             events: JSON.parse(localStorage.getItem('acaf_events')) || [],
             athletes: JSON.parse(localStorage.getItem('acaf_athletes')) || [],
+            ranking: JSON.parse(localStorage.getItem('acaf_ranking')) || [],
+            gyms: JSON.parse(localStorage.getItem('acaf_gyms')) || [],
             records: JSON.parse(localStorage.getItem('acaf_records')) || [],
             gallery: JSON.parse(localStorage.getItem('acaf_gallery')) || [],
             rules: JSON.parse(localStorage.getItem('acaf_rules')) || [],
             courses: JSON.parse(localStorage.getItem('acaf_courses')) || [],
             judges: JSON.parse(localStorage.getItem('acaf_judges')) || [],
             sponsors: JSON.parse(localStorage.getItem('acaf_sponsors')) || [],
-            settings: JSON.parse(localStorage.getItem('acaf_settings')) || { heroBg: null, social: {} }
+            contacts: JSON.parse(localStorage.getItem('acaf_contacts')) || [
+                { type: 'email', value: 'info@strongmanuruguay.com', label: '' },
+                { type: 'phone', value: '+598 99 123 456', label: '' },
+                { type: 'address', value: 'Montevideo, Uruguay', label: '' }
+            ],
+            settings: JSON.parse(localStorage.getItem('acaf_settings')) || { 
+                heroBg: null, 
+                logo: null,
+                social: {} 
+            },
+            visits: parseInt(localStorage.getItem('acaf_visits')) || 0
         };
 
         let isAdmin = false;
         let currentAthleteFilter = 'all';
+        let currentRankingFilter = 'all';
 
+        // CATEGORÍAS DE PESO
+        const weightCategories = {
+            male: [
+                { value: 'lightweight', label: 'Peso Ligero (-80kg)' },
+                { value: 'middleweight', label: 'Peso Medio (80-95kg)' },
+                { value: 'lightheavy', label: 'Semipesado (95-105kg)' },
+                { value: 'heavyweight', label: 'Peso Pesado (105-120kg)' },
+                { value: 'superheavy', label: 'Superpesado (+120kg)' }
+            ],
+            female: [
+                { value: 'lightweight', label: 'Peso Ligero (-60kg)' },
+                { value: 'middleweight', label: 'Peso Medio (60-70kg)' },
+                { value: 'heavyweight', label: 'Peso Pesado (70-82kg)' },
+                { value: 'superheavy', label: 'Superpesado (+82kg)' }
+            ]
+        };
+
+        // INICIALIZACIÓN
         document.addEventListener('DOMContentLoaded', function() {
             loadAllData();
             setupNavbar();
+            updateCounters();
+            countVisit();
             if (data.events.length === 0) loadSampleData();
         });
 
@@ -671,6 +1191,17 @@
             });
         }
 
+        function countVisit() {
+            data.visits++;
+            localStorage.setItem('acaf_visits', data.visits);
+            document.getElementById('visitCounter').textContent = data.visits.toLocaleString();
+        }
+
+        function updateCounters() {
+            document.getElementById('visitCounter').textContent = data.visits.toLocaleString();
+            document.getElementById('athleteCounter').textContent = data.athletes.length.toLocaleString();
+        }
+
         function loadSampleData() {
             data.events = [
                 { id: 1, name: "Campeonato Nacional 2024", date: "2024-03-15", time: "10:00", cost: 1500, location: "Estadio Centenario, Montevideo", description: "El evento más importante del año.", image: null },
@@ -680,22 +1211,19 @@
                 { id: 1, name: "Juan", lastName: "Pérez", doc: "3.456.789-0", phone: "099 123 456", gender: "male", years: 5, number: 101, hasCard: true, photo: null, personalRecords: [{test: "Peso Muerto", value: "320kg"}, {test: "Sentadilla", value: "280kg"}] },
                 { id: 2, name: "María", lastName: "González", doc: "4.567.890-1", phone: "098 765 432", gender: "female", years: 3, number: 201, hasCard: true, photo: null, personalRecords: [{test: "Peso Muerto", value: "180kg"}, {test: "Press Banca", value: "95kg"}] }
             ];
+            data.ranking = [
+                { id: 1, athleteId: 1, gender: 'male', category: 'heavyweight', position: 1, points: 2500 },
+                { id: 2, athleteId: 2, gender: 'female', category: 'middleweight', position: 1, points: 2200 }
+            ];
+            data.gyms = [
+                { id: 1, name: "Gimnasio Power House", address: "Av. Italia 1234, Montevideo", phone: "2601 2345", photo: null }
+            ];
             data.records = [
                 { id: 1, test: "Peso Muerto", holder: "Carlos Rodríguez", mark: "360kg", date: "2023-11-15" },
-                { id: 2, test: "Sentadilla", holder: "Juan Pérez", mark: "300kg", date: "2023-10-20" },
-                { id: 3, test: "Press Banca", holder: "Luis Silva", mark: "220kg", date: "2023-12-05" },
-                { id: 4, test: "Atlas Stones", holder: "Carlos Rodríguez", mark: "180kg", date: "2023-11-15" }
+                { id: 2, test: "Sentadilla", holder: "Juan Pérez", mark: "300kg", date: "2023-10-20" }
             ];
             data.rules = [
-                { id: 1, category: "Levantamiento", name: "Peso Muerto", description: "Levantar la barra desde el suelo hasta extensión completa. No straps permitidos." },
-                { id: 2, category: "Levantamiento", name: "Sentadilla", description: "La cadera debe pasar debajo de la rodilla. Juez principal + 2 laterales." },
-                { id: 3, category: "Implementos", name: "Atlas Stones", description: "Colocar la piedra sobre plataforma. Tacky permitido." }
-            ];
-            data.courses = [
-                { id: 1, title: "Curso Jueces Nivel 1", date: "2024-02-10", time: "14:00", location: "Gimnasio Municipal, Montevideo", cost: 2000, description: "Certificación inicial para jueces." }
-            ];
-            data.judges = [
-                { id: 1, name: "Roberto", lastName: "Fernández", doc: "2.345.678-9", phone: "091 234 567", level: "Internacional", photo: null }
+                { id: 1, category: "Levantamiento", name: "Peso Muerto", description: "Levantar la barra desde el suelo hasta extensión completa. No straps permitidos." }
             ];
             saveAllData();
         }
@@ -703,27 +1231,61 @@
         function saveAllData() {
             localStorage.setItem('acaf_events', JSON.stringify(data.events));
             localStorage.setItem('acaf_athletes', JSON.stringify(data.athletes));
+            localStorage.setItem('acaf_ranking', JSON.stringify(data.ranking));
+            localStorage.setItem('acaf_gyms', JSON.stringify(data.gyms));
             localStorage.setItem('acaf_records', JSON.stringify(data.records));
             localStorage.setItem('acaf_gallery', JSON.stringify(data.gallery));
             localStorage.setItem('acaf_rules', JSON.stringify(data.rules));
             localStorage.setItem('acaf_courses', JSON.stringify(data.courses));
             localStorage.setItem('acaf_judges', JSON.stringify(data.judges));
             localStorage.setItem('acaf_sponsors', JSON.stringify(data.sponsors));
+            localStorage.setItem('acaf_contacts', JSON.stringify(data.contacts));
             localStorage.setItem('acaf_settings', JSON.stringify(data.settings));
+            updateCounters();
         }
 
         function loadAllData() {
             renderEvents();
             renderAthletes();
+            renderGyms();
             renderRecords();
             renderGallery();
             renderRules();
             renderCourses();
             renderJudges();
             renderSponsors();
+            renderContacts();
             applySettings();
         }
 
+        // NAVEGACIÓN
+        function showHome() {
+            document.getElementById('inicio').style.display = 'flex';
+            document.getElementById('mainMenu').style.display = 'none';
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            window.scrollTo(0, 0);
+        }
+
+        function showSection(sectionId) {
+            document.getElementById('inicio').style.display = 'none';
+            document.getElementById('mainMenu').style.display = 'block';
+            
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+                if (sectionId === 'ranking') renderRanking();
+            }
+            
+            window.scrollTo(0, 0);
+        }
+
+        // RENDERIZADO
         function formatDate(dateStr) {
             const date = new Date(dateStr);
             return date.toLocaleDateString('es-UY', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -793,6 +1355,114 @@
         function filterAthletes(gender) {
             currentAthleteFilter = gender;
             renderAthletes();
+        }
+
+        // RANKING
+        function renderRanking() {
+            const container = document.getElementById('rankingContainer');
+            
+            if (currentRankingFilter === 'all') {
+                container.innerHTML = `
+                    <div class="ranking-category">
+                        <h3><i class="fas fa-mars"></i> Masculino</h3>
+                        ${renderRankingByGender('male')}
+                    </div>
+                    <div class="ranking-category">
+                        <h3><i class="fas fa-venus"></i> Femenino</h3>
+                        ${renderRankingByGender('female')}
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="ranking-category">
+                        <h3><i class="fas fa-${currentRankingFilter === 'male' ? 'mars' : 'venus'}"></i> 
+                        ${currentRankingFilter === 'male' ? 'Masculino' : 'Femenino'}</h3>
+                        ${renderRankingByGender(currentRankingFilter)}
+                    </div>
+                `;
+            }
+        }
+
+        function renderRankingByGender(gender) {
+            const categories = weightCategories[gender];
+            let html = '';
+            
+            categories.forEach(cat => {
+                const rankingItems = data.ranking.filter(r => r.gender === gender && r.category === cat.value);
+                rankingItems.sort((a, b) => a.position - b.position);
+                
+                if (rankingItems.length > 0) {
+                    html += `
+                        <div style="margin-bottom: 2rem;">
+                            <h4 style="color: var(--accent-light); margin-bottom: 1rem; padding: 0.5rem; background: rgba(0,102,204,0.1); border-radius: 5px;">
+                                ${cat.label}
+                            </h4>
+                            <table class="ranking-table">
+                                <thead>
+                                    <tr>
+                                        <th>Pos</th>
+                                        <th>Atleta</th>
+                                        <th>Puntos</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${rankingItems.map(item => {
+                                        const athlete = data.athletes.find(a => a.id === item.athleteId);
+                                        return `
+                                            <tr>
+                                                <td class="rank-position">#${item.position}</td>
+                                                <td>
+                                                    <div class="rank-athlete">
+                                                        ${athlete && athlete.photo ? `<img src="${athlete.photo}" alt="">` : '<div style="width: 50px; height: 50px; border-radius: 50%; background: #333; display: flex; align-items: center; justify-content: center;"><i class="fas fa-user"></i></div>'}
+                                                        <div class="rank-athlete-info">
+                                                            <span class="rank-athlete-name">${athlete ? athlete.name + ' ' + athlete.lastName : 'Desconocido'}</span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="rank-points">${item.points}</td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                }
+            });
+            
+            if (html === '') {
+                return '<div class="empty-state"><i class="fas fa-trophy"></i><p>No hay datos en el ranking para esta categoría</p></div>';
+            }
+            
+            return html;
+        }
+
+        function filterRanking(gender) {
+            currentRankingFilter = gender;
+            renderRanking();
+        }
+
+        // GIMNASIOS
+        function renderGyms() {
+            const container = document.getElementById('gymsContainer');
+            if (data.gyms.length === 0) {
+                container.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;"><i class="fas fa-dumbbell"></i><p>No hay gimnasios afiliados registrados</p></div>';
+                return;
+            }
+            container.innerHTML = data.gyms.map(gym => `
+                <div class="gym-card">
+                    <div class="gym-image" style="background: linear-gradient(45deg, #1a1a1a, #2a2a2a); display: flex; align-items: center; justify-content: center;">
+                        ${gym.photo ? `<img src="${gym.photo}" style="width: 100%; height: 100%; object-fit: cover;">` : '<i class="fas fa-dumbbell" style="font-size: 3rem; color: var(--accent);"></i>'}
+                    </div>
+                    <div class="gym-content">
+                        <h3 class="gym-name">${gym.name}</h3>
+                        <div class="gym-info">
+                            <span><i class="fas fa-map-marker-alt"></i> ${gym.address}</span>
+                            <span><i class="fas fa-phone"></i> ${gym.phone}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
         }
 
         function renderRecords() {
@@ -913,18 +1583,50 @@
             `).join('');
         }
 
+        function renderContacts() {
+            const container = document.getElementById('footerContacts');
+            if (data.contacts.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted);">No hay contactos registrados</p>';
+                return;
+            }
+            
+            container.innerHTML = data.contacts.map(contact => {
+                let icon = 'fa-info-circle';
+                if (contact.type === 'phone') icon = 'fa-phone';
+                if (contact.type === 'email') icon = 'fa-envelope';
+                if (contact.type === 'address') icon = 'fa-map-marker-alt';
+                
+                return `
+                    <div class="contact-item">
+                        <i class="fas ${icon}"></i>
+                        <span>${contact.label ? contact.label + ': ' : ''}${contact.value}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
         function applySettings() {
+            // Hero Background
             if (data.settings.heroBg) {
                 const heroVideo = document.getElementById('heroVideo');
                 if (data.settings.heroBg.type === 'video') {
                     heroVideo.src = data.settings.heroBg.src;
                     heroVideo.style.display = 'block';
+                    document.querySelector('.hero').style.backgroundImage = 'none';
                 } else {
                     heroVideo.style.display = 'none';
                     document.querySelector('.hero').style.backgroundImage = `url(${data.settings.heroBg.src})`;
                     document.querySelector('.hero').style.backgroundSize = 'cover';
+                    document.querySelector('.hero').style.backgroundPosition = 'center';
                 }
             }
+            
+            // Logo
+            if (data.settings.logo) {
+                document.getElementById('heroLogoImg').src = data.settings.logo;
+            }
+            
+            // Social Links
             if (data.settings.social) {
                 const socialLinks = document.querySelectorAll('.social-links a');
                 if (data.settings.social.facebook) socialLinks[0].href = data.settings.social.facebook;
@@ -934,6 +1636,7 @@
             }
         }
 
+        // ADMIN MODAL
         function openAdminModal() {
             document.getElementById('adminModal').classList.add('active');
             document.body.style.overflow = 'hidden';
@@ -971,18 +1674,22 @@
 
         function loadAdminData() {
             loadAdminList('events');
+            updateRankingAthletesSelect();
         }
 
         function loadAdminList(type) {
             const lists = {
                 events: 'eventsList',
-                athletes: 'athletesList', 
+                athletes: 'athletesList',
+                ranking: 'rankingListAdmin',
+                gyms: 'gymsListAdmin',
                 records: 'recordsListAdmin',
                 gallery: 'galleryListAdmin',
                 rules: 'rulesListAdmin',
                 courses: 'coursesListAdmin',
                 judges: 'judgesListAdmin',
-                sponsors: 'sponsorsListAdmin'
+                sponsors: 'sponsorsListAdmin',
+                contacts: 'contactsListAdmin'
             };
             
             if (!lists[type]) return;
@@ -995,20 +1702,72 @@
                 return;
             }
             
-            container.innerHTML = items.map(item => `
+            let renderFn;
+            switch(type) {
+                case 'ranking':
+                    renderRankingAdmin(container);
+                    break;
+                case 'contacts':
+                    renderContactsAdmin(container);
+                    break;
+                default:
+                    container.innerHTML = items.map(item => `
+                        <div class="list-item">
+                            <div class="list-item-info">
+                                <div class="list-item-title">${item.name || item.title || item.test || `${item.name || ''} ${item.lastName || ''}`}</div>
+                                <div class="list-item-subtitle">${item.date || item.location || item.holder || item.level || item.address || ''}</div>
+                            </div>
+                            <div class="list-item-actions">
+                                <button class="btn btn-small btn-icon" onclick="edit${type.charAt(0).toUpperCase() + type.slice(1)}(${item.id})"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-small btn-icon btn-danger" onclick="delete${type.charAt(0).toUpperCase() + type.slice(1)}(${item.id})"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    `).join('');
+            }
+        }
+
+        function renderRankingAdmin(container) {
+            if (data.ranking.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted); text-align: center;">No hay ranking registrado</p>';
+                return;
+            }
+            container.innerHTML = data.ranking.map(item => {
+                const athlete = data.athletes.find(a => a.id === item.athleteId);
+                const catLabel = weightCategories[item.gender].find(c => c.value === item.category)?.label || item.category;
+                return `
+                    <div class="list-item">
+                        <div class="list-item-info">
+                            <div class="list-item-title">#${item.position} - ${athlete ? athlete.name + ' ' + athlete.lastName : 'Desconocido'}</div>
+                            <div class="list-item-subtitle">${item.gender === 'male' ? 'Masculino' : 'Femenino'} | ${catLabel} | ${item.points} pts</div>
+                        </div>
+                        <div class="list-item-actions">
+                            <button class="btn btn-small btn-icon" onclick="editRanking(${item.id})"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-small btn-icon btn-danger" onclick="deleteRanking(${item.id})"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderContactsAdmin(container) {
+            if (data.contacts.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted); text-align: center;">No hay contactos registrados</p>';
+                return;
+            }
+            container.innerHTML = data.contacts.map((item, index) => `
                 <div class="list-item">
                     <div class="list-item-info">
-                        <div class="list-item-title">${item.name || item.title || item.test || `${item.name || ''} ${item.lastName || ''}`}</div>
-                        <div class="list-item-subtitle">${item.date || item.location || item.holder || item.level || ''}</div>
+                        <div class="list-item-title">${item.type === 'phone' ? 'Teléfono' : item.type === 'email' ? 'Email' : 'Dirección'}</div>
+                        <div class="list-item-subtitle">${item.label ? item.label + ': ' : ''}${item.value}</div>
                     </div>
                     <div class="list-item-actions">
-                        <button class="btn btn-small btn-icon" onclick="edit${type.charAt(0).toUpperCase() + type.slice(1)}(${item.id})"><i class="fas fa-edit"></i></button>
-                        <button class="btn btn-small btn-icon btn-danger" onclick="delete${type.charAt(0).toUpperCase() + type.slice(1)}(${item.id})"><i class="fas fa-trash"></i></button>
+                        <button class="btn btn-small btn-icon btn-danger" onclick="deleteContact(${index})"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>
             `).join('');
         }
 
+        // FORMULARIOS ADMIN
         function saveEvent(e) {
             e.preventDefault();
             const id = document.getElementById('eventId').value;
@@ -1134,6 +1893,7 @@
             saveAllData();
             renderAthletes();
             loadAdminList('athletes');
+            updateRankingAthletesSelect();
             resetAthleteForm();
             alert('Atleta guardado correctamente');
         }
@@ -1188,15 +1948,148 @@
         function deleteAthletes(id) {
             if (!confirm('¿Eliminar este atleta?')) return;
             data.athletes = data.athletes.filter(a => a.id !== id);
+            data.ranking = data.ranking.filter(r => r.athleteId !== id);
             saveAllData();
             renderAthletes();
             loadAdminList('athletes');
+            updateRankingAthletesSelect();
         }
 
         function resetAthleteForm() {
             document.getElementById('athleteForm').reset();
             document.getElementById('athleteId').value = '';
             document.getElementById('personalRecords').innerHTML = '';
+        }
+
+        // RANKING ADMIN
+        function updateRankingAthletesSelect() {
+            const select = document.getElementById('rankingAthlete');
+            select.innerHTML = '<option value="">Seleccionar atleta...</option>';
+            data.athletes.forEach(athlete => {
+                select.innerHTML += `<option value="${athlete.id}">${athlete.name} ${athlete.lastName} (${athlete.gender === 'male' ? 'M' : 'F'})</option>`;
+            });
+        }
+
+        function updateRankingCategories() {
+            const gender = document.getElementById('rankingGender').value;
+            const select = document.getElementById('rankingCategory');
+            select.innerHTML = '<option value="">Seleccionar...</option>';
+            weightCategories[gender].forEach(cat => {
+                select.innerHTML += `<option value="${cat.value}">${cat.label}</option>`;
+            });
+        }
+
+        function saveRanking(e) {
+            e.preventDefault();
+            const id = document.getElementById('rankingId').value;
+            const rankingData = {
+                id: id ? parseInt(id) : Date.now(),
+                athleteId: parseInt(document.getElementById('rankingAthlete').value),
+                gender: document.getElementById('rankingGender').value,
+                category: document.getElementById('rankingCategory').value,
+                position: parseInt(document.getElementById('rankingPosition').value),
+                points: parseInt(document.getElementById('rankingPoints').value)
+            };
+            
+            if (id) {
+                const index = data.ranking.findIndex(r => r.id === parseInt(id));
+                if (index !== -1) data.ranking[index] = rankingData;
+            } else {
+                data.ranking.push(rankingData);
+            }
+            saveAllData();
+            loadAdminList('ranking');
+            resetRankingForm();
+            alert('Ranking guardado correctamente');
+        }
+
+        function editRanking(id) {
+            const item = data.ranking.find(r => r.id === id);
+            if (!item) return;
+            document.getElementById('rankingId').value = item.id;
+            document.getElementById('rankingAthlete').value = item.athleteId;
+            document.getElementById('rankingGender').value = item.gender;
+            updateRankingCategories();
+            document.getElementById('rankingCategory').value = item.category;
+            document.getElementById('rankingPosition').value = item.position;
+            document.getElementById('rankingPoints').value = item.points;
+        }
+
+        function deleteRanking(id) {
+            if (!confirm('¿Eliminar esta entrada del ranking?')) return;
+            data.ranking = data.ranking.filter(r => r.id !== id);
+            saveAllData();
+            loadAdminList('ranking');
+        }
+
+        function resetRankingForm() {
+            document.getElementById('rankingForm').reset();
+            document.getElementById('rankingId').value = '';
+        }
+
+        // GIMNASIOS ADMIN
+        function saveGym(e) {
+            e.preventDefault();
+            const id = document.getElementById('gymId').value;
+            const gymData = {
+                id: id ? parseInt(id) : Date.now(),
+                name: document.getElementById('gymName').value,
+                address: document.getElementById('gymAddress').value,
+                phone: document.getElementById('gymPhone').value,
+                photo: null
+            };
+            
+            const fileInput = document.getElementById('gymPhoto');
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    gymData.photo = e.target.result;
+                    finishSaveGym(gymData, id);
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                if (id) {
+                    const existing = data.gyms.find(g => g.id === parseInt(id));
+                    if (existing) gymData.photo = existing.photo;
+                }
+                finishSaveGym(gymData, id);
+            }
+        }
+
+        function finishSaveGym(gymData, id) {
+            if (id) {
+                const index = data.gyms.findIndex(g => g.id === parseInt(id));
+                if (index !== -1) data.gyms[index] = gymData;
+            } else {
+                data.gyms.push(gymData);
+            }
+            saveAllData();
+            renderGyms();
+            loadAdminList('gyms');
+            resetGymForm();
+            alert('Gimnasio guardado correctamente');
+        }
+
+        function editGyms(id) {
+            const gym = data.gyms.find(g => g.id === id);
+            if (!gym) return;
+            document.getElementById('gymId').value = gym.id;
+            document.getElementById('gymName').value = gym.name;
+            document.getElementById('gymAddress').value = gym.address;
+            document.getElementById('gymPhone').value = gym.phone;
+        }
+
+        function deleteGyms(id) {
+            if (!confirm('¿Eliminar este gimnasio?')) return;
+            data.gyms = data.gyms.filter(g => g.id !== id);
+            saveAllData();
+            renderGyms();
+            loadAdminList('gyms');
+        }
+
+        function resetGymForm() {
+            document.getElementById('gymForm').reset();
+            document.getElementById('gymId').value = '';
         }
 
         function saveRecord(e) {
@@ -1503,6 +2396,32 @@
             document.getElementById('sponsorId').value = '';
         }
 
+        // CONTACTOS ADMIN
+        function saveContact(e) {
+            e.preventDefault();
+            const contactData = {
+                type: document.getElementById('contactType').value,
+                value: document.getElementById('contactValue').value,
+                label: document.getElementById('contactLabel').value
+            };
+            
+            data.contacts.push(contactData);
+            saveAllData();
+            renderContacts();
+            loadAdminList('contacts');
+            document.getElementById('contactForm').reset();
+            alert('Contacto agregado correctamente');
+        }
+
+        function deleteContact(index) {
+            if (!confirm('¿Eliminar este contacto?')) return;
+            data.contacts.splice(index, 1);
+            saveAllData();
+            renderContacts();
+            loadAdminList('contacts');
+        }
+
+        // SETTINGS
         function updateHeroBg() {
             const fileInput = document.getElementById('heroBgFile');
             if (!fileInput.files || !fileInput.files[0]) {
@@ -1519,7 +2438,38 @@
                 };
                 saveAllData();
                 applySettings();
+                
+                // Update preview
+                const preview = document.getElementById('heroBgPreview');
+                if (isVideo) {
+                    preview.innerHTML = `<video src="${e.target.result}" controls style="max-width: 100%; max-height: 100%;"></video>`;
+                } else {
+                    preview.innerHTML = `<img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">`;
+                }
+                
                 alert('Fondo actualizado correctamente');
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+        }
+
+        function updateLogo() {
+            const fileInput = document.getElementById('logoFile');
+            if (!fileInput.files || !fileInput.files[0]) {
+                alert('Seleccione una imagen');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                data.settings.logo = e.target.result;
+                saveAllData();
+                applySettings();
+                
+                // Update preview
+                const preview = document.getElementById('logoPreview');
+                preview.innerHTML = `<img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">`;
+                
+                alert('Logo actualizado correctamente');
             };
             reader.readAsDataURL(fileInput.files[0]);
         }
