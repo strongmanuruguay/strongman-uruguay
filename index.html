@@ -23,7 +23,16 @@
         body { font-family: 'Roboto', sans-serif; background: var(--primary); color: var(--text); overflow-x: hidden; }
         h1, h2, h3, h4, h5, h6 { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 2px; }
         
-        .hero { position: relative; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .hero { 
+    position: relative; 
+    min-height: 100vh; 
+    height: auto;
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    overflow: hidden; 
+    padding: 100px 2rem 150px 2rem;
+}
         .hero-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
         .hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: -1; }
         .hero-content { text-align: center; z-index: 1; padding: 2rem; animation: fadeInUp 1s ease; }
@@ -1322,31 +1331,51 @@
 
         // NAVEGACIÓN
         function showHome() {
-            document.getElementById('inicio').style.display = 'flex';
-            document.getElementById('mainMenu').style.display = 'none';
-            document.querySelectorAll('.content-section').forEach(section => {
-                section.classList.remove('active');
-            });
-            window.scrollTo(0, 0);
-        }
-
-        function showSection(sectionId) {
-            document.getElementById('inicio').style.display = 'none';
-            document.getElementById('mainMenu').style.display = 'block';
-            
-            document.querySelectorAll('.content-section').forEach(section => {
-                section.classList.remove('active');
-            });
-            
-            const targetSection = document.getElementById(sectionId);
-            if (targetSection) {
-                targetSection.classList.add('active');
-                if (sectionId === 'ranking') renderRanking();
-            }
-            
-            window.scrollTo(0, 0);
-        }
-
+    // Mostrar hero
+    document.getElementById('inicio').style.display = 'flex';
+    // Ocultar menú de secciones
+    document.getElementById('mainMenu').style.display = 'none';
+    // Ocultar todas las secciones individuales
+    document.querySelectorAll('.content-section').forEach(section => {
+        section.classList.remove('active');
+        section.style.display = 'none';
+    });
+    // Cerrar menú móvil si está abierto
+    document.getElementById('navLinks').classList.remove('active');
+    window.scrollTo(0, 0);
+}
+       function showSection(sectionId) {
+    // Ocultar todo primero
+    document.getElementById('inicio').style.display = 'none';
+    document.getElementById('mainMenu').style.display = 'none';
+    
+    // Ocultar TODAS las secciones de contenido
+    document.querySelectorAll('.content-section').forEach(section => {
+        section.classList.remove('active');
+        section.style.display = 'none'; // Agregar esto
+    });
+    
+    // Mostrar SOLO la sección seleccionada
+    const targetSection = document.getElementById(sectionId);
+    if (targetSection) {
+        targetSection.style.display = 'block'; // Agregar esto
+        targetSection.classList.add('active');
+        if (sectionId === 'ranking') renderRanking();
+        if (sectionId === 'atletas') renderAthletes();
+        if (sectionId === 'eventos') renderEvents();
+        if (sectionId === 'gimnasios') renderGyms();
+        if (sectionId === 'galeria') renderGallery();
+        if (sectionId === 'reglas') renderRules();
+        if (sectionId === 'cursos') renderCourses();
+        if (sectionId === 'jueces') renderJudges();
+        if (sectionId === 'sponsors') renderSponsors();
+    }
+    
+    // Cerrar menú en móvil si está abierto
+    document.getElementById('navLinks').classList.remove('active');
+    
+    window.scrollTo(0, 0);
+}
         // RENDERIZADO
         function formatDate(dateStr) {
             const date = new Date(dateStr);
@@ -2552,9 +2581,13 @@
 function showHomeSections() {
     document.getElementById('inicio').style.display = 'none';
     document.getElementById('mainMenu').style.display = 'block';
+    // Ocultar secciones individuales si alguna estaba abierta
+    document.querySelectorAll('.content-section').forEach(section => {
+        section.classList.remove('active');
+        section.style.display = 'none';
+    });
     window.scrollTo(0, 0);
 }
-
 function toggleMenu() {
     document.getElementById('navLinks').classList.toggle('active');
 }
