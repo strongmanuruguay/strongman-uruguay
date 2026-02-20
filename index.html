@@ -484,6 +484,33 @@
         .admin-float-btn:hover {
             transform: scale(1.1);
         }
+        
+        /* ARREGLAR FONDOS BLANCOS EN ADMIN */
+        .admin-panel select,
+        .admin-panel input[type="text"],
+        .admin-panel input[type="number"],
+        .admin-panel input[type="tel"],
+        .admin-panel input[type="email"],
+        .admin-panel input[type="url"],
+        .admin-panel input[type="date"],
+        .admin-panel input[type="time"],
+        .admin-panel input[type="password"],
+        .admin-panel textarea {
+            background: rgba(0, 0, 0, 0.6) !important;
+            color: white !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        }
+        
+        .admin-panel select option,
+        .admin-panel select optgroup {
+            background: #1a1a1a !important;
+            color: white !important;
+        }
+        
+        .admin-panel select optgroup {
+            color: var(--accent-light) !important;
+            font-weight: bold;
+        }
         @media (max-width: 768px) {
             .admin-float-btn {
                 width: 55px;
@@ -823,15 +850,57 @@
                                 <label>Lugar</label>
                                 <input type="text" id="eventLocation" required>
                             </div>
-                            <div class="form-group">
+                                                         <div class="form-group">
                                 <label>Descripción</label>
                                 <textarea id="eventDesc" rows="3"></textarea>
                             </div>
+                            
+                            <div class="form-group">
+                                <label>Categorías Habilitadas (seleccioná las que aplican)</label>
+                                <div id="eventCategories" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.5rem;">
+                                    <div class="checkbox-group" style="background: rgba(0,0,0,0.3); padding: 0.5rem; border-radius: 5px;">
+                                        <input type="checkbox" id="cat_male_light" value="male_lightweight">
+                                        <label for="cat_male_light" style="color: white; margin-left: 0.5rem;">Masc. Ligero (-80kg)</label>
+                                    </div>
+                                    <div class="checkbox-group" style="background: rgba(0,0,0,0.3); padding: 0.5rem; border-radius: 5px;">
+                                        <input type="checkbox" id="cat_male_middle" value="male_middleweight">
+                                        <label for="cat_male_middle" style="color: white; margin-left: 0.5rem;">Masc. Medio (80-95kg)</label>
+                                    </div>
+                                    <div class="checkbox-group" style="background: rgba(0,0,0,0.3); padding: 0.5rem; border-radius: 5px;">
+                                        <input type="checkbox" id="cat_male_lightheavy" value="male_lightheavy">
+                                        <label for="cat_male_lightheavy" style="color: white; margin-left: 0.5rem;">Masc. Semipesado (95-105kg)</label>
+                                    </div>
+                                    <div class="checkbox-group" style="background: rgba(0,0,0,0.3); padding: 0.5rem; border-radius: 5px;">
+                                        <input type="checkbox" id="cat_male_heavy" value="male_heavyweight">
+                                        <label for="cat_male_heavy" style="color: white; margin-left: 0.5rem;">Masc. Pesado (105-120kg)</label>
+                                    </div>
+                                    <div class="checkbox-group" style="background: rgba(0,0,0,0.3); padding: 0.5rem; border-radius: 5px;">
+                                        <input type="checkbox" id="cat_male_super" value="male_superheavy">
+                                        <label for="cat_male_super" style="color: white; margin-left: 0.5rem;">Masc. Superpesado (+120kg)</label>
+                                    </div>
+                                    <div class="checkbox-group" style="background: rgba(0,0,0,0.3); padding: 0.5rem; border-radius: 5px;">
+                                        <input type="checkbox" id="cat_female_light" value="female_lightweight">
+                                        <label for="cat_female_light" style="color: white; margin-left: 0.5rem;">Fem. Ligero (-60kg)</label>
+                                    </div>
+                                    <div class="checkbox-group" style="background: rgba(0,0,0,0.3); padding: 0.5rem; border-radius: 5px;">
+                                        <input type="checkbox" id="cat_female_middle" value="female_middleweight">
+                                        <label for="cat_female_middle" style="color: white; margin-left: 0.5rem;">Fem. Medio (60-70kg)</label>
+                                    </div>
+                                    <div class="checkbox-group" style="background: rgba(0,0,0,0.3); padding: 0.5rem; border-radius: 5px;">
+                                        <input type="checkbox" id="cat_female_heavy" value="female_heavyweight">
+                                        <label for="cat_female_heavy" style="color: white; margin-left: 0.5rem;">Fem. Pesado (70-82kg)</label>
+                                    </div>
+                                    <div class="checkbox-group" style="background: rgba(0,0,0,0.3); padding: 0.5rem; border-radius: 5px;">
+                                        <input type="checkbox" id="cat_female_super" value="female_superheavy">
+                                        <label for="cat_female_super" style="color: white; margin-left: 0.5rem;">Fem. Superpesado (+82kg)</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
                             <div class="form-group">
                                 <label>Imagen del Evento</label>
                                 <input type="file" id="eventImage" accept="image/*">
-                            </div>
-                            <button type="submit" class="btn btn-success">Guardar Evento</button>
+                            </div>                           <button type="submit" class="btn btn-success">Guardar Evento</button>
                             <button type="button" class="btn btn-outline" onclick="resetEventForm()">Cancelar</button>
                         </form>
                         <div id="eventsList" style="margin-top: 2rem;"></div>
@@ -1987,38 +2056,50 @@
         }
 
         // FORMULARIOS ADMIN
-        function saveEvent(e) {
-            e.preventDefault();
-            const id = document.getElementById('eventId').value;
-            const eventData = {
-                id: id ? parseInt(id) : Date.now(),
-                name: document.getElementById('eventName').value,
-                date: document.getElementById('eventDate').value,
-                time: document.getElementById('eventTime').value,
-                cost: document.getElementById('eventCost').value,
-                location: document.getElementById('eventLocation').value,
-                description: document.getElementById('eventDesc').value,
-                image: null
-            };
-            
-            const fileInput = document.getElementById('eventImage');
-            if (fileInput.files && fileInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    eventData.image = e.target.result;
-                    finishSaveEvent(eventData, id);
-                };
-                reader.readAsDataURL(fileInput.files[0]);
-            } else {
-                if (id) {
-                    const existing = data.events.find(ev => ev.id === parseInt(id));
-                    if (existing) eventData.image = existing.image;
+function saveEvent(e) {
+    e.preventDefault();
+    const id = document.getElementById('eventId').value;
+    
+    // Obtener categorías seleccionadas
+    const categories = [];
+    document.querySelectorAll('#eventCategories input[type="checkbox"]:checked').forEach(cb => {
+        categories.push(cb.value);
+    });
+    
+    const eventData = {
+        id: id ? parseInt(id) : Date.now(),
+        name: document.getElementById('eventName').value,
+        date: document.getElementById('eventDate').value,
+        time: document.getElementById('eventTime').value,
+        cost: document.getElementById('eventCost').value,
+        location: document.getElementById('eventLocation').value,
+        description: document.getElementById('eventDesc').value,
+        categories: categories,
+        image: null
+    };
+    
+    const fileInput = document.getElementById('eventImage');
+    if (fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            eventData.image = e.target.result;
+            finishSaveEvent(eventData, id);
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+    } else {
+        if (id) {
+            const existing = data.events.find(ev => ev.id === parseInt(id));
+            if (existing) {
+                eventData.image = existing.image;
+                if (categories.length === 0 && existing.categories) {
+                    eventData.categories = existing.categories;
                 }
-                finishSaveEvent(eventData, id);
             }
         }
-
-        function finishSaveEvent(eventData, id) {
+        finishSaveEvent(eventData, id);
+    }
+}
+               function finishSaveEvent(eventData, id) {
             if (id) {
                 const index = data.events.findIndex(e => e.id === parseInt(id));
                 if (index !== -1) data.events[index] = eventData;
@@ -2033,17 +2114,21 @@
         }
 
         function editEvents(id) {
-            const event = data.events.find(e => e.id === id);
-            if (!event) return;
-            document.getElementById('eventId').value = event.id;
-            document.getElementById('eventName').value = event.name;
-            document.getElementById('eventDate').value = event.date;
-            document.getElementById('eventTime').value = event.time;
-            document.getElementById('eventCost').value = event.cost;
-            document.getElementById('eventLocation').value = event.location;
-            document.getElementById('eventDesc').value = event.description || '';
-        }
-
+    const event = data.events.find(e => e.id === id);
+    if (!event) return;
+    document.getElementById('eventId').value = event.id;
+    document.getElementById('eventName').value = event.name;
+    document.getElementById('eventDate').value = event.date;
+    document.getElementById('eventTime').value = event.time;
+    document.getElementById('eventCost').value = event.cost;
+    document.getElementById('eventLocation').value = event.location;
+    document.getElementById('eventDesc').value = event.description || '';
+    
+    // Marcar categorías guardadas
+    document.querySelectorAll('#eventCategories input[type="checkbox"]').forEach(cb => {
+        cb.checked = event.categories && event.categories.includes(cb.value);
+    });
+}
         function deleteEvents(id) {
             if (!confirm('¿Eliminar este evento?')) return;
             data.events = data.events.filter(e => e.id !== id);
@@ -2189,15 +2274,9 @@
             });
         }
 
-        function updateRankingCategories() {
-            const gender = document.getElementById('rankingGender').value;
-            const select = document.getElementById('rankingCategory');
-            select.innerHTML = '<option value="">Seleccionar...</option>';
-            weightCategories[gender].forEach(cat => {
-                select.innerHTML += `<option value="${cat.value}">${cat.label}</option>`;
-            });
-        }
-
+      function updateRankingCategories() {
+    // Las categorías están fijas en el HTML, no necesitan actualizarse
+} 
         function saveRanking(e) {
             e.preventDefault();
             const id = document.getElementById('rankingId').value;
@@ -2310,41 +2389,41 @@
             document.getElementById('gymForm').reset();
             document.getElementById('gymId').value = '';
         }
-
-        function saveRecord(e) {
-            e.preventDefault();
-            const id = document.getElementById('recordId').value;
-            const recordData = {
-                id: id ? parseInt(id) : Date.now(),
-                test: document.getElementById('recordTest').value,
-                holder: document.getElementById('recordHolder').value,
-                mark: document.getElementById('recordMark').value,
-                date: document.getElementById('recordDate').value
-            };
-            
-            if (id) {
-                const index = data.records.findIndex(r => r.id === parseInt(id));
-                if (index !== -1) data.records[index] = recordData;
-            } else {
-                data.records.push(recordData);
-            }
-            saveAllData();
-            renderRecords();
-            loadAdminList('records');
-            resetRecordForm();
-            alert('Récord guardado correctamente');
-        }
-
-        function editRecords(id) {
-            const record = data.records.find(r => r.id === id);
-            if (!record) return;
-            document.getElementById('recordId').value = record.id;
-            document.getElementById('recordTest').value = record.test;
-            document.getElementById('recordHolder').value = record.holder;
-            document.getElementById('recordMark').value = record.mark;
-            document.getElementById('recordDate').value = record.date || '';
-        }
-
+function saveRecord(e) {
+    e.preventDefault();
+    const id = document.getElementById('recordId').value;
+    const recordData = {
+        id: id ? parseInt(id) : Date.now(),
+        test: document.getElementById('recordTest').value,
+        category: document.getElementById('recordCategory').value,
+        holder: document.getElementById('recordHolder').value,
+        mark: document.getElementById('recordMark').value,
+        date: document.getElementById('recordDate').value
+    };
+    
+    if (id) {
+        const index = data.records.findIndex(r => r.id === parseInt(id));
+        if (index !== -1) data.records[index] = recordData;
+    } else {
+        data.records.push(recordData);
+    }
+    saveAllData();
+    renderRecords();
+    loadAdminList('records');
+    resetRecordForm();
+    alert('Récord guardado correctamente');
+}
+        
+     function editRecords(id) {
+    const record = data.records.find(r => r.id === id);
+    if (!record) return;
+    document.getElementById('recordId').value = record.id;
+    document.getElementById('recordTest').value = record.test;
+    document.getElementById('recordCategory').value = record.category || '';
+    document.getElementById('recordHolder').value = record.holder;
+    document.getElementById('recordMark').value = record.mark;
+    document.getElementById('recordDate').value = record.date || '';
+}  
         function deleteRecords(id) {
             if (!confirm('¿Eliminar este récord?')) return;
             data.records = data.records.filter(r => r.id !== id);
