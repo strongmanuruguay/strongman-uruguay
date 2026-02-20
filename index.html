@@ -536,7 +536,8 @@
                 <li><a onclick="showHome()">Inicio</a></li>
                 <li><a onclick="showSection('ranking')">Ranking</a></li>
                 <li><a onclick="showSection('atletas')">Atletas</a></li>
-                <li><a onclick="showSection('eventos')">Eventos</a></li>
+                <li><a onclick="showSection('records')">Récords</a></li>
+                <li><a onclick="showSection('eventos')">Eventos</a></li>             
                 <li><a onclick="showSection('gimnasios')">Gimnasios</a></li>
                 <li><a onclick="showSection('galeria')">Galería</a></li>
                 <li><a onclick="showSection('reglas')">Reglas</a></li>
@@ -586,13 +587,20 @@
                 <h3>Ranking Nacional</h3>
                 <p>Ver posiciones de atletas hombres y mujeres por categoría</p>
             </div>
-            <div class="menu-item" onclick="showSection('atletas')">
+                       <div class="menu-item" onclick="showSection('atletas')">
                 <i class="fas fa-users"></i>
                 <h3>Atletas</h3>
                 <p>Conoce a nuestros atletas registrados</p>
             </div>
-            <div class="menu-item" onclick="showSection('eventos')">
-                <i class="fas fa-calendar-alt"></i>
+            
+            <div class="menu-item" onclick="showSection('records')">
+                <i class="fas fa-trophy"></i>
+                <h3>Récords Nacionales</h3>
+                <p>Mejores marcas de atletas uruguayos</p>
+            </div>
+            
+            <div class="menu-item" onclick="showSection('eventos')">               
+ <i class="fas fa-calendar-alt"></i>
                 <h3>Eventos</h3>
                 <p>Próximas competencias y eventos</p>
             </div>
@@ -654,6 +662,15 @@
         </div>
         <div class="grid" id="athletesContainer"></div>
     </section>
+
+    <!-- SECCIÓN RÉCORDS -->
+    <section id="records" class="content-section">
+        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-arrow-left"></i> Volver al Inicio</button>
+        <h2 class="section-title">Récords Nacionales</h2>
+        <div class="grid" id="recordsContainer"></div>
+    </section>
+
+    
 
     <!-- SECCIÓN EVENTOS -->
     <section id="eventos" class="content-section">
