@@ -987,12 +987,9 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label>Categoría de Peso</label>
-                                <select id="rankingCategory" required>
-                                    <option value="">Seleccionar...</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
+                                                           <label>Categoría de Peso (escribí la que corresponda)</label>
+                                <input type="text" id="rankingCategory" placeholder="Ej: Masculino Pesado (105-120kg)" required style="background: rgba(0,0,0,0.5); color: white;">
+                            </div>                            <div class="form-group">
                                 <label>Posición</label>
                                 <input type="number" id="rankingPosition" min="1" required>
                             </div>
@@ -1579,31 +1576,32 @@
             return date.toLocaleDateString('es-UY', { day: 'numeric', month: 'long', year: 'numeric' });
         }
 
-        function renderEvents() {
-            const container = document.getElementById('eventsContainer');
-            if (data.events.length === 0) {
-                container.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;"><i class="fas fa-calendar-times"></i><p>No hay eventos programados</p></div>';
-                return;
-            }
-            container.innerHTML = data.events.map(event => `
-                <div class="card">
-                    <div class="card-image" style="background: linear-gradient(45deg, #1a1a1a, #2a2a2a); display: flex; align-items: center; justify-content: center;">
-                        ${event.image ? `<img src="${event.image}" style="width: 100%; height: 100%; object-fit: cover;">` : '<i class="fas fa-trophy" style="font-size: 4rem; color: var(--accent);"></i>'}
-                    </div>
-                    <div class="card-content">
-                        <h3 class="card-title">${event.name}</h3>
-                        <div class="card-meta">
-                            <span><i class="fas fa-calendar"></i> ${formatDate(event.date)}</span>
-                            <span><i class="fas fa-clock"></i> ${event.time} hs</span>
-                            <span><i class="fas fa-map-marker-alt"></i> ${event.location}</span>
-                        </div>
-                        <p style="color: var(--text-muted); margin-bottom: 1rem;">${event.description || ''}</p>
-                        <span class="price-tag">$${event.cost} UYU</span>
-                    </div>
-                </div>
-            `).join('');
-        }
-
+       function renderEvents() {
+    const container = document.getElementById('eventsContainer');
+    if (data.events.length === 0) {
+        container.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;"><i class="fas fa-calendar-times"></i><p>No hay eventos programados</p></div>';
+        return;
+    }
+    container.innerHTML = data.events.map(event => {
+        const catLabels = {
+            'male_lightweight': 'Masc. Ligero',
+            'male_middleweight': 'Masc. Medio',
+            'male_lightheavy': 'Masc. Semipesado',
+            'male_heavyweight': 'Masc. Pesado',
+            'male_superheavy': 'Masc. Superpesado',
+            'female_lightweight': 'Fem. Ligero',
+            'female_middleweight': 'Fem. Medio',
+            'female_heavyweight': 'Fem. Pesado',
+            'female_superheavy': 'Fem. Superpesado'
+        };
+        
+        const categoriesHtml = event.categories && event.categories.length > 0 
+            ? '<div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);"><p style="color: var(--accent-light); font-size: 0.9rem; margin-bottom: 0.5rem;"><i class="fas fa-list"></i> CATEGORÍAS HABILITADAS:</p><div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">' + event.categories.map(cat => '<span style="display: inline-block; padding: 0.2rem 0.8rem; background: rgba(40, 167, 69, 0.2); color: #28a745; border: 1px solid #28a745; border-radius: 15px; font-size: 0.8rem;">' + (catLabels[cat] || cat) + '</span>').join('') + '</div></div>'
+            : '';
+        
+        return '<div class="card"><div class="card-image" style="background: linear-gradient(45deg, #1a1a1a, #2a2a2a); display: flex; align-items: center; justify-content: center;">' + (event.image ? '<img src="' + event.image + '" style="width: 100%; height: 100%; object-fit: cover;">' : '<i class="fas fa-trophy" style="font-size: 4rem; color: var(--accent);"></i>') + '</div><div class="card-content"><h3 class="card-title">' + event.name + '</h3><div class="card-meta"><span><i class="fas fa-calendar"></i> ' + formatDate(event.date) + '</span><span><i class="fas fa-clock"></i> ' + event.time + ' hs</span><span><i class="fas fa-map-marker-alt"></i> ' + event.location + '</span></div><p style="color: var(--text-muted); margin-bottom: 1rem;">' + (event.description || '') + '</p><span style="display: inline-block; background: var(--gold); color: var(--primary); padding: 0.3rem 1rem; border-radius: 20px; font-weight: 700;">$' + event.cost + ' UYU</span>' + categoriesHtml + '</div></div>';
+    }).join('');
+}
         function renderAthletes() {
             const container = document.getElementById('athletesContainer');
             let athletes = data.athletes;
