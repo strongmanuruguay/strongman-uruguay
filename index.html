@@ -1039,10 +1039,12 @@
                                 <label>Prueba</label>
                                 <input type="text" id="recordTest" required>
                             </div>
-                            <div class="form-group">
-                                <label>Titular</label>
-                                <input type="text" id="recordHolder" required>
-                            </div>
+                                                        <div class="form-group">
+                                <label>Atleta (seleccionar de la lista)</label>
+                                <select id="recordHolder" required style="background: rgba(0,0,0,0.5); color: white;">
+                                    <option value="">Seleccionar atleta...</option>
+                                </select>
+                            </div>                          
                             <div class="form-group">
                                 <label>Marca</label>
                                 <input type="text" id="recordMark" required>
@@ -1418,6 +1420,22 @@
             visits: parseInt(localStorage.getItem('acaf_visits')) || 0
         };
 
+const weightCategories = {
+    male: [
+        { value: 'male_lightweight', label: 'Ligero (-80kg)' },
+        { value: 'male_middleweight', label: 'Medio (80-95kg)' },
+        { value: 'male_lightheavy', label: 'Semipesado (95-105kg)' },
+        { value: 'male_heavyweight', label: 'Pesado (105-120kg)' },
+        { value: 'male_superheavy', label: 'Superpesado (+120kg)' }
+    ],
+    female: [
+        { value: 'female_lightweight', label: 'Ligero (-60kg)' },
+        { value: 'female_middleweight', label: 'Medio (60-70kg)' },
+        { value: 'female_heavyweight', label: 'Pesado (70-82kg)' },
+        { value: 'female_superheavy', label: 'Superpesado (+82kg)' }
+    ]
+};
+
         let isAdmin = false;
         let currentAthleteFilter = 'all';
         let currentRankingFilter = 'all';
@@ -1556,6 +1574,7 @@
         targetSection.classList.add('active');
         if (sectionId === 'ranking') renderRanking();
         if (sectionId === 'atletas') renderAthletes();
+        if (sectionId === 'records') renderRecords();
         if (sectionId === 'eventos') renderEvents();
         if (sectionId === 'gimnasios') renderGyms();
         if (sectionId === 'galeria') renderGallery();
@@ -1950,14 +1969,16 @@
             }
         }
 
-        function switchTab(tab) {
+       function switchTab(tab) {
             document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
             event.target.classList.add('active');
             document.getElementById(`panel-${tab}`).classList.add('active');
             loadAdminList(tab);
+            if (tab === 'records') {
+                loadRecordAthletesSelect();
+            }
         }
-
         function loadAdminData() {
             loadAdminList('events');
             updateRankingAthletesSelect();
@@ -2398,6 +2419,30 @@ function saveRecord(e) {
         mark: document.getElementById('recordMark').value,
         date: document.getElementById('recordDate').value
     };
+function saveRecord(e) {
+    e.preventDefault();
+    const id = document.getElementById('recordId').value;
+    const recordData = {
+        id: id ? parseInt(id) : Date.now(),
+        test: document.getElementById('recordTest').value,
+        category: document.getElementById('recordCategory').value,
+        holder: document.getElementById('recordHolder').value,
+        mark: document.getElementById('recordMark').value,
+        date: document.getElementById('recordDate').value
+    };
+    
+    if (id) {
+        const index = data.records.findIndex(r => r.id === parseInt(id));
+        if (index !== -1) data.records[index] = recordData;
+    } else {
+        data.records.push(recordData);
+    }
+    saveAllData();
+    renderRecords();
+    loadAdminList('records');
+    resetRecordForm();
+    alert('Récord guardado correctamente');
+}
     
     if (id) {
         const index = data.records.findIndex(r => r.id === parseInt(id));
@@ -2781,6 +2826,15 @@ function saveRecord(e) {
             applySettings();
             alert('Redes sociales actualizadas');
         }
+function loadRecordAthletesSelect() {
+    const select = document.getElementById('recordHolder');
+    if (!select) return;
+    let html = '<option value="">Seleccionar atleta...</option>';
+    data.athletes.forEach(athlete => {
+        html += '<option value="' + athlete.name + ' ' + athlete.lastName + '">' + athlete.name + ' ' + athlete.lastName + ' (' + (athlete.gender === 'male' ? 'M' : 'F') + ')</option>';
+    });
+    select.innerHTML = html;
+}
 function saveContactSimple(e, type) {
     e.preventDefault();
     
