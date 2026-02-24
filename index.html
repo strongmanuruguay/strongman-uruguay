@@ -1440,23 +1440,22 @@ const weightCategories = {
         let currentAthleteFilter = 'all';
         let currentRankingFilter = 'all';
 
-        // CATEGORÍAS DE PESO
+                // CATEGORÍAS DE PESO
         const weightCategories = {
             male: [
-                { value: 'lightweight', label: 'Peso Ligero (-80kg)' },
-                { value: 'middleweight', label: 'Peso Medio (80-95kg)' },
-                { value: 'lightheavy', label: 'Semipesado (95-105kg)' },
-                { value: 'heavyweight', label: 'Peso Pesado (105-120kg)' },
-                { value: 'superheavy', label: 'Superpesado (+120kg)' }
+                { value: 'male_lightweight', label: 'Ligero (-80kg)' },
+                { value: 'male_middleweight', label: 'Medio (80-95kg)' },
+                { value: 'male_lightheavy', label: 'Semipesado (95-105kg)' },
+                { value: 'male_heavyweight', label: 'Pesado (105-120kg)' },
+                { value: 'male_superheavy', label: 'Superpesado (+120kg)' }
             ],
             female: [
-                { value: 'lightweight', label: 'Peso Ligero (-60kg)' },
-                { value: 'middleweight', label: 'Peso Medio (60-70kg)' },
-                { value: 'heavyweight', label: 'Peso Pesado (70-82kg)' },
-                { value: 'superheavy', label: 'Superpesado (+82kg)' }
+                { value: 'female_lightweight', label: 'Ligero (-60kg)' },
+                { value: 'female_middleweight', label: 'Medio (60-70kg)' },
+                { value: 'female_heavyweight', label: 'Pesado (70-82kg)' },
+                { value: 'female_superheavy', label: 'Superpesado (+82kg)' }
             ]
         };
-
         // INICIALIZACIÓN
         document.addEventListener('DOMContentLoaded', function() {
             loadAllData();
