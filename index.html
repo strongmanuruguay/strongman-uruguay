@@ -1975,10 +1975,8 @@ const weightCategories = {
             event.target.classList.add('active');
             document.getElementById(`panel-${tab}`).classList.add('active');
             loadAdminList(tab);
-            if (tab === 'records') {
-                loadRecordAthletesSelect();
-            }
-        }
+           }           
+        
         function loadAdminData() {
             loadAdminList('events');
             updateRankingAthletesSelect();
