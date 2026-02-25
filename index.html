@@ -1516,7 +1516,22 @@
             updateCounters();
         }
 
-        function loadAllData() {
+               function loadAllData() {
+            // Cargar todos los datos desde localStorage
+            data.events = JSON.parse(localStorage.getItem('acaf_events')) || [];
+            data.athletes = JSON.parse(localStorage.getItem('acaf_athletes')) || [];
+            data.ranking = JSON.parse(localStorage.getItem('acaf_ranking')) || [];
+            data.gyms = JSON.parse(localStorage.getItem('acaf_gyms')) || [];
+            data.records = JSON.parse(localStorage.getItem('acaf_records')) || [];
+            data.gallery = JSON.parse(localStorage.getItem('acaf_gallery')) || [];
+            data.rules = JSON.parse(localStorage.getItem('acaf_rules')) || [];
+            data.courses = JSON.parse(localStorage.getItem('acaf_courses')) || [];
+            data.judges = JSON.parse(localStorage.getItem('acaf_judges')) || [];
+            data.sponsors = JSON.parse(localStorage.getItem('acaf_sponsors')) || [];
+            data.contacts = JSON.parse(localStorage.getItem('acaf_contacts')) || [];
+            data.settings = JSON.parse(localStorage.getItem('acaf_settings')) || { heroBg: null, logo: null, social: {} };
+            
+            // Renderizar todo
             renderEvents();
             renderAthletes();
             renderGyms();
@@ -1528,6 +1543,12 @@
             renderSponsors();
             renderContacts();
             applySettings();
+            
+            console.log('Datos cargados:', {
+                athletes: data.athletes.length,
+                ranking: data.ranking.length,
+                events: data.events.length
+            });
         }
 
         // NAVEGACIÓN
@@ -1693,60 +1714,68 @@
             }
         }
 
-        function renderRankingByGender(gender) {
-            const categories = weightCategories[gender];
-            let html = '';
-            
-            categories.forEach(cat => {
-                const rankingItems = data.ranking.filter(r => r.gender === gender && r.category === cat.value);
-                rankingItems.sort((a, b) => a.position - b.position);
-                
-                if (rankingItems.length > 0) {
-                    html += `
-                        <div style="margin-bottom: 2rem;">
-                            <h4 style="color: var(--accent-light); margin-bottom: 1rem; padding: 0.5rem; background: rgba(0,102,204,0.1); border-radius: 5px;">
-                                ${cat.label}
-                            </h4>
-                            <table class="ranking-table">
-                                <thead>
+      function renderRankingByGender(gender) {
+    const categories = weightCategories[gender];
+    let html = '';
+    
+    categories.forEach(cat => {
+        // Filtrar items de ranking por género y categoría
+        const rankingItems = data.ranking.filter(r => {
+            return r.gender === gender && r.category === cat.value;
+        });
+        
+        // Ordenar por posición
+        rankingItems.sort((a, b) => a.position - b.position);
+        
+        if (rankingItems.length > 0) {
+            html += `
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--accent-light); margin-bottom: 1rem; padding: 0.5rem; background: rgba(0,102,204,0.1); border-radius: 5px;">
+                        ${cat.label}
+                    </h4>
+                    <table class="ranking-table">
+                        <thead>
+                            <tr>
+                                <th>Pos</th>
+                                <th>Atleta</th>
+                                <th>Puntos</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rankingItems.map(item => {
+                                // Buscar atleta por ID - CORREGIDO
+                                const athlete = data.athletes.find(a => a.id === parseInt(item.athleteId));
+                                return `
                                     <tr>
-                                        <th>Pos</th>
-                                        <th>Atleta</th>
-                                        <th>Puntos</th>
+                                        <td class="rank-position">#${item.position}</td>
+                                        <td>
+                                            <div class="rank-athlete">
+                                                ${athlete && athlete.photo ? 
+                                                    `<img src="${athlete.photo}" alt="">` : 
+                                                    '<div style="width: 50px; height: 50px; border-radius: 50%; background: #333; display: flex; align-items: center; justify-content: center;"><i class="fas fa-user"></i></div>'
+                                                }
+                                                <div class="rank-athlete-info">
+                                                    <span class="rank-athlete-name">${athlete ? athlete.name + ' ' + athlete.lastName : 'Atleta #' + item.athleteId}</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="rank-points">${item.points}</td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    ${rankingItems.map(item => {
-                                        const athlete = data.athletes.find(a => a.id === item.athleteId);
-                                        return `
-                                            <tr>
-                                                <td class="rank-position">#${item.position}</td>
-                                                <td>
-                                                    <div class="rank-athlete">
-                                                        ${athlete && athlete.photo ? `<img src="${athlete.photo}" alt="">` : '<div style="width: 50px; height: 50px; border-radius: 50%; background: #333; display: flex; align-items: center; justify-content: center;"><i class="fas fa-user"></i></div>'}
-                                                        <div class="rank-athlete-info">
-                                                            <span class="rank-athlete-name">${athlete ? athlete.name + ' ' + athlete.lastName : 'Desconocido'}</span>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td class="rank-points">${item.points}</td>
-                                            </tr>
-                                        `;
-                                    }).join('')}
-                                </tbody>
-                            </table>
-                        </div>
-                    `;
-                }
-            });
-            
-            if (html === '') {
-                return '<div class="empty-state"><i class="fas fa-trophy"></i><p>No hay datos en el ranking para esta categoría</p></div>';
-            }
-            
-            return html;
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
         }
-
+    });
+    
+    if (html === '') {
+        return '<div class="empty-state"><i class="fas fa-trophy"></i><p>No hay datos en el ranking para esta categoría</p></div>';
+    }
+    
+    return html;
+}
         function filterRanking(gender) {
             currentRankingFilter = gender;
             renderRanking();
@@ -2305,29 +2334,52 @@
         }
 
         function saveRanking(e) {
-            e.preventDefault();
-            const id = document.getElementById('rankingId').value;
-            const rankingData = {
-                id: id ? parseInt(id) : Date.now(),
-                athleteId: parseInt(document.getElementById('rankingAthlete').value),
-                gender: document.getElementById('rankingGender').value,
-                category: document.getElementById('rankingCategory').value,
-                position: parseInt(document.getElementById('rankingPosition').value),
-                points: parseInt(document.getElementById('rankingPoints').value)
-            };
-            
-            if (id) {
-                const index = data.ranking.findIndex(r => r.id === parseInt(id));
-                if (index !== -1) data.ranking[index] = rankingData;
-            } else {
-                data.ranking.push(rankingData);
-            }
-            saveAllData();
-            loadAdminList('ranking');
-            resetRankingForm();
-            alert('Ranking guardado correctamente');
+    e.preventDefault();
+    const id = document.getElementById('rankingId').value;
+    
+    // Obtener valores del formulario
+    const athleteId = parseInt(document.getElementById('rankingAthlete').value);
+    const gender = document.getElementById('rankingGender').value;
+    const category = document.getElementById('rankingCategory').value;
+    const position = parseInt(document.getElementById('rankingPosition').value);
+    const points = parseInt(document.getElementById('rankingPoints').value);
+    
+    // Validar que el atleta existe
+    const athleteExists = data.athletes.find(a => a.id === athleteId);
+    if (!athleteExists) {
+        alert('Error: El atleta seleccionado no existe');
+        return;
+    }
+    
+    const rankingData = {
+        id: id ? parseInt(id) : Date.now(),
+        athleteId: athleteId,
+        gender: gender,
+        category: category,
+        position: position,
+        points: points
+    };
+    
+    if (id) {
+        // Actualizar existente
+        const index = data.ranking.findIndex(r => r.id === parseInt(id));
+        if (index !== -1) {
+            data.ranking[index] = rankingData;
         }
-
+    } else {
+        // Nuevo item
+        data.ranking.push(rankingData);
+    }
+    
+    // Guardar en localStorage
+    saveAllData();
+    
+    // Recargar vistas
+    loadAdminList('ranking');
+    resetRankingForm();
+    
+    alert('Ranking guardado correctamente');
+}
         function editRanking(id) {
             const item = data.ranking.find(r => r.id === id);
             if (!item) return;
