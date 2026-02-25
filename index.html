@@ -547,6 +547,13 @@
     <div class="admin-float-btn" onclick="openAdminModal()" title="Panel de Administración">
         <i class="fas fa-lock"></i>
     </div>
+
+    <!-- BOTÓN DEBUG -->
+    <div style="position: fixed; bottom: 100px; right: 20px; z-index: 9998;">
+        <button onclick="debugInfo()" style="background: red; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer;">
+            DEBUG
+        </button>
+    </div>
     
 <nav id="navbar">
     <div class="nav-container">
@@ -2936,6 +2943,21 @@
                 document.getElementById('navLinks').classList.remove('active');
             }
         });
+        // FUNCIÓN DEBUG
+        function debugInfo() {
+            let mensaje = "ATLETAS: " + data.athletes.length + "\n";
+            mensaje += "RANKING: " + data.ranking.length + "\n\n";
+            
+            if (data.ranking.length > 0) {
+                mensaje += "RANKING DETALLE:\n";
+                data.ranking.forEach(function(item) {
+                    var atleta = data.athletes.find(function(a) { return a.id === parseInt(item.athleteId); });
+                    mensaje += "Pos " + item.position + ": " + (atleta ? atleta.name + " " + atleta.lastName : "ID " + item.athleteId) + " - " + item.points + " pts\n";
+                });
+            }
+            
+            alert(mensaje);
+        }
     </script>
 </body>
 </html>
