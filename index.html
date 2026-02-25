@@ -994,9 +994,26 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                                           <label>Categoría de Peso (escribí la que corresponda)</label>
-                                <input type="text" id="rankingCategory" placeholder="Ej: Masculino Pesado (105-120kg)" required style="background: rgba(0,0,0,0.5); color: white;">
-                            </div>                            <div class="form-group">
+                                <label>Categoría de Peso</label>
+                                <select id="rankingCategory" required style="background: rgba(0,0,0,0.5); color: white; width: 100%; padding: 0.8rem;">
+                                    <option value="">Seleccionar categoría...</option>
+                                    <optgroup label="Masculino">
+                                        <option value="male_lightweight">Ligero (-80kg)</option>
+                                        <option value="male_middleweight">Medio (80-95kg)</option>
+                                        <option value="male_lightheavy">Semipesado (95-105kg)</option>
+                                        <option value="male_heavyweight">Pesado (105-120kg)</option>
+                                        <option value="male_superheavy">Superpesado (+120kg)</option>
+                                    </optgroup>
+                                    <optgroup label="Femenino">
+                                        <option value="female_lightweight">Ligero (-60kg)</option>
+                                        <option value="female_middleweight">Medio (60-70kg)</option>
+                                        <option value="female_heavyweight">Pesado (70-82kg)</option>
+                                        <option value="female_superheavy">Superpesado (+82kg)</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+
+                               <div class="form-group">
                                 <label>Posición</label>
                                 <input type="number" id="rankingPosition" min="1" required>
                             </div>
@@ -2396,16 +2413,15 @@
     alert('Ranking guardado correctamente');
 }
         function editRanking(id) {
-            const item = data.ranking.find(r => r.id === id);
-            if (!item) return;
-            document.getElementById('rankingId').value = item.id;
-            document.getElementById('rankingAthlete').value = item.athleteId;
-            document.getElementById('rankingGender').value = item.gender;
-            document.getElementById('rankingCategory').value = item.category;
-            document.getElementById('rankingPosition').value = item.position;
-            document.getElementById('rankingPoints').value = item.points;
-        }
-
+    const item = data.ranking.find(r => r.id === id);
+    if (!item) return;
+    document.getElementById('rankingId').value = item.id;
+    document.getElementById('rankingAthlete').value = item.athleteId;
+    document.getElementById('rankingGender').value = item.gender;
+    document.getElementById('rankingCategory').value = item.category;
+    document.getElementById('rankingPosition').value = item.position;
+    document.getElementById('rankingPoints').value = item.points;
+}
         function deleteRanking(id) {
             if (!confirm('¿Eliminar esta entrada del ranking?')) return;
             data.ranking = data.ranking.filter(r => r.id !== id);
