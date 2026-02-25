@@ -548,13 +548,7 @@
         <i class="fas fa-lock"></i>
     </div>
 
-    <!-- BOTÓN DEBUG -->
-    <div style="position: fixed; bottom: 100px; right: 20px; z-index: 9998;">
-        <button onclick="debugInfo()" style="background: red; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer;">
-            DEBUG
-        </button>
-    </div>
-    
+      
 <nav id="navbar">
     <div class="nav-container">
         <div class="nav-logo">
@@ -2967,38 +2961,6 @@
                 document.getElementById('navLinks').classList.remove('active');
             }
         });
-        // FUNCIÓN DEBUG
-        function debugInfo() {
-    let mensaje = "=== DEBUG ===\n\n";
-    
-    mensaje += "ATLETAS: " + data.athletes.length + "\n";
-    mensaje += "RANKING: " + data.ranking.length + "\n\n";
-    
-    // Ver detalle del ranking
-    if (data.ranking.length > 0) {
-        mensaje += "RANKING GUARDADO:\n";
-        data.ranking.forEach(function(item) {
-            var atleta = data.athletes.find(function(a) { 
-                return a.id === parseInt(item.athleteId); 
-            });
-            mensaje += "Pos " + item.position + ": " + 
-                      (atleta ? atleta.name + " " + atleta.lastName : "ID " + item.athleteId) + 
-                      " - Cat: " + item.category + 
-                      " - Gen: " + item.gender + 
-                      " - " + item.points + " pts\n";
-        });
-        mensaje += "\n";
-    }
-    
-    // Probar renderRankingByGender
-    mensaje += "=== PRUEBA RENDER ===\n";
-    var pruebaMale = renderRankingByGender('male');
-    mensaje += "HTML Masculino generado: " + (pruebaMale ? pruebaMale.length : 0) + " caracteres\n";
-    var pruebaFemale = renderRankingByGender('female');
-    mensaje += "HTML Femenino generado: " + (pruebaFemale ? pruebaFemale.length : 0) + " caracteres\n";
-    
-    alert(mensaje);
-}   
- </script>
+         </script>
 </body>
 </html>
