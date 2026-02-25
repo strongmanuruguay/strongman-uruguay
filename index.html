@@ -1696,31 +1696,39 @@
         }
 
         // RANKING
-        function renderRanking() {
-            const container = document.getElementById('rankingContainer');
-            
-            if (currentRankingFilter === 'all') {
-                container.innerHTML = `
-                    <div class="ranking-category">
-                        <h3><i class="fas fa-mars"></i> Masculino</h3>
-                        ${renderRankingByGender('male')}
-                    </div>
-                    <div class="ranking-category">
-                        <h3><i class="fas fa-venus"></i> Femenino</h3>
-                        ${renderRankingByGender('female')}
-                    </div>
-                `;
-            } else {
-                container.innerHTML = `
-                    <div class="ranking-category">
-                        <h3><i class="fas fa-${currentRankingFilter === 'male' ? 'mars' : 'venus'}"></i> 
-                        ${currentRankingFilter === 'male' ? 'Masculino' : 'Femenino'}</h3>
-                        ${renderRankingByGender(currentRankingFilter)}
-                    </div>
-                `;
-            }
-        }
-
+      function renderRanking() {
+    console.log("=== RENDER RANKING ===");
+    console.log("Filtro actual:", currentRankingFilter);
+    console.log("Total ranking:", data.ranking.length);
+    
+    const container = document.getElementById('rankingContainer');
+    console.log("Container encontrado:", container ? "SÍ" : "NO");
+    
+    if (currentRankingFilter === 'all') {
+        console.log("Mostrando ALL - Masculino y Femenino");
+        container.innerHTML = `
+            <div class="ranking-category">
+                <h3><i class="fas fa-mars"></i> Masculino</h3>
+                ${renderRankingByGender('male')}
+            </div>
+            <div class="ranking-category">
+                <h3><i class="fas fa-venus"></i> Femenino</h3>
+                ${renderRankingByGender('female')}
+            </div>
+        `;
+    } else {
+        console.log("Mostrando filtro:", currentRankingFilter);
+        container.innerHTML = `
+            <div class="ranking-category">
+                <h3><i class="fas fa-${currentRankingFilter === 'male' ? 'mars' : 'venus'}"></i> 
+                ${currentRankingFilter === 'male' ? 'Masculino' : 'Femenino'}</h3>
+                ${renderRankingByGender(currentRankingFilter)}
+            </div>
+        `;
+    }
+    
+    console.log("HTML generado:", container.innerHTML.substring(0, 200) + "...");
+}
       function renderRankingByGender(gender) {
     const categories = weightCategories[gender];
     let html = '';
@@ -2945,19 +2953,36 @@
         });
         // FUNCIÓN DEBUG
         function debugInfo() {
-            let mensaje = "ATLETAS: " + data.athletes.length + "\n";
-            mensaje += "RANKING: " + data.ranking.length + "\n\n";
-            
-            if (data.ranking.length > 0) {
-                mensaje += "RANKING DETALLE:\n";
-                data.ranking.forEach(function(item) {
-                    var atleta = data.athletes.find(function(a) { return a.id === parseInt(item.athleteId); });
-                    mensaje += "Pos " + item.position + ": " + (atleta ? atleta.name + " " + atleta.lastName : "ID " + item.athleteId) + " - " + item.points + " pts\n";
-                });
-            }
-            
-            alert(mensaje);
-        }
-    </script>
+    let mensaje = "=== DEBUG ===\n\n";
+    
+    mensaje += "ATLETAS: " + data.athletes.length + "\n";
+    mensaje += "RANKING: " + data.ranking.length + "\n\n";
+    
+    // Ver detalle del ranking
+    if (data.ranking.length > 0) {
+        mensaje += "RANKING GUARDADO:\n";
+        data.ranking.forEach(function(item) {
+            var atleta = data.athletes.find(function(a) { 
+                return a.id === parseInt(item.athleteId); 
+            });
+            mensaje += "Pos " + item.position + ": " + 
+                      (atleta ? atleta.name + " " + atleta.lastName : "ID " + item.athleteId) + 
+                      " - Cat: " + item.category + 
+                      " - Gen: " + item.gender + 
+                      " - " + item.points + " pts\n";
+        });
+        mensaje += "\n";
+    }
+    
+    // Probar renderRankingByGender
+    mensaje += "=== PRUEBA RENDER ===\n";
+    var pruebaMale = renderRankingByGender('male');
+    mensaje += "HTML Masculino generado: " + (pruebaMale ? pruebaMale.length : 0) + " caracteres\n";
+    var pruebaFemale = renderRankingByGender('female');
+    mensaje += "HTML Femenino generado: " + (pruebaFemale ? pruebaFemale.length : 0) + " caracteres\n";
+    
+    alert(mensaje);
+}   
+ </script>
 </body>
 </html>
