@@ -2867,7 +2867,7 @@
         }
 
         // SETTINGS
-        function updateHeroBg() {
+               function updateHeroBg() {
             const fileInput = document.getElementById('heroBgFile');
             if (!fileInput.files || !fileInput.files[0]) {
                 alert('Seleccione un archivo');
@@ -2876,6 +2876,7 @@
             
             const reader = new FileReader();
             reader.onload = function(e) {
+                const timestamp = new Date().getTime();
                 const isVideo = fileInput.files[0].type.startsWith('video/');
                 data.settings.heroBg = {
                     type: isVideo ? 'video' : 'image',
@@ -2884,20 +2885,18 @@
                 saveAllData();
                 applySettings();
                 
-                // Update preview
                 const preview = document.getElementById('heroBgPreview');
                 if (isVideo) {
-                    preview.innerHTML = `<video src="${e.target.result}" controls style="max-width: 100%; max-height: 100%;"></video>`;
+                    preview.innerHTML = `<video src="${e.target.result}?t=${timestamp}" controls style="max-width: 100%; max-height: 100%;"></video>`;
                 } else {
-                    preview.innerHTML = `<img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">`;
+                    preview.innerHTML = `<img src="${e.target.result}?t=${timestamp}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">`;
                 }
                 
                 alert('Fondo actualizado correctamente');
             };
             reader.readAsDataURL(fileInput.files[0]);
         }
-
-        function updateLogo() {
+               function updateLogo() {
             const fileInput = document.getElementById('logoFile');
             if (!fileInput.files || !fileInput.files[0]) {
                 alert('Seleccione una imagen');
@@ -2906,18 +2905,48 @@
             
             const reader = new FileReader();
             reader.onload = function(e) {
+                const timestamp = new Date().getTime();
                 data.settings.logo = e.target.result;
                 saveAllData();
                 applySettings();
                 
-                // Update preview
                 const preview = document.getElementById('logoPreview');
-                preview.innerHTML = `<img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">`;
+                preview.innerHTML = `<img src="${e.target.result}?t=${timestamp}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">`;
                 
                 alert('Logo actualizado correctamente');
             };
             reader.readAsDataURL(fileInput.files[0]);
         }
+
+              function updateSectionBg(section, input) {
+            if (!input.files || !input.files[0]) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const timestamp = new Date().getTime();
+                const imageUrl = e.target.result + '?t=' + timestamp;
+                
+                if (!data.settings.sectionBgs) data.settings.sectionBgs = {};
+                data.settings.sectionBgs[section] = imageUrl;
+                saveAllData();
+                
+                const preview = document.getElementById(`previewBg${section.charAt(0).toUpperCase() + section.slice(1)}`);
+                if (preview) {
+                    preview.innerHTML = `<img src="${imageUrl}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">`;
+                }
+                
+                const sectionEl = document.getElementById(section);
+                if (sectionEl) {
+                    sectionEl.style.backgroundImage = `url(${imageUrl})`;
+                    sectionEl.style.backgroundSize = 'cover';
+                    sectionEl.style.backgroundPosition = 'center';
+                    sectionEl.style.backgroundAttachment = 'fixed';
+                }
+                
+                alert(`Fondo de ${section} actualizado`);
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+        }  
 
         function updateSocialLinks() {
             data.settings.social = {
