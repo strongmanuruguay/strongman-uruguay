@@ -1597,7 +1597,7 @@
             window.scrollTo(0, 0);
         }
 
-        function showSection(sectionId) {
+               function showSection(sectionId) {
             // Ocultar todo primero
             document.getElementById('inicio').style.display = 'none';
             document.getElementById('mainMenu').style.display = 'none';
@@ -1607,6 +1607,18 @@
                 section.classList.remove('active');
                 section.style.display = 'none';
             });
+            
+            // Aplicar fondos de sección antes de mostrar
+            if (data.settings.sectionBgs && data.settings.sectionBgs[sectionId]) {
+                const sectionEl = document.getElementById(sectionId);
+                if (sectionEl) {
+                    const timestamp = new Date().getTime();
+                    sectionEl.style.backgroundImage = `url(${data.settings.sectionBgs[sectionId]}?t=${timestamp})`;
+                    sectionEl.style.backgroundSize = 'cover';
+                    sectionEl.style.backgroundPosition = 'center';
+                    sectionEl.style.backgroundAttachment = 'fixed';
+                }
+            }
             
             // Mostrar SOLO la sección seleccionada
             const targetSection = document.getElementById(sectionId);
