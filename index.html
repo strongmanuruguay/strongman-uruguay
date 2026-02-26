@@ -1617,18 +1617,30 @@
                 section.style.display = 'none';
             });
             
-            // Aplicar fondos de sección antes de mostrar
+                        // Aplicar fondos de sección antes de mostrar
             if (data.settings.sectionBgs && data.settings.sectionBgs[sectionId]) {
+                alert("PASO 1: Hay fondo guardado para " + sectionId);
+                
                 const sectionEl = document.getElementById(sectionId);
+                alert("PASO 2: Buscando elemento con ID: " + sectionId + " - Encontrado: " + (sectionEl ? "SI" : "NO"));
+                
                 if (sectionEl) {
+                    alert("PASO 3: Aplicando imagen...");
+                    
                     const timestamp = new Date().getTime();
-                    sectionEl.style.backgroundImage = `url(${data.settings.sectionBgs[sectionId]}?t=${timestamp})`;
+                    const imageUrl = data.settings.sectionBgs[sectionId] + '?t=' + timestamp;
+                    
+                    alert("PASO 4: URL de imagen: " + imageUrl.substring(0, 100) + "...");
+                    
+                    sectionEl.style.backgroundImage = 'url(' + imageUrl + ')';
                     sectionEl.style.backgroundSize = 'cover';
                     sectionEl.style.backgroundPosition = 'center';
                     sectionEl.style.backgroundAttachment = 'fixed';
+                    
+                    alert("PASO 5: Estilos aplicados");
                 }
-            }
-            
+            } 
+          
             // Mostrar SOLO la sección seleccionada
             const targetSection = document.getElementById(sectionId);
             if (targetSection) {
