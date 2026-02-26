@@ -1597,7 +1597,16 @@
             window.scrollTo(0, 0);
         }
 
-               function showSection(sectionId) {
+                      function showSection(sectionId) {
+            // DEBUG - BORRAR DESPUÉS
+            let debugMsg = "Sección: " + sectionId + "\n";
+            debugMsg += "¿sectionBgs existe? " + (data.settings.sectionBgs ? "SÍ" : "NO") + "\n";
+            if (data.settings.sectionBgs) {
+                debugMsg += "Secciones con fondo: " + Object.keys(data.settings.sectionBgs).join(", ") + "\n";
+                debugMsg += "¿Esta sección tiene fondo? " + (data.settings.sectionBgs[sectionId] ? "SÍ" : "NO");
+            }
+            alert(debugMsg);
+            
             // Ocultar todo primero
             document.getElementById('inicio').style.display = 'none';
             document.getElementById('mainMenu').style.display = 'none';
