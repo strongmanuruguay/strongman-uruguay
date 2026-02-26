@@ -1970,17 +1970,19 @@
             }).join('');
         }
 
-        function applySettings() {
+                function applySettings() {
+            const timestamp = new Date().getTime();
+            
             // Hero Background
             if (data.settings.heroBg) {
                 const heroVideo = document.getElementById('heroVideo');
                 if (data.settings.heroBg.type === 'video') {
-                    heroVideo.src = data.settings.heroBg.src;
+                    heroVideo.src = data.settings.heroBg.src + '?t=' + timestamp;
                     heroVideo.style.display = 'block';
                     document.querySelector('.hero').style.backgroundImage = 'none';
                 } else {
                     heroVideo.style.display = 'none';
-                    document.querySelector('.hero').style.backgroundImage = `url(${data.settings.heroBg.src})`;
+                    document.querySelector('.hero').style.backgroundImage = `url(${data.settings.heroBg.src}?t=${timestamp})`;
                     document.querySelector('.hero').style.backgroundSize = 'cover';
                     document.querySelector('.hero').style.backgroundPosition = 'center';
                 }
@@ -1988,7 +1990,20 @@
             
             // Logo
             if (data.settings.logo) {
-                document.getElementById('heroLogoImg').src = data.settings.logo;
+                document.getElementById('heroLogoImg').src = data.settings.logo + '?t=' + timestamp;
+            }
+            
+            // Section Backgrounds
+            if (data.settings.sectionBgs) {
+                Object.keys(data.settings.sectionBgs).forEach(section => {
+                    const sectionEl = document.getElementById(section);
+                    if (sectionEl) {
+                        sectionEl.style.backgroundImage = `url(${data.settings.sectionBgs[section]}?t=${timestamp})`;
+                        sectionEl.style.backgroundSize = 'cover';
+                        sectionEl.style.backgroundPosition = 'center';
+                        sectionEl.style.backgroundAttachment = 'fixed';
+                    }
+                });
             }
             
             // Social Links
@@ -2000,7 +2015,6 @@
                 if (data.settings.social.tiktok) socialLinks[3].href = data.settings.social.tiktok;
             }
         }
-
         // ADMIN MODAL
         function openAdminModal() {
             document.getElementById('adminModal').classList.add('active');
@@ -2917,25 +2931,29 @@
             alert('Redes sociales actualizadas');
         }
 
-        function updateSectionBg(section, input) {
+               function updateSectionBg(section, input) {
             if (!input.files || !input.files[0]) return;
             
             const reader = new FileReader();
             reader.onload = function(e) {
+                // Agregar timestamp único para evitar caché
+                const timestamp = new Date().getTime();
+                const imageUrl = e.target.result + '?t=' + timestamp;
+                
                 if (!data.settings.sectionBgs) data.settings.sectionBgs = {};
-                data.settings.sectionBgs[section] = e.target.result;
+                data.settings.sectionBgs[section] = imageUrl;
                 saveAllData();
                 
                 // Update preview
                 const preview = document.getElementById(`previewBg${section.charAt(0).toUpperCase() + section.slice(1)}`);
                 if (preview) {
-                    preview.innerHTML = `<img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">`;
+                    preview.innerHTML = `<img src="${imageUrl}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">`;
                 }
                 
-                // Apply to section
+                // Apply to section con timestamp para evitar caché
                 const sectionEl = document.getElementById(section);
                 if (sectionEl) {
-                    sectionEl.style.backgroundImage = `url(${e.target.result})`;
+                    sectionEl.style.backgroundImage = `url(${imageUrl})`;
                     sectionEl.style.backgroundSize = 'cover';
                     sectionEl.style.backgroundPosition = 'center';
                     sectionEl.style.backgroundAttachment = 'fixed';
@@ -2945,7 +2963,6 @@
             };
             reader.readAsDataURL(input.files[0]);
         }
-
         // MENÚ RESPONSIVE
         function toggleMenu() {
             document.getElementById('navLinks').classList.toggle('active');
