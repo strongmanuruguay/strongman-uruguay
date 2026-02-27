@@ -2025,10 +2025,16 @@
             }
             
             // Logo
-            if (data.settings.logo) {
-                document.getElementById('heroLogoImg').src = data.settings.logo + '?t=' + timestamp;
-            }
-            
+                         if (data.settings.logo) {
+                alert("Aplicando logo...");
+                const logoImg = document.getElementById('heroLogoImg');
+                alert("Elemento logo encontrado: " + (logoImg ? "SI" : "NO"));
+                if (logoImg) {
+                    alert("URL del logo: " + data.settings.logo.substring(0, 100) + "...");
+                    logoImg.src = data.settings.logo + '?t=' + timestamp;
+                    alert("Logo aplicado. src ahora es: " + logoImg.src.substring(0, 100) + "...");
+                }
+            }           
             // Section Backgrounds
             if (data.settings.sectionBgs) {
                 Object.keys(data.settings.sectionBgs).forEach(section => {
