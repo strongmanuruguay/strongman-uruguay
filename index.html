@@ -547,8 +547,7 @@
     <div class="admin-float-btn" onclick="openAdminModal()" title="Panel de Administración">
         <i class="fas fa-lock"></i>
     </div>
-
-      
+    
 <nav id="navbar">
     <div class="nav-container">
         <div class="nav-logo">
@@ -988,26 +987,9 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label>Categoría de Peso</label>
-                                <select id="rankingCategory" required style="background: rgba(0,0,0,0.5); color: white; width: 100%; padding: 0.8rem;">
-                                    <option value="">Seleccionar categoría...</option>
-                                    <optgroup label="Masculino">
-                                        <option value="male_lightweight">Ligero (-80kg)</option>
-                                        <option value="male_middleweight">Medio (80-95kg)</option>
-                                        <option value="male_lightheavy">Semipesado (95-105kg)</option>
-                                        <option value="male_heavyweight">Pesado (105-120kg)</option>
-                                        <option value="male_superheavy">Superpesado (+120kg)</option>
-                                    </optgroup>
-                                    <optgroup label="Femenino">
-                                        <option value="female_lightweight">Ligero (-60kg)</option>
-                                        <option value="female_middleweight">Medio (60-70kg)</option>
-                                        <option value="female_heavyweight">Pesado (70-82kg)</option>
-                                        <option value="female_superheavy">Superpesado (+82kg)</option>
-                                    </optgroup>
-                                </select>
-                            </div>
-
-                               <div class="form-group">
+                                                           <label>Categoría de Peso (escribí la que corresponda)</label>
+                                <input type="text" id="rankingCategory" placeholder="Ej: Masculino Pesado (105-120kg)" required style="background: rgba(0,0,0,0.5); color: white;">
+                            </div>                            <div class="form-group">
                                 <label>Posición</label>
                                 <input type="number" id="rankingPosition" min="1" required>
                             </div>
@@ -1534,10 +1516,8 @@
             updateCounters();
         }
 
-            function loadAllData() {
-            alert("Cargando datos...");
-            
-            // Cargar todos los datos desde localStorage               
+               function loadAllData() {
+            // Cargar todos los datos desde localStorage
             data.events = JSON.parse(localStorage.getItem('acaf_events')) || [];
             data.athletes = JSON.parse(localStorage.getItem('acaf_athletes')) || [];
             data.ranking = JSON.parse(localStorage.getItem('acaf_ranking')) || [];
@@ -1599,16 +1579,7 @@
             window.scrollTo(0, 0);
         }
 
-                      function showSection(sectionId) {
-            // DEBUG - BORRAR DESPUÉS
-            let debugMsg = "Sección: " + sectionId + "\n";
-            debugMsg += "¿sectionBgs existe? " + (data.settings.sectionBgs ? "SÍ" : "NO") + "\n";
-            if (data.settings.sectionBgs) {
-                debugMsg += "Secciones con fondo: " + Object.keys(data.settings.sectionBgs).join(", ") + "\n";
-                debugMsg += "¿Esta sección tiene fondo? " + (data.settings.sectionBgs[sectionId] ? "SÍ" : "NO");
-            }
-            alert(debugMsg);
-            
+        function showSection(sectionId) {
             // Ocultar todo primero
             document.getElementById('inicio').style.display = 'none';
             document.getElementById('mainMenu').style.display = 'none';
@@ -1619,30 +1590,6 @@
                 section.style.display = 'none';
             });
             
-                        // Aplicar fondos de sección antes de mostrar
-            if (data.settings.sectionBgs && data.settings.sectionBgs[sectionId]) {
-                alert("PASO 1: Hay fondo guardado para " + sectionId);
-                
-                const sectionEl = document.getElementById(sectionId);
-                alert("PASO 2: Buscando elemento con ID: " + sectionId + " - Encontrado: " + (sectionEl ? "SI" : "NO"));
-                
-                if (sectionEl) {
-                    alert("PASO 3: Aplicando imagen...");
-                    
-                    const timestamp = new Date().getTime();
-                    const imageUrl = data.settings.sectionBgs[sectionId] + '?t=' + timestamp;
-                    
-                    alert("PASO 4: URL de imagen: " + imageUrl.substring(0, 100) + "...");
-                    
-                    sectionEl.style.backgroundImage = 'url(' + imageUrl + ')';
-                    sectionEl.style.backgroundSize = 'cover';
-                    sectionEl.style.backgroundPosition = 'center';
-                    sectionEl.style.backgroundAttachment = 'fixed';
-                    
-                    alert("PASO 5: Estilos aplicados");
-                }
-            } 
-          
             // Mostrar SOLO la sección seleccionada
             const targetSection = document.getElementById(sectionId);
             if (targetSection) {
@@ -1742,39 +1689,31 @@
         }
 
         // RANKING
-      function renderRanking() {
-    console.log("=== RENDER RANKING ===");
-    console.log("Filtro actual:", currentRankingFilter);
-    console.log("Total ranking:", data.ranking.length);
-    
-    const container = document.getElementById('rankingContainer');
-    console.log("Container encontrado:", container ? "SÍ" : "NO");
-    
-    if (currentRankingFilter === 'all') {
-        console.log("Mostrando ALL - Masculino y Femenino");
-        container.innerHTML = `
-            <div class="ranking-category">
-                <h3><i class="fas fa-mars"></i> Masculino</h3>
-                ${renderRankingByGender('male')}
-            </div>
-            <div class="ranking-category">
-                <h3><i class="fas fa-venus"></i> Femenino</h3>
-                ${renderRankingByGender('female')}
-            </div>
-        `;
-    } else {
-        console.log("Mostrando filtro:", currentRankingFilter);
-        container.innerHTML = `
-            <div class="ranking-category">
-                <h3><i class="fas fa-${currentRankingFilter === 'male' ? 'mars' : 'venus'}"></i> 
-                ${currentRankingFilter === 'male' ? 'Masculino' : 'Femenino'}</h3>
-                ${renderRankingByGender(currentRankingFilter)}
-            </div>
-        `;
-    }
-    
-    console.log("HTML generado:", container.innerHTML.substring(0, 200) + "...");
-}
+        function renderRanking() {
+            const container = document.getElementById('rankingContainer');
+            
+            if (currentRankingFilter === 'all') {
+                container.innerHTML = `
+                    <div class="ranking-category">
+                        <h3><i class="fas fa-mars"></i> Masculino</h3>
+                        ${renderRankingByGender('male')}
+                    </div>
+                    <div class="ranking-category">
+                        <h3><i class="fas fa-venus"></i> Femenino</h3>
+                        ${renderRankingByGender('female')}
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="ranking-category">
+                        <h3><i class="fas fa-${currentRankingFilter === 'male' ? 'mars' : 'venus'}"></i> 
+                        ${currentRankingFilter === 'male' ? 'Masculino' : 'Femenino'}</h3>
+                        ${renderRankingByGender(currentRankingFilter)}
+                    </div>
+                `;
+            }
+        }
+
       function renderRankingByGender(gender) {
     const categories = weightCategories[gender];
     let html = '';
@@ -2005,47 +1944,25 @@
             }).join('');
         }
 
-            function applySettings() {
-            alert("Aplicando settings...");
-            const timestamp = new Date().getTime();           
-           
+        function applySettings() {
             // Hero Background
             if (data.settings.heroBg) {
                 const heroVideo = document.getElementById('heroVideo');
                 if (data.settings.heroBg.type === 'video') {
-                    heroVideo.src = data.settings.heroBg.src + '?t=' + timestamp;
+                    heroVideo.src = data.settings.heroBg.src;
                     heroVideo.style.display = 'block';
                     document.querySelector('.hero').style.backgroundImage = 'none';
                 } else {
                     heroVideo.style.display = 'none';
-                    document.querySelector('.hero').style.backgroundImage = `url(${data.settings.heroBg.src}?t=${timestamp})`;
+                    document.querySelector('.hero').style.backgroundImage = `url(${data.settings.heroBg.src})`;
                     document.querySelector('.hero').style.backgroundSize = 'cover';
                     document.querySelector('.hero').style.backgroundPosition = 'center';
                 }
             }
             
             // Logo
-                         if (data.settings.logo) {
-                alert("Aplicando logo...");
-                const logoImg = document.getElementById('heroLogoImg');
-                alert("Elemento logo encontrado: " + (logoImg ? "SI" : "NO"));
-                if (logoImg) {
-                    alert("URL del logo: " + data.settings.logo.substring(0, 100) + "...");
-                    logoImg.src = data.settings.logo + '?t=' + timestamp;
-                    alert("Logo aplicado. src ahora es: " + logoImg.src.substring(0, 100) + "...");
-                }
-            }           
-            // Section Backgrounds
-            if (data.settings.sectionBgs) {
-                Object.keys(data.settings.sectionBgs).forEach(section => {
-                    const sectionEl = document.getElementById(section);
-                    if (sectionEl) {
-                        sectionEl.style.backgroundImage = `url(${data.settings.sectionBgs[section]}?t=${timestamp})`;
-                        sectionEl.style.backgroundSize = 'cover';
-                        sectionEl.style.backgroundPosition = 'center';
-                        sectionEl.style.backgroundAttachment = 'fixed';
-                    }
-                });
+            if (data.settings.logo) {
+                document.getElementById('heroLogoImg').src = data.settings.logo;
             }
             
             // Social Links
@@ -2057,6 +1974,7 @@
                 if (data.settings.social.tiktok) socialLinks[3].href = data.settings.social.tiktok;
             }
         }
+
         // ADMIN MODAL
         function openAdminModal() {
             document.getElementById('adminModal').classList.add('active');
@@ -2463,15 +2381,16 @@
     alert('Ranking guardado correctamente');
 }
         function editRanking(id) {
-    const item = data.ranking.find(r => r.id === id);
-    if (!item) return;
-    document.getElementById('rankingId').value = item.id;
-    document.getElementById('rankingAthlete').value = item.athleteId;
-    document.getElementById('rankingGender').value = item.gender;
-    document.getElementById('rankingCategory').value = item.category;
-    document.getElementById('rankingPosition').value = item.position;
-    document.getElementById('rankingPoints').value = item.points;
-}
+            const item = data.ranking.find(r => r.id === id);
+            if (!item) return;
+            document.getElementById('rankingId').value = item.id;
+            document.getElementById('rankingAthlete').value = item.athleteId;
+            document.getElementById('rankingGender').value = item.gender;
+            document.getElementById('rankingCategory').value = item.category;
+            document.getElementById('rankingPosition').value = item.position;
+            document.getElementById('rankingPoints').value = item.points;
+        }
+
         function deleteRanking(id) {
             if (!confirm('¿Eliminar esta entrada del ranking?')) return;
             data.ranking = data.ranking.filter(r => r.id !== id);
@@ -2909,7 +2828,7 @@
         }
 
         // SETTINGS
-               function updateHeroBg() {
+        function updateHeroBg() {
             const fileInput = document.getElementById('heroBgFile');
             if (!fileInput.files || !fileInput.files[0]) {
                 alert('Seleccione un archivo');
@@ -2918,7 +2837,6 @@
             
             const reader = new FileReader();
             reader.onload = function(e) {
-                const timestamp = new Date().getTime();
                 const isVideo = fileInput.files[0].type.startsWith('video/');
                 data.settings.heroBg = {
                     type: isVideo ? 'video' : 'image',
@@ -2927,18 +2845,20 @@
                 saveAllData();
                 applySettings();
                 
+                // Update preview
                 const preview = document.getElementById('heroBgPreview');
                 if (isVideo) {
-                    preview.innerHTML = `<video src="${e.target.result}?t=${timestamp}" controls style="max-width: 100%; max-height: 100%;"></video>`;
+                    preview.innerHTML = `<video src="${e.target.result}" controls style="max-width: 100%; max-height: 100%;"></video>`;
                 } else {
-                    preview.innerHTML = `<img src="${e.target.result}?t=${timestamp}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">`;
+                    preview.innerHTML = `<img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">`;
                 }
                 
                 alert('Fondo actualizado correctamente');
             };
             reader.readAsDataURL(fileInput.files[0]);
         }
-               function updateLogo() {
+
+        function updateLogo() {
             const fileInput = document.getElementById('logoFile');
             if (!fileInput.files || !fileInput.files[0]) {
                 alert('Seleccione una imagen');
@@ -2947,48 +2867,18 @@
             
             const reader = new FileReader();
             reader.onload = function(e) {
-                const timestamp = new Date().getTime();
                 data.settings.logo = e.target.result;
                 saveAllData();
                 applySettings();
                 
+                // Update preview
                 const preview = document.getElementById('logoPreview');
-                preview.innerHTML = `<img src="${e.target.result}?t=${timestamp}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">`;
+                preview.innerHTML = `<img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">`;
                 
                 alert('Logo actualizado correctamente');
             };
             reader.readAsDataURL(fileInput.files[0]);
         }
-
-              function updateSectionBg(section, input) {
-            if (!input.files || !input.files[0]) return;
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const timestamp = new Date().getTime();
-                const imageUrl = e.target.result + '?t=' + timestamp;
-                
-                if (!data.settings.sectionBgs) data.settings.sectionBgs = {};
-                data.settings.sectionBgs[section] = imageUrl;
-                saveAllData();
-                
-                const preview = document.getElementById(`previewBg${section.charAt(0).toUpperCase() + section.slice(1)}`);
-                if (preview) {
-                    preview.innerHTML = `<img src="${imageUrl}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">`;
-                }
-                
-                const sectionEl = document.getElementById(section);
-                if (sectionEl) {
-                    sectionEl.style.backgroundImage = `url(${imageUrl})`;
-                    sectionEl.style.backgroundSize = 'cover';
-                    sectionEl.style.backgroundPosition = 'center';
-                    sectionEl.style.backgroundAttachment = 'fixed';
-                }
-                
-                alert(`Fondo de ${section} actualizado`);
-            };
-            reader.readAsDataURL(fileInput.files[0]);
-        }  
 
         function updateSocialLinks() {
             data.settings.social = {
@@ -3002,29 +2892,25 @@
             alert('Redes sociales actualizadas');
         }
 
-               function updateSectionBg(section, input) {
+        function updateSectionBg(section, input) {
             if (!input.files || !input.files[0]) return;
             
             const reader = new FileReader();
             reader.onload = function(e) {
-                // Agregar timestamp único para evitar caché
-                const timestamp = new Date().getTime();
-                const imageUrl = e.target.result + '?t=' + timestamp;
-                
                 if (!data.settings.sectionBgs) data.settings.sectionBgs = {};
-                data.settings.sectionBgs[section] = imageUrl;
+                data.settings.sectionBgs[section] = e.target.result;
                 saveAllData();
                 
                 // Update preview
                 const preview = document.getElementById(`previewBg${section.charAt(0).toUpperCase() + section.slice(1)}`);
                 if (preview) {
-                    preview.innerHTML = `<img src="${imageUrl}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">`;
+                    preview.innerHTML = `<img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">`;
                 }
                 
-                // Apply to section con timestamp para evitar caché
+                // Apply to section
                 const sectionEl = document.getElementById(section);
                 if (sectionEl) {
-                    sectionEl.style.backgroundImage = `url(${imageUrl})`;
+                    sectionEl.style.backgroundImage = `url(${e.target.result})`;
                     sectionEl.style.backgroundSize = 'cover';
                     sectionEl.style.backgroundPosition = 'center';
                     sectionEl.style.backgroundAttachment = 'fixed';
@@ -3034,6 +2920,7 @@
             };
             reader.readAsDataURL(input.files[0]);
         }
+
         // MENÚ RESPONSIVE
         function toggleMenu() {
             document.getElementById('navLinks').classList.toggle('active');
@@ -3049,6 +2936,6 @@
                 document.getElementById('navLinks').classList.remove('active');
             }
         });
-         </script>
+    </script>
 </body>
 </html>
