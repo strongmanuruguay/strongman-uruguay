@@ -1534,8 +1534,10 @@
             updateCounters();
         }
 
-               function loadAllData() {
-            // Cargar todos los datos desde localStorage
+            function loadAllData() {
+            alert("Cargando datos...");
+            
+            // Cargar todos los datos desde localStorage               
             data.events = JSON.parse(localStorage.getItem('acaf_events')) || [];
             data.athletes = JSON.parse(localStorage.getItem('acaf_athletes')) || [];
             data.ranking = JSON.parse(localStorage.getItem('acaf_ranking')) || [];
@@ -2003,9 +2005,10 @@
             }).join('');
         }
 
-                function applySettings() {
-            const timestamp = new Date().getTime();
-            
+            function applySettings() {
+            alert("Aplicando settings...");
+            const timestamp = new Date().getTime();           
+           
             // Hero Background
             if (data.settings.heroBg) {
                 const heroVideo = document.getElementById('heroVideo');
