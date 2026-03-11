@@ -1948,6 +1948,7 @@
                 if (sectionId === 'cursos') renderCourses();
                 if (sectionId === 'jueces') renderJudges();
                 if (sectionId === 'sponsors') renderSponsors();
+                if (sectionId === 'tienda') loadProducts();
             }
             
             // Cerrar menú en móvil si está abierto
@@ -3285,7 +3286,7 @@ let cart = JSON.parse(localStorage.getItem('cartStrongman')) || [];
 // Cargar productos desde localStorage
 function loadProducts() {
     const productos = JSON.parse(localStorage.getItem('productosTienda')) || [];
-    const grid = document.querySelector('.tienda-grid');
+    const grid = document.getElementById('productsContainer');
     
     if (!grid) return;
     
