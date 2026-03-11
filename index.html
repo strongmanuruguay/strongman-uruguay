@@ -2379,6 +2379,7 @@
                 judges: 'judgesListAdmin',
                 sponsors: 'sponsorsListAdmin',
                 contacts: 'contactsListAdmin'
+                shop: 'productsList'
             };
             
             if (!lists[type]) return;
@@ -2393,6 +2394,8 @@
             
             if (type === 'ranking') {
                 renderRankingAdmin(container);
+            } else if (type === 'shop') {
+                loadProductsList();
             } else if (type === 'contacts') {
                 renderContactsAdmin(container);
             } else {
