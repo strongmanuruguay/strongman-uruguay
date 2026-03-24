@@ -928,15 +928,16 @@
                 <p>Capacitaciones y seminarios</p>
             </div>
             <div class="menu-item" onclick="showSection('jueces')">
-            <div class="menu-item" onclick="showSection('tienda')">
-                <i class="fas fa-shopping-cart"></i>
-                <h3>Tienda</h3>
-                <p>Productos oficiales de la asociación</p>
-            </div>
                 <i class="fas fa-gavel"></i>
                 <h3>Jueces</h3>
                 <p>Cuerpo de jueces certificados</p>
             </div>
+            
+            <div class="menu-item" onclick="showSection('tienda')">
+                <i class="fas fa-shopping-cart"></i>
+                <h3>Tienda</h3>
+                <p>Productos oficiales de la asociación</p>
+            </div>         
         </div>
     </section>
 
@@ -1035,6 +1036,38 @@
         <div class="grid" id="productsContainer"></div>
     </section>
 
+    <!-- CARRITO -->
+    <div class="cart-float-btn" onclick="openCart()" id="cartBtn">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="cart-count" id="cartCount">0</span>
+    </div>
+
+    <div id="cartModal" class="modal">
+        <div class="modal-content cart-drawer">
+            <div class="modal-header">
+                <h2><i class="fas fa-shopping-cart"></i> Tu Carrito</h2>
+                <button class="close-btn" onclick="closeCart()">&times;</button>
+            </div>
+            <div class="modal-body" id="cartBody">
+                <div class="empty-state">
+                    <i class="fas fa-shopping-cart"></i>
+                    <p>Tu carrito está vacío</p>
+                </div>
+            </div>
+            <div class="cart-footer" id="cartFooter" style="display: none;">
+                <div class="cart-total">
+                    <strong>Total: $<span id="cartTotal">0</span></strong>
+                </div>
+                <button class="btn btn-success" onclick="sendWhatsAppOrder()" style="width: 100%; margin-bottom: 0.5rem;">
+                    <i class="fab fa-whatsapp"></i> Enviar pedido por WhatsApp
+                </button>
+                <button class="btn btn-outline" onclick="clearCart()" style="width: 100%;">
+                    <i class="fas fa-trash"></i> Vaciar carrito
+                </button>
+            </div>
+        </div>
+    </div>
+
     <footer>
         <div class="footer-content">
             <div class="footer-section">
@@ -1073,6 +1106,8 @@
             <p>&copy; 2024 Strongman Uruguay - A.C.A.F. Todos los derechos reservados.</p>
         </div>
     </footer>
+
+
 
     <!-- MODAL ADMIN -->
     <div id="adminModal" class="modal">
@@ -1691,7 +1726,16 @@
                     </div>
                 </div>
 
-                <div id="panel-shop" class="admin-panel">
+               
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+                    
+            </div>
+        </div>    
+         <div id="panel-shop" class="admin-panel">
                         <h3>Gestión de Tienda</h3>
                         
                         <!-- Formulario para agregar/editar producto -->
@@ -1730,15 +1774,6 @@
                             </div>
                         </div>
                     </div>
-                    
-                </div>
-            </div>
-        </div>
-    </div>
-                    
-            </div>
-        </div>    
-
     <script>
         // DATOS
         let data = {
@@ -3602,37 +3637,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
     </script>
-    <!-- CARRITO FLOTANTE -->
-    <div class="cart-float-btn" onclick="openCart()" id="cartBtn">
-        <i class="fas fa-shopping-cart"></i>
-        <span class="cart-count" id="cartCount">0</span>
-    </div>
 
-    <!-- MODAL CARRITO -->
-    <div id="cartModal" class="modal">
-        <div class="modal-content cart-drawer">
-            <div class="modal-header">
-                <h2><i class="fas fa-shopping-cart"></i> Tu Carrito</h2>
-                <button class="close-btn" onclick="closeCart()">&times;</button>
-            </div>
-            <div class="modal-body" id="cartBody">
-                <div class="empty-state">
-                    <i class="fas fa-shopping-cart"></i>
-                    <p>Tu carrito está vacío</p>
-                </div>
-            </div>
-            <div class="cart-footer" id="cartFooter" style="display: none;">
-                <div class="cart-total">
-                    <strong>Total: $<span id="cartTotal">0</span></strong>
-                </div>
-                <button class="btn btn-success" onclick="sendWhatsAppOrder()" style="width: 100%; margin-bottom: 0.5rem;">
-                    <i class="fab fa-whatsapp"></i> Enviar pedido por WhatsApp
-                </button>
-                <button class="btn btn-outline" onclick="clearCart()" style="width: 100%;">
-                    <i class="fas fa-trash"></i> Vaciar carrito
-                </button>
-            </div>
-        </div>
-    </div>
 </body>
 </html>
