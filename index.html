@@ -506,7 +506,54 @@
             background: #1a1a1a !important;
             color: white !important;
         }
+      
+                /* ===== PANEL TIENDA - FORMULARIO ===== */
+        #panel-shop .admin-card {
+            max-width: 100%;
+            overflow: hidden;
+        }
         
+        #panel-shop input[type="text"],
+        #panel-shop input[type="number"],
+        #panel-shop textarea {
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            background: rgba(0, 0, 0, 0.6) !important;
+            color: white !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            padding: 0.8rem !important;
+            margin-top: 0.3rem !important;
+            border-radius: 5px !important;
+            font-size: 1rem !important;
+        }
+        
+        #panel-shop textarea {
+            min-height: 80px !important;
+            resize: vertical;
+        }
+        
+        #panel-shop label {
+            display: block !important;
+            margin-bottom: 0.3rem !important;
+            color: var(--text-muted) !important;
+            font-weight: 500 !important;
+        }
+        
+        #panel-shop button {
+            margin-top: 1rem !important;
+        }
+        
+        @media (max-width: 768px) {
+            #panel-shop .admin-card {
+                padding: 1rem !important;
+            }
+            
+            #panel-shop input,
+            #panel-shop textarea {
+                font-size: 16px !important; /* Evita zoom en iPhone */
+            }
+        }
         .admin-panel select optgroup {
             color: var(--accent-light) !important;
             font-weight: bold;
