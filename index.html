@@ -1095,11 +1095,12 @@
         <h2 class="section-title">Sponsors</h2>
         <div class="sponsors-grid" id="sponsorsContainer"></div>
     </section>
-    <!-- SECCIÓN TIENDA -->
+
+       <!-- SECCIÓN TIENDA -->
     <section id="tienda" class="content-section">
         <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-arrow-left"></i> Volver al Inicio</button>
         <h2 class="section-title">Tienda Oficial</h2>
-        <div class="grid" id="productsContainer"></div>
+        <div id="productsContainer"></div>
     </section>
 
     <!-- CARRITO -->
@@ -1627,7 +1628,7 @@
             <form onsubmit="saveContactSimple(event, 'phone')">
                 <div class="form-group">
                     <label>Número de teléfono</label>
-                    <input type="tel" class="contact-phone-input" placeholder="Ej: +598 99 123 456" required>
+                    <input type="tel" class="contact-phone-input" placeholder="Ej: +598 99 404 435" required>
                 </div>
                 <div class="form-group">
                     <label>¿A quién pertenece? (opcional)</label>
@@ -1941,7 +1942,7 @@
                 { id: 2, test: "Sentadilla", holder: "Juan Pérez", mark: "280kg", date: "2023-10-20" }
             ];
             data.rules = [
-                { id: 1, category: "Levantamiento", name: "Peso Muerto", description: "Levantar la barra desde el suelo hasta extensión completa. No straps permitidos." }
+                { id: 1, category: "Levantamiento", name: "Peso Muerto", description: "Levantar la barra desde el suelo hasta extensión completa. Straps permitidos." }
             ];
             saveAllData();
         }
