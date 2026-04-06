@@ -575,7 +575,49 @@
                 right: 15px;
             }
         }
-        
+ 
+         /* Fix para tarjetas de productos */
+#productsContainer {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
+    gap: 2rem !important;
+    width: 100% !important;
+}
+
+.producto-card {
+    position: relative !important;
+    height: auto !important;
+    min-height: 450px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background: var(--secondary) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+}
+
+.producto-imagen {
+    width: 100% !important;
+    height: 250px !important;
+    object-fit: cover !important;
+    display: block !important;
+    background: #2a2a2a !important;
+}
+
+.producto-info {
+    padding: 1.5rem !important;
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.producto-nombre {
+    font-size: 1.2rem !important;
+    margin-bottom: 0.5rem !important;
+    line-height: 1.3 !important;
+    min-height: 3rem !important;
+}
+  
         /* Preview de fondos en admin */
         .bg-preview {
             width: 100%;
