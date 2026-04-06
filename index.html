@@ -2471,16 +2471,31 @@
             document.body.style.overflow = 'hidden';
         }
 
-        function closeAdminModal() {
-            document.getElementById('adminModal').classList.remove('active');
-            document.body.style.overflow = 'auto';
-            isAdmin = false;
-            document.getElementById('loginForm').style.display = 'block';
-            document.getElementById('adminDashboard').style.display = 'none';
-            document.getElementById('adminPassword').value = '';
-            document.getElementById('loginError').style.display = 'none';
-        }
-
+       function closeAdminModal() {
+    document.getElementById('adminModal').classList.remove('active');
+    document.body.style.overflow = 'auto';
+    
+    // Reset completo del estado de admin
+    isAdmin = false;
+    
+    // Ocultar dashboard y mostrar login
+    document.getElementById('loginForm').style.display = 'block';
+    document.getElementById('adminDashboard').style.display = 'none';
+    
+    // Limpiar password y error
+    document.getElementById('adminPassword').value = '';
+    document.getElementById('loginError').style.display = 'none';
+    
+    // Resetear tabs - quitar active de todas
+    document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+    
+    // Volver a poner la primera tab (events) como default para la próxima vez
+    const firstTab = document.querySelector('.admin-tab');
+    if (firstTab) firstTab.classList.add('active');
+    const firstPanel = document.querySelector('.admin-panel');
+    if (firstPanel) firstPanel.classList.add('active');
+}
         function login() {
             const password = document.getElementById('adminPassword').value;
             if (password === 'DiegoBeto2026') {
