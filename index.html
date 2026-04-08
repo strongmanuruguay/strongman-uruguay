@@ -1865,17 +1865,26 @@
                             </div>
                             <div style="margin-bottom: 1rem;">
     <label>Imagen Principal *</label>
-    <input type="text" id="productImage1" class="form-control" placeholder="https://... o img/producto.jpg" style="width: 100%; padding: 0.5rem; margin-top: 0.3rem;">
+    <input type="file" id="productImage1" accept="image/*" onchange="previewImage(this, 'preview1')" style="width: 100%; padding: 0.5rem; margin-top: 0.3rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px;">
+    <div id="preview1" style="margin-top: 0.5rem; max-width: 200px; display: none;">
+        <img src="" style="width: 100%; border-radius: 8px; border: 2px solid var(--gold);">
+    </div>
 </div>
 <div style="margin-bottom: 1rem;">
     <label>Imagen 2 (opcional)</label>
-    <input type="text" id="productImage2" class="form-control" placeholder="https://... o img/producto-2.jpg" style="width: 100%; padding: 0.5rem; margin-top: 0.3rem;">
+    <input type="file" id="productImage2" accept="image/*" onchange="previewImage(this, 'preview2')" style="width: 100%; padding: 0.5rem; margin-top: 0.3rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px;">
+    <div id="preview2" style="margin-top: 0.5rem; max-width: 200px; display: none;">
+        <img src="" style="width: 100%; border-radius: 8px; border: 2px solid var(--accent);">
+    </div>
 </div>
 <div style="margin-bottom: 1rem;">
     <label>Imagen 3 (opcional)</label>
-    <input type="text" id="productImage3" class="form-control" placeholder="https://... o img/producto-3.jpg" style="width: 100%; padding: 0.5rem; margin-top: 0.3rem;">
-</div> 
-                           <div style="margin-bottom: 1rem;">
+    <input type="file" id="productImage3" accept="image/*" onchange="previewImage(this, 'preview3')" style="width: 100%; padding: 0.5rem; margin-top: 0.3rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px;">
+    <div id="preview3" style="margin-top: 0.5rem; max-width: 200px; display: none;">
+        <img src="" style="width: 100%; border-radius: 8px; border: 2px solid var(--accent);">
+    </div>
+</div>
+                                                       <div style="margin-bottom: 1rem;">
                                 <label>Stock disponible</label>
                                 <input type="number" id="productStock" class="form-control" value="0" min="0" style="width: 100%; padding: 0.5rem; margin-top: 0.3rem;">
                             </div>
@@ -3456,7 +3465,7 @@
 let cart = JSON.parse(localStorage.getItem('cartStrongman')) || [];
 
 // Cargar productos desde localStorage
-function loadProducts() {
+ function loadProducts() {
     const productos = JSON.parse(localStorage.getItem('productosTienda')) || [];
     const grid = document.getElementById('productsContainer');
     
@@ -3706,14 +3715,11 @@ document.addEventListener('DOMContentLoaded', () => {
             container.innerHTML = html;
         }
 
-        function saveProduct() {
+         function saveProduct() {
     const id = document.getElementById('productId').value;
     const nombre = document.getElementById('productName').value.trim();
     const precio = parseFloat(document.getElementById('productPrice').value);
     const descripcion = document.getElementById('productDesc').value.trim();
-    const imagen1 = document.getElementById('productImage1').value.trim();
-    const imagen2 = document.getElementById('productImage2').value.trim();
-    const imagen3 = document.getElementById('productImage3').value.trim();
     const stock = parseInt(document.getElementById('productStock').value) || 0;
     
     if (!nombre || !precio || precio <= 0) {
@@ -3721,42 +3727,106 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
     
-    if (!imagen1) {
-        alert('❌ La imagen principal es obligatoria');
-        return;
-    }
+    // Verificar que haya al menos una imagen (nueva o existente)
+    const fileInput1 = document.getElementById('productImage1');
+    const fileInput2 = document.getElementById('productImage2');
+    const fileInput3 = document.getElementById('productImage3');
     
-    let products = JSON.parse(localStorage.getItem('productosTienda')) || [];
-    
-    // Crear array de imágenes (solo las que tienen valor)
-    const imagenes = [imagen1];
-    if (imagen2) imagenes.push(imagen2);
-    if (imagen3) imagenes.push(imagen3);
-    
+    // Si estamos editando, mantener imágenes existentes si no se seleccionaron nuevas
+    let imagenesExistentes = [];
     if (id) {
-        const index = products.findIndex(p => p.id === id);
-        if (index !== -1) {
-            products[index] = { id, nombre, precio, descripcion, imagenes, stock };
+        const products = JSON.parse(localStorage.getItem('productosTienda')) || [];
+        const existing = products.find(p => p.id === id);
+        if (existing && existing.imagenes) {
+            imagenesExistentes = existing.imagenes;
         }
-    } else {
-        const newProduct = {
-            id: Date.now().toString(),
-            nombre,
-            precio,
-            descripcion,
-            imagenes,
-            stock
-        };
-        products.push(newProduct);
     }
     
-    localStorage.setItem('productosTienda', JSON.stringify(products));
-    loadProductsList();
-    clearProductForm();
-    alert('✅ Producto guardado correctamente');
-}
-              
-    function editProduct(id) {
+    // Leer archivos seleccionados
+    const imagenesNuevas = [];
+    const promesas = [];
+    
+    // Función para leer archivo como base64
+    function readFile(file) {
+        return new Promise((resolve) => {
+            if (!file) {
+                resolve(null);
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                resolve(e.target.result);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+    
+    // Leer las 3 imágenes
+    promesas.push(readFile(fileInput1.files[0]));
+    promesas.push(readFile(fileInput2.files[0]));
+    promesas.push(readFile(fileInput3.files[0]));
+    
+    Promise.all(promesas).then(resultados => {
+        // Construir array final de imágenes
+        const imagenesFinales = [];
+        
+        // Imagen 1: usar nueva si existe, sino la existente, sino error
+        if (resultados[0]) {
+            imagenesFinales.push(resultados[0]);
+        } else if (imagenesExistentes[0]) {
+            imagenesFinales.push(imagenesExistentes[0]);
+        } else if (!id) {
+            alert('❌ La imagen principal es obligatoria');
+            return;
+        }
+        
+        // Imagen 2: usar nueva si existe, sino la existente
+        if (resultados[1]) {
+            imagenesFinales.push(resultados[1]);
+        } else if (imagenesExistentes[1]) {
+            imagenesFinales.push(imagenesExistentes[1]);
+        }
+        
+        // Imagen 3: usar nueva si existe, sino la existente
+        if (resultados[2]) {
+            imagenesFinales.push(resultados[2]);
+        } else if (imagenesExistentes[2]) {
+            imagenesFinales.push(imagenesExistentes[2]);
+        }
+        
+        // Guardar producto
+        let products = JSON.parse(localStorage.getItem('productosTienda')) || [];
+        
+        if (id) {
+            const index = products.findIndex(p => p.id === id);
+            if (index !== -1) {
+                products[index] = { id, nombre, precio, descripcion, imagenes: imagenesFinales, stock };
+            }
+        } else {
+            const newProduct = {
+                id: Date.now().toString(),
+                nombre,
+                precio,
+                descripcion,
+                imagenes: imagenesFinales,
+                stock
+            };
+            products.push(newProduct);
+        }
+        
+        localStorage.setItem('productosTienda', JSON.stringify(products));
+        loadProductsList();
+        clearProductForm();
+        
+        // Limpiar previews
+        document.getElementById('preview1').style.display = 'none';
+        document.getElementById('preview2').style.display = 'none';
+        document.getElementById('preview3').style.display = 'none';
+        
+        alert('✅ Producto guardado correctamente');
+    });
+}             
+     function editProduct(id) {
     const products = JSON.parse(localStorage.getItem('productosTienda')) || [];
     const product = products.find(p => p.id === id);
     
@@ -3766,27 +3836,42 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('productName').value = product.nombre;
     document.getElementById('productPrice').value = product.precio;
     document.getElementById('productDesc').value = product.descripcion || '';
+    document.getElementById('productStock').value = product.stock || 0;
     
-    // Manejar imágenes (array o string antiguo)
-    if (product.imagenes && Array.isArray(product.imagenes)) {
-        document.getElementById('productImage1').value = product.imagenes[0] || '';
-        document.getElementById('productImage2').value = product.imagenes[1] || '';
-        document.getElementById('productImage3').value = product.imagenes[2] || '';
-    } else if (product.imagen) {
-        // Compatibilidad con productos antiguos (1 sola imagen)
-        document.getElementById('productImage1').value = product.imagen;
-        document.getElementById('productImage2').value = '';
-        document.getElementById('productImage3').value = '';
+    // Limpiar inputs de archivo y previews
+    document.getElementById('productImage1').value = '';
+    document.getElementById('productImage2').value = '';
+    document.getElementById('productImage3').value = '';
+    
+    // Mostrar imágenes existentes en los previews
+    const imagenes = product.imagenes || [];
+    
+    if (imagenes[0]) {
+        const preview1 = document.getElementById('preview1');
+        preview1.querySelector('img').src = imagenes[0];
+        preview1.style.display = 'block';
     } else {
-        document.getElementById('productImage1').value = '';
-        document.getElementById('productImage2').value = '';
-        document.getElementById('productImage3').value = '';
+        document.getElementById('preview1').style.display = 'none';
     }
     
-    document.getElementById('productStock').value = product.stock || 0;
+    if (imagenes[1]) {
+        const preview2 = document.getElementById('preview2');
+        preview2.querySelector('img').src = imagenes[1];
+        preview2.style.display = 'block';
+    } else {
+        document.getElementById('preview2').style.display = 'none';
+    }
+    
+    if (imagenes[2]) {
+        const preview3 = document.getElementById('preview3');
+        preview3.querySelector('img').src = imagenes[2];
+        preview3.style.display = 'block';
+    } else {
+        document.getElementById('preview3').style.display = 'none';
+    }
+    
     document.getElementById('shopFormTitle').textContent = 'Editar Producto';
-}   
-
+}
         function deleteProduct(id) {
             if (!confirm('¿Eliminar este producto?')) return;
             
@@ -3796,7 +3881,25 @@ document.addEventListener('DOMContentLoaded', () => {
             loadProductsList();
         }
 
-       function clearProductForm() {
+// Previsualizar imagen seleccionada
+function previewImage(input, previewId) {
+    const previewDiv = document.getElementById(previewId);
+    const img = previewDiv.querySelector('img');
+    
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            img.src = e.target.result;
+            previewDiv.style.display = 'block';
+        };
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        previewDiv.style.display = 'none';
+        img.src = '';
+    }
+}
+
+      function clearProductForm() {
     document.getElementById('productId').value = '';
     document.getElementById('productName').value = '';
     document.getElementById('productPrice').value = '';
@@ -3806,8 +3909,12 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('productImage3').value = '';
     document.getElementById('productStock').value = '0';
     document.getElementById('shopFormTitle').textContent = 'Agregar Producto';
+    
+    // Limpiar previews
+    document.getElementById('preview1').style.display = 'none';
+    document.getElementById('preview2').style.display = 'none';
+    document.getElementById('preview3').style.display = 'none';
 }
-
         // Agregar shop a loadAdminList
         const originalLoadAdminList = loadAdminList;
         loadAdminList = function(type) {
