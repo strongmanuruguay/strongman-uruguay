@@ -1250,7 +1250,7 @@
                         <button class="admin-tab" onclick="switchTab('sponsors')">Sponsors</button>
                         <button class="admin-tab" onclick="switchTab('contacts')">Contactos</button>
                         <button class="admin-tab" onclick="switchTab('settings')">Apariencia</button>
-                        <button class="admin-tab" onclick="switchTab('shop')">Tienda</button>
+                        <button class="admin-tab" onclick="openShopModal()">Tienda</button>
                     </div>
 
                     <!-- PANEL EVENTOS -->
@@ -1843,64 +1843,93 @@
     </div>
                     
             </div>
-        </div>    
-         <div id="panel-shop" class="admin-panel">
-                        <h3>Gestión de Tienda</h3>
-                        
-                        <!-- Formulario para agregar/editar producto -->
-                        <div class="admin-card" style="margin-bottom: 2rem;">
-                            <h4 id="shopFormTitle">Agregar Producto</h4>
-                            <input type="hidden" id="productId">
-                            <div style="margin-bottom: 1rem;">
-                                <label>Nombre del producto *</label>
-                                <input type="text" id="productName" class="form-control" placeholder="Ej: Muñequeras Strongman" style="width: 100%; padding: 0.5rem; margin-top: 0.3rem;">
-                            </div>
-                            <div style="margin-bottom: 1rem;">
-                                <label>Precio (UYU) *</label>
-                                <input type="number" id="productPrice" class="form-control" placeholder="Ej: 1500" style="width: 100%; padding: 0.5rem; margin-top: 0.3rem;">
-                            </div>
-                            <div style="margin-bottom: 1rem;">
-                                <label>Descripción</label>
-                                <textarea id="productDesc" class="form-control" placeholder="Descripción del producto..." style="width: 100%; padding: 0.5rem; margin-top: 0.3rem; min-height: 80px;"></textarea>
-                            </div>
-                            <div style="margin-bottom: 1rem;">
-    <label>Imagen Principal *</label>
-    <input type="file" id="productImage1" accept="image/*" onchange="previewImage(this, 'preview1')" style="width: 100%; padding: 0.5rem; margin-top: 0.3rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px;">
-    <div id="preview1" style="margin-top: 0.5rem; max-width: 200px; display: none;">
-        <img src="" style="width: 100%; border-radius: 8px; border: 2px solid var(--gold);">
-    </div>
-</div>
-<div style="margin-bottom: 1rem;">
-    <label>Imagen 2 (opcional)</label>
-    <input type="file" id="productImage2" accept="image/*" onchange="previewImage(this, 'preview2')" style="width: 100%; padding: 0.5rem; margin-top: 0.3rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px;">
-    <div id="preview2" style="margin-top: 0.5rem; max-width: 200px; display: none;">
-        <img src="" style="width: 100%; border-radius: 8px; border: 2px solid var(--accent);">
-    </div>
-</div>
-<div style="margin-bottom: 1rem;">
-    <label>Imagen 3 (opcional)</label>
-    <input type="file" id="productImage3" accept="image/*" onchange="previewImage(this, 'preview3')" style="width: 100%; padding: 0.5rem; margin-top: 0.3rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px;">
-    <div id="preview3" style="margin-top: 0.5rem; max-width: 200px; display: none;">
-        <img src="" style="width: 100%; border-radius: 8px; border: 2px solid var(--accent);">
-    </div>
-</div>
-                                                       <div style="margin-bottom: 1rem;">
-                                <label>Stock disponible</label>
-                                <input type="number" id="productStock" class="form-control" value="0" min="0" style="width: 100%; padding: 0.5rem; margin-top: 0.3rem;">
-                            </div>
-                            <button class="btn btn-success" onclick="saveProduct()">💾 Guardar Producto</button>
-                            <button class="btn btn-outline" onclick="clearProductForm()" style="margin-left: 0.5rem;">🔄 Limpiar</button>
-                        </div>
-                        
-                        <!-- Lista de productos -->
-                        <div class="admin-card">
-                            <h4>Productos en Tienda</h4>
-                            <div id="productsList">
-                                <p style="color: var(--text-muted);">Cargando productos...</p>
-                            </div>
+        </div> 
+
+<!-- MODAL TIENDA - APARTE -->
+<div id="shopModal" class="modal">
+    <div class="modal-content" style="max-width: 1000px; max-height: 90vh;">
+        <div class="modal-header" style="background: var(--gold); color: #000;">
+            <h2><i class="fas fa-store"></i> Gestión de Tienda</h2>
+            <button class="close-btn" onclick="closeShopModal()" style="color: #000;">&times;</button>
+        </div>
+        <div class="modal-body" style="overflow-y: auto;">
+            
+            <!-- Botón volver al admin -->
+            <button class="btn btn-outline" onclick="closeShopModal()" style="margin-bottom: 1.5rem;">
+                <i class="fas fa-arrow-left"></i> Volver al Panel de Administrador
+            </button>
+            
+            <!-- Formulario de producto -->
+            <div class="admin-card" style="margin-bottom: 2rem;">
+                <h4 id="shopFormTitle">Agregar Producto</h4>
+                <input type="hidden" id="productId">
+                
+                <div style="margin-bottom: 1rem;">
+                    <label>Nombre del producto *</label>
+                    <input type="text" id="productName" placeholder="Ej: Muñequeras Strongman" style="width: 100%; padding: 0.8rem; margin-top: 0.3rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px;">
+                </div>
+                
+                <div style="margin-bottom: 1rem;">
+                    <label>Precio (UYU) *</label>
+                    <input type="number" id="productPrice" placeholder="Ej: 1500" style="width: 100%; padding: 0.8rem; margin-top: 0.3rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px;">
+                </div>
+                
+                <div style="margin-bottom: 1rem;">
+                    <label>Descripción</label>
+                    <textarea id="productDesc" placeholder="Descripción del producto..." style="width: 100%; padding: 0.8rem; margin-top: 0.3rem; min-height: 80px; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px;"></textarea>
+                </div>
+                
+                <!-- Imágenes -->
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <label>Imagen Principal *</label>
+                        <input type="file" id="productImage1" accept="image/*" onchange="previewImage(this, 'preview1')" style="width: 100%; padding: 0.5rem; margin-top: 0.3rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px;">
+                        <div id="preview1" style="margin-top: 0.5rem; display: none;">
+                            <img src="" style="width: 100%; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--gold);">
                         </div>
                     </div>
-    <script>
+                    <div>
+                        <label>Imagen 2 (opcional)</label>
+                        <input type="file" id="productImage2" accept="image/*" onchange="previewImage(this, 'preview2')" style="width: 100%; padding: 0.5rem; margin-top: 0.3rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px;">
+                        <div id="preview2" style="margin-top: 0.5rem; display: none;">
+                            <img src="" style="width: 100%; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--accent);">
+                        </div>
+                    </div>
+                    <div>
+                        <label>Imagen 3 (opcional)</label>
+                        <input type="file" id="productImage3" accept="image/*" onchange="previewImage(this, 'preview3')" style="width: 100%; padding: 0.5rem; margin-top: 0.3rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px;">
+                        <div id="preview3" style="margin-top: 0.5rem; display: none;">
+                            <img src="" style="width: 100%; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--accent);">
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 1rem;">
+                    <label>Stock disponible</label>
+                    <input type="number" id="productStock" value="0" min="0" style="width: 100%; padding: 0.8rem; margin-top: 0.3rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px;">
+                </div>
+                
+                <button class="btn btn-success" onclick="saveProduct()">
+                    <i class="fas fa-save"></i> Guardar Producto
+                </button>
+                <button class="btn btn-outline" onclick="clearProductForm()" style="margin-left: 0.5rem;">
+                    <i class="fas fa-undo"></i> Limpiar
+                </button>
+            </div>
+            
+            <!-- Lista de productos -->
+            <div class="admin-card">
+                <h4>Productos en Tienda</h4>
+                <div id="productsList">
+                    <p style="color: var(--text-muted);">Cargando productos...</p>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+   
+             <script>
         // DATOS
         let data = {
             events: JSON.parse(localStorage.getItem('acaf_events')) || [],
@@ -2512,6 +2541,23 @@
     if (firstTab) firstTab.classList.add('active');
     const firstPanel = document.querySelector('.admin-panel');
     if (firstPanel) firstPanel.classList.add('active');
+}
+
+
+// Abrir modal de tienda
+function openShopModal() {
+    document.getElementById('shopModal').classList.add('active');
+    loadProductsList();
+}
+
+// Cerrar modal de tienda y volver al admin
+function closeShopModal() {
+    document.getElementById('shopModal').classList.remove('active');
+    // Limpiar formulario al cerrar
+    clearProductForm();
+    document.getElementById('preview1').style.display = 'none';
+    document.getElementById('preview2').style.display = 'none';
+    document.getElementById('preview3').style.display = 'none';
 }
         function login() {
             const password = document.getElementById('adminPassword').value;
