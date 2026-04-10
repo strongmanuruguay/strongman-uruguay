@@ -952,6 +952,7 @@
                 <li><a onclick="showSection('cursos')">Cursos</a></li>
                 <li><a onclick="showSection('jueces')">Jueces</a></li>
                 <li><a onclick="showSection('tienda')">Tienda</a></li>
+                <li><a onclick="showSection('competencias-publico')">Competencias</a></li>
 
 
                 <li><a onclick="openAdminModal(); return false;" class="admin-btn"><i class="fas fa-lock"></i> Admin</a></li>
@@ -1042,6 +1043,12 @@
             </div>
             
             <div class="menu-item" onclick="showSection('tienda')">
+            <div class="menu-item" onclick="showSection('competencias-publico')">
+    <i class="fas fa-clipboard-list"></i>
+    <h3>Competencias</h3>
+    <p>Resultados de torneos y planillas</p>
+</div>
+               
                 <i class="fas fa-shopping-cart"></i>
                 <h3>Tienda</h3>
                 <p>Productos oficiales de la asociación</p>
@@ -1144,6 +1151,26 @@
         <h2 class="section-title">Tienda Oficial</h2>
         <div id="productsContainer"></div>
     </section>
+
+<!-- SECCIÓN COMPETENCIAS PÚBLICO -->
+<section id="competencias-publico" class="content-section">
+    <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-arrow-left"></i> Volver al Inicio</button>
+    <h2 class="section-title">Competencias y Resultados</h2>
+    
+    <div style="margin-bottom: 2rem;">
+        <label style="color: var(--text-muted);">Seleccionar Torneo</label>
+        <select id="publicCompSelect" onchange="cargarCompetenciaPublica()" style="width: 100%; max-width: 500px; padding: 1rem; margin-top: 0.5rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px; font-size: 1rem;">
+            <option value="">Seleccione un torneo...</option>
+        </select>
+    </div>
+    
+    <div id="publicCompContainer">
+        <div class="empty-state">
+            <i class="fas fa-clipboard-list"></i>
+            <p>Seleccione un torneo para ver los resultados oficiales</p>
+        </div>
+    </div>
+</section>
 
     <!-- CARRITO -->
     <div class="cart-float-btn" onclick="openCart()" id="cartBtn">
@@ -2306,6 +2333,7 @@
                 if (sectionId === 'jueces') renderJudges();
                 if (sectionId === 'sponsors') renderSponsors();
                 if (sectionId === 'tienda') loadProducts();
+                if (sectionId === 'competencias-publico') actualizarSelectCompPublicas();
             }
             
             // Cerrar menú en móvil si está abierto
@@ -3371,6 +3399,148 @@ function cargarResultadosPublicos() {
             `;
         }).join('')}
     `;
+}
+
+
+// Cargar competencia en vista pública
+function cargarCompetenciaPublica() {
+    const select = document.getElementById('publicCompSelect');
+    const container = document.getElementById('publicCompContainer');
+    const compId = select.value;
+    
+    if (!compId) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-clipboard-list"></i>
+                <p>Seleccione un torneo para ver los resultados oficiales</p>
+            </div>
+        `;
+        return;
+    }
+    
+    const competencias = JSON.parse(localStorage.getItem('acaf_competencias')) || [];
+    const comp = competencias.find(c => c.id === compId);
+    
+    if (!comp) return;
+    
+    // Agrupar por categoría
+    const categorias = [...new Set(comp.atletas.map(a => a.categoria))].filter(c => c);
+    
+    container.innerHTML = `
+        <div style="background: var(--secondary); padding: 2rem; border-radius: 15px; margin-bottom: 2rem; border: 1px solid rgba(255,255,255,0.1);">
+            <h3 style="color: var(--gold); font-size: 2rem; margin-bottom: 1rem;">${comp.nombre}</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; color: var(--text-muted); margin-bottom: 1rem;">
+                <span><i class="fas fa-calendar" style="color: var(--accent);"></i> ${formatearFecha(comp.fecha)}</span>
+                <span><i class="fas fa-clock" style="color: var(--accent);"></i> ${comp.hora} hs</span>
+                <span><i class="fas fa-map-marker-alt" style="color: var(--accent);"></i> ${comp.lugar}</span>
+                <span><i class="fas fa-users" style="color: var(--accent);"></i> ${comp.atletas.length} atletas</span>
+            </div>
+            <p><strong style="color: var(--accent-light);">Jueces:</strong> ${comp.jueces.join(', ')}</p>
+            <p><strong style="color: var(--accent-light);">Estado:</strong> <span style="color: ${comp.estado === 'finalizada' ? 'var(--success)' : 'var(--warning)'}; text-transform: uppercase;">${comp.estado === 'finalizada' ? '✅ Finalizada' : '⏳ En curso'}</span></p>
+        </div>
+        
+        ${comp.estado !== 'finalizada' ? `
+            <div style="background: rgba(255,193,7,0.1); border: 1px solid var(--warning); padding: 1rem; border-radius: 10px; margin-bottom: 2rem; text-align: center;">
+                <i class="fas fa-exclamation-triangle" style="color: var(--warning);"></i>
+                <span style="color: var(--warning);"> Esta competencia aún no ha finalizado. Los resultados son parciales.</span>
+            </div>
+        ` : ''}
+        
+        <h3 style="color: var(--accent-light); margin-bottom: 1.5rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem;">Resultados por Categoría</h3>
+        
+        ${categorias.length === 0 ? '<p style="color: var(--text-muted);">No hay atletas clasificados por categoría</p>' : categorias.map(cat => {
+            const deCategoria = comp.atletas
+                .filter(a => a.categoria === cat)
+                .sort((a, b) => (a.posicion || 999) - (b.posicion || 999));
+            
+            if (deCategoria.length === 0) return '';
+            
+            return `
+                <div style="background: var(--secondary); padding: 1.5rem; border-radius: 15px; margin-bottom: 2rem; border: 1px solid rgba(255,255,255,0.1);">
+                    <h4 style="color: var(--gold); margin-bottom: 1rem; font-size: 1.3rem;">${getCategoriaLabel(cat)}</h4>
+                    
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
+                            <thead>
+                                <tr style="background: rgba(0,102,204,0.2);">
+                                    <th style="padding: 1rem; text-align: center; border-bottom: 2px solid var(--accent);">Posición</th>
+                                    <th style="padding: 1rem; text-align: left; border-bottom: 2px solid var(--accent);">Atleta</th>
+                                    ${comp.pruebas.map(p => `
+                                        <th style="padding: 1rem; text-align: center; border-bottom: 2px solid var(--accent);">
+                                            ${p.nombre}
+                                            <small style="display: block; color: var(--text-muted); font-weight: normal;">${p.implemento}</small>
+                                        </th>
+                                    `).join('')}
+                                    <th style="padding: 1rem; text-align: center; border-bottom: 2px solid var(--accent);">Total Puntos</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${deCategoria.map((a, idx) => `
+                                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); ${idx < 3 ? 'background: rgba(255,215,0,0.05);' : ''}">
+                                        <td style="padding: 1rem; text-align: center; font-size: 1.5rem;">
+                                            ${a.posicion === 1 ? '🥇' : a.posicion === 2 ? '🥈' : a.posicion === 3 ? '🥉' : `<span style="color: var(--text-muted);">${a.posicion || '-'}</span>`}
+                                        </td>
+                                        <td style="padding: 1rem;">
+                                            <div style="font-weight: bold; color: var(--text);">${a.nombre}</div>
+                                            <small style="color: var(--text-muted);">#${a.numero}</small>
+                                        </td>
+                                        ${comp.pruebas.map(p => {
+                                            const r = a.resultados?.[p.id];
+                                            return `
+                                                <td style="padding: 1rem; text-align: center;">
+                                                    ${r?.marca ? `
+                                                        <div style="font-weight: bold;">${r.marca}</div>
+                                                        ${r.puntos ? `<small style="color: var(--gold);">${r.puntos} pts</small>` : ''}
+                                                    ` : '<span style="color: var(--text-muted);">-</span>'}
+                                                </td>
+                                            `;
+                                        }).join('')}
+                                        <td style="padding: 1rem; text-align: center; font-weight: bold; color: var(--gold); font-size: 1.2rem;">
+                                            ${a.totalPuntos || 0}
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }).join('')}
+        
+        ${comp.pruebas.length > 0 ? `
+            <div style="background: var(--secondary); padding: 1.5rem; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); margin-top: 2rem;">
+                <h4 style="color: var(--accent-light); margin-bottom: 1rem;">Detalle de Pruebas</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                    ${comp.pruebas.map((p, idx) => `
+                        <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 10px;">
+                            <strong style="color: var(--gold);">${idx + 1}. ${p.nombre}</strong>
+                            <p style="color: var(--text-muted); margin: 0.5rem 0 0 0; font-size: 0.9rem;">
+                                Implemento: ${p.implemento}<br>
+                                ${p.pesoImplemento ? `Peso: ${p.pesoImplemento}kg<br>` : ''}
+                                Tipo: ${p.tipo === 'peso' ? 'Peso máximo' : p.tipo === 'distancia' ? 'Distancia' : p.tipo === 'tiempo' ? 'Tiempo' : 'Repeticiones'}
+                            </p>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        ` : ''}
+    `;
+}
+
+// Actualizar select de competencias públicas
+function actualizarSelectCompPublicas() {
+    const select = document.getElementById('publicCompSelect');
+    if (!select) return;
+    
+    const competencias = JSON.parse(localStorage.getItem('acaf_competencias')) || [];
+    
+    // Ordenar por fecha (más reciente primero)
+    competencias.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+    
+    select.innerHTML = '<option value="">Seleccione un torneo...</option>' +
+        competencias.map(c => `
+            <option value="${c.id}">${c.nombre} - ${formatearFecha(c.fecha)} ${c.estado === 'finalizada' ? '✓' : ''}</option>
+        `).join('');
 }
 
 // Helper: obtener label de categoría
