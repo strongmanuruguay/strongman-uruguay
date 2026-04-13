@@ -5585,17 +5585,5 @@ function eliminarSuscriptor(email) {
   suscriptores = suscriptores.filter(s => s.email !== email);
   localStorage.setItem
 
-  localStorage.setItem('strongman_suscriptores', JSON.stringify(suscriptores));
-}
-
-// Cerrar popup al hacer clic fuera
-document.addEventListener('click', function(event) {
-  const popup = document.getElementById('popup-suscripcion');
-  if (event.target === popup) {
-    cerrarPopupTemporal();
-  }
-});
-</script>
-
 </body>
 </html>
