@@ -1,5 +1,306 @@
 <!DOCTYPE html>
 <html lang="es">
+
+<style>
+/* ============================================
+   POPUP DE SUSCRIPCIÓN - STRONGMAN URUGUAY
+   ============================================ */
+
+.popup-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85);
+  z-index: 10000;
+  justify-content: center;
+  align-items: center;
+}
+
+.popup-overlay.activo {
+  display: flex;
+}
+
+.popup-contenido {
+  background: linear-gradient(145deg, #1a1a2e 0%, #16213e 100%);
+  border: 3px solid #e94560;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 450px;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(233, 69, 96, 0.4);
+  color: white;
+  overflow: hidden;
+}
+
+.popup-cerrar {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: none;
+  border: none;
+  color: #e94560;
+  font-size: 32px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.popup-header {
+  text-align: center;
+  padding: 30px 25px 20px;
+  background: rgba(233, 69, 96, 0.1);
+}
+
+.popup-icono {
+  font-size: 50px;
+  margin-bottom: 10px;
+}
+
+.popup-header h2 {
+  color: #e94560;
+  margin: 0 0 10px 0;
+  font-size: 22px;
+  text-transform: uppercase;
+}
+
+.popup-header p {
+  color: #a0a0a0;
+  margin: 0;
+  font-size: 14px;
+}
+
+.popup-body {
+  padding: 20px 25px;
+}
+
+.campo-form {
+  margin-bottom: 15px;
+}
+
+.campo-form label {
+  display: block;
+  margin-bottom: 5px;
+  color: #e94560;
+  font-weight: bold;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.campo-form input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #0f3460;
+  border-radius: 8px;
+  background-color: #0a0a0a;
+  color: white;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+.campo-form input:focus {
+  outline: none;
+  border-color: #e94560;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: flex-start;
+  margin: 20px 0;
+  font-size: 12px;
+  color: #ccc;
+  line-height: 1.4;
+}
+
+.checkbox-container input[type="checkbox"] {
+  margin-right: 10px;
+  margin-top: 2px;
+  width: 16px;
+  height: 16px;
+  accent-color: #e94560;
+  flex-shrink: 0;
+}
+
+.checkbox-container a {
+  color: #e94560;
+  text-decoration: underline;
+}
+
+.btn-suscribir {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(45deg, #e94560, #ff6b6b);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  letter-spacing: 1px;
+}
+
+.btn-no-gracias {
+  width: 100%;
+  padding: 12px;
+  margin-top: 12px;
+  background: transparent;
+  color: #888;
+  border: 1px solid #444;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.popup-footer {
+  text-align: center;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.3);
+  font-size: 11px;
+  color: #666;
+}
+
+.modal-terminos {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  z-index: 10001;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-terminos.activo {
+  display: flex;
+}
+
+.modal-contenido {
+  background: #1a1a2e;
+  border: 2px solid #e94560;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 25px;
+  position: relative;
+  color: white;
+}
+
+.modal-cerrar {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: none;
+  border: none;
+  color: #e94560;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.terminos-texto {
+  margin: 20px 0;
+  line-height: 1.6;
+  font-size: 13px;
+}
+
+.terminos-texto p {
+  margin-bottom: 12px;
+  color: #ccc;
+}
+
+.terminos-texto strong {
+  color: #e94560;
+}
+
+.btn-aceptar {
+  width: 100%;
+  padding: 12px;
+  background: #e94560;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.mensaje-exito {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  z-index: 10002;
+  justify-content: center;
+  align-items: center;
+}
+
+.mensaje-exito.activo {
+  display: flex;
+}
+
+.mensaje-contenido {
+  background: linear-gradient(145deg, #1a1a2e, #16213e);
+  border: 3px solid #4ecca3;
+  border-radius: 15px;
+  padding: 40px;
+  text-align: center;
+  max-width: 350px;
+  color: white;
+}
+
+.icono-exito {
+  width: 60px;
+  height: 60px;
+  background: #4ecca3;
+  color: #1a1a2e;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  font-weight: bold;
+  margin: 0 auto 20px;
+}
+
+.mensaje-contenido h3 {
+  color: #4ecca3;
+  margin-bottom: 10px;
+  font-size: 22px;
+}
+
+.mensaje-contenido button {
+  margin-top: 20px;
+  padding: 12px 30px;
+  background: #4ecca3;
+  color: #1a1a2e;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+@media (max-width: 480px) {
+  .popup-contenido {
+    width: 95%;
+    margin: 10px;
+  }
+  
+  .popup-header h2 {
+    font-size: 18px;
+  }
+}
+/* ============================================ */
+</style>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -5068,6 +5369,221 @@ function closeImageZoom() {
             }
         };
     </script>
+
+<!-- ============================================
+     POPUP DE SUSCRIPCIÓN - STRONGMAN URUGUAY
+     ============================================ -->
+<div id="popup-suscripcion" class="popup-overlay">
+  <div class="popup-contenido">
+    <button class="popup-cerrar" onclick="cerrarPopup()">&times;</button>
+    
+    <div class="popup-header">
+      <div class="popup-icono">💪</div>
+      <h2>¡Únete a Strongman Uruguay!</h2>
+      <p>Recibí noticias de eventos, cursos, talleres y más</p>
+    </div>
+    
+    <div class="popup-body">
+      <form id="form-suscripcion" onsubmit="registrarSuscriptor(event)">
+        <div class="campo-form">
+          <label for="nombre">Nombre</label>
+          <input type="text" id="nombre" name="nombre" required placeholder="Tu nombre">
+        </div>
+        
+        <div class="campo-form">
+          <label for="apellido">Apellido</label>
+          <input type="text" id="apellido" name="apellido" required placeholder="Tu apellido">
+        </div>
+        
+        <div class="campo-form">
+          <label for="email">Correo Electrónico</label>
+          <input type="email" id="email" name="email" required placeholder="tu@email.com">
+        </div>
+        
+        <div class="checkbox-container">
+          <input type="checkbox" id="acepto" name="acepto" required>
+          <label for="acepto">
+            Acepto recibir notificaciones sobre eventos, talleres, cursos e indumentaria de Strongman Uruguay.
+            <a href="#" onclick="mostrarTerminos(); return false;">Ver términos</a>
+          </label>
+        </div>
+        
+        <button type="submit" class="btn-suscribir">SUSCRIBIRME</button>
+      </form>
+      
+      <button class="btn-no-gracias" onclick="cerrarPopupTemporal()">
+        No por ahora
+      </button>
+    </div>
+    
+    <div class="popup-footer">
+      <p>🔒 Tu información está protegida</p>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DE TÉRMINOS Y CONDICIONES -->
+<div id="modal-terminos" class="modal-terminos">
+  <div class="modal-contenido">
+    <button class="modal-cerrar" onclick="cerrarTerminos()">&times;</button>
+    <h3>Términos y Condiciones</h3>
+    <div class="terminos-texto">
+      <p><strong>1. Datos:</strong> Nombre, apellido y correo electrónico.</p>
+      <p><strong>2. Uso:</strong> Envío de información sobre eventos, competencias, talleres, cursos e indumentaria.</p>
+      <p><strong>3. Frecuencia:</strong> Máximo 2-3 correos por semana.</p>
+      <p><strong>4. Derechos:</strong> Podés cancelar tu suscripción en cualquier momento.</p>
+      <p><strong>5. Protección:</strong> Cumplimos con la Ley N° 18.331 de Protección de Datos Personales de Uruguay.</p>
+    </div>
+    <button class="btn-aceptar" onclick="cerrarTerminos()">Entendido</button>
+  </div>
+</div>
+
+<!-- MENSAJE DE ÉXITO -->
+<div id="mensaje-exito" class="mensaje-exito">
+  <div class="mensaje-contenido">
+    <div class="icono-exito">✓</div>
+    <h3>¡Bienvenido!</h3>
+    <p>Gracias por suscribirte. Revisá tu correo.</p>
+    <button onclick="cerrarMensajeExito()">Perfecto</button>
+  </div>
+</div>
+<!-- ============================================ -->
+
+<script>
+// ============================================
+// SISTEMA DE SUSCRIPCIÓN - STRONGMAN URUGUAY
+// ============================================
+
+// Mostrar popup después de 3 segundos
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(function() {
+    mostrarPopupSiCorresponde();
+  }, 3000);
+});
+
+function mostrarPopupSiCorresponde() {
+  const suscrito = localStorage.getItem('strongman_suscrito');
+  const rechazo = localStorage.getItem('strongman_rechazo_fecha');
+  
+  if (suscrito === 'true') return;
+  
+  if (rechazo) {
+    const fechaRechazo = new Date(rechazo);
+    const ahora = new Date();
+    const diasDiferencia = (ahora - fechaRechazo) / (1000 * 60 * 60 * 24);
+    if (diasDiferencia < 7) return;
+  }
+  
+  mostrarPopup();
+}
+
+function mostrarPopup() {
+  const popup = document.getElementById('popup-suscripcion');
+  if (popup) {
+    popup.classList.add('activo');
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function cerrarPopup() {
+  const popup = document.getElementById('popup-suscripcion');
+  if (popup) {
+    popup.classList.remove('activo');
+    document.body.style.overflow = 'auto';
+  }
+}
+
+function cerrarPopupTemporal() {
+  localStorage.setItem('strongman_rechazo_fecha', new Date().toISOString());
+  cerrarPopup();
+}
+
+function mostrarTerminos() {
+  const modal = document.getElementById('modal-terminos');
+  if (modal) modal.classList.add('activo');
+}
+
+function cerrarTerminos() {
+  const modal = document.getElementById('modal-terminos');
+  if (modal) modal.classList.remove('activo');
+}
+
+function registrarSuscriptor(event) {
+  event.preventDefault();
+  
+  const nombre = document.getElementById('nombre').value.trim();
+  const apellido = document.getElementById('apellido').value.trim();
+  const email = document.getElementById('email').value.trim().toLowerCase();
+  
+  if (!validarEmail(email)) {
+    alert('Por favor, ingresa un correo electrónico válido.');
+    return;
+  }
+  
+  const suscriptor = {
+    id: Date.now(),
+    nombre: nombre,
+    apellido: apellido,
+    email: email,
+    fechaRegistro: new Date().toISOString(),
+    activo: true
+  };
+  
+  guardarSuscriptor(suscriptor);
+  localStorage.setItem('strongman_suscrito', 'true');
+  localStorage.removeItem('strongman_rechazo_fecha');
+  
+  cerrarPopup();
+  mostrarMensajeExito();
+  enviarCorreoConfirmacion(suscriptor);
+  
+  document.getElementById('form-suscripcion').reset();
+}
+
+function guardarSuscriptor(suscriptor) {
+  let suscriptores = JSON.parse(localStorage.getItem('strongman_suscriptores') || '[]');
+  const existe = suscriptores.find(s => s.email === suscriptor.email);
+  if (existe) {
+    alert('Este correo ya está registrado.');
+    return;
+  }
+  suscriptores.push(suscriptor);
+  localStorage.setItem('strongman_suscriptores', JSON.stringify(suscriptores));
+}
+
+function validarEmail(email) {
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return regex.test(email);
+}
+
+function mostrarMensajeExito() {
+  const mensaje = document.getElementById('mensaje-exito');
+  if (mensaje) mensaje.classList.add('activo');
+}
+
+function cerrarMensajeExito() {
+  const mensaje = document.getElementById('mensaje-exito');
+  if (mensaje) mensaje.classList.remove('activo');
+}
+
+function enviarCorreoConfirmacion(suscriptor) {
+  console.log('Correo de confirmación para:', suscriptor.email);
+  // Aquí iría la integración con EmailJS o servicio similar
+}
+
+// Funciones para el panel de admin
+function obtenerSuscriptores() {
+  return JSON.parse(localStorage.getItem('strongman_suscriptores') || '[]');
+}
+
+function obtenerCantidadSuscriptores() {
+  return obtenerSuscriptores().length;
+}
+
+function eliminarSuscriptor(email) {
+  let suscriptores = obtenerSuscriptores();
+  suscriptores = suscriptores.filter(s => s.email !== email);
+  localStorage.setItem
 
 </body>
 </html>
