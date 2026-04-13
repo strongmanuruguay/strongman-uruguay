@@ -5583,6 +5583,8 @@ function obtenerCantidadSuscriptores() {
 function eliminarSuscriptor(email) {
   let suscriptores = obtenerSuscriptores();
   suscriptores = suscriptores.filter(s => s.email !== email);
+  localStorage.setItem
+
   localStorage.setItem('strongman_suscriptores', JSON.stringify(suscriptores));
 }
 
