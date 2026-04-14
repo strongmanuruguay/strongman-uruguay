@@ -5154,114 +5154,137 @@ function closeImageZoom() {
 // SISTEMA DE SUSCRIPCIÓN - STRONGMAN URUGUAY
 // ============================================
 
-// Mostrar popup después de 3 segundos
-setTimeout(function() {
-  mostrarPopupSiCorresponde();
-}, 3000);
+// Ejecutar inmediatamente cuando el DOM esté listo
+(function() {
+    // Esperar a que todo cargue
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', iniciarPopup);
+    } else {
+        // Si ya cargó, ejecutar ahora
+        iniciarPopup();
+    }
+    
+    function iniciarPopup() {
+        // Verificar si ya se mostró en esta sesión
+        if (window.popupYaMostrado) return;
+        window.popupYaMostrado = true;
+        
+        // Esperar 2 segundos y mostrar
+        setTimeout(function() {
+            mostrarPopupSiCorresponde();
+        }, 2000);
+    }
+})();
 
 function mostrarPopupSiCorresponde() {
-  const suscrito = localStorage.getItem('strongman_suscrito');
-  const rechazo = localStorage.getItem('strongman_rechazo_fecha');
-  
-  if (suscrito === 'true') return;
-  
-  if (rechazo) {
-    const fechaRechazo = new Date(rechazo);
-    const ahora = new Date();
-    const diasDiferencia = (ahora - fechaRechazo) / (1000 * 60 * 60 * 24);
-    if (diasDiferencia < 7) return;
-  }
-  
-  mostrarPopup();
+    const suscrito = localStorage.getItem('strongman_suscrito');
+    const rechazo = localStorage.getItem('strongman_rechazo_fecha');
+    
+    if (suscrito === 'true') return;
+    
+    if (rechazo) {
+        const fechaRechazo = new Date(rechazo);
+        const ahora = new Date();
+        const diasDiferencia = (ahora - fechaRechazo) / (1000 * 60 * 60 * 24);
+        if (diasDiferencia < 7) return;
+    }
+    
+    mostrarPopup();
 }
 
 function mostrarPopup() {
-  const popup = document.getElementById('popup-suscripcion');
-  if (popup) popup.classList.add('activo');
+    const popup = document.getElementById('popup-suscripcion');
+    if (popup) {
+        popup.classList.add('activo');
+        document.body.style.overflow = 'hidden';
+    }
 }
 
 function cerrarPopup() {
-  const popup = document.getElementById('popup-suscripcion');
-  if (popup) popup.classList.remove('activo');
+    const popup = document.getElementById('popup-suscripcion');
+    if (popup) {
+        popup.classList.remove('activo');
+        document.body.style.overflow = 'auto';
+    }
 }
 
 function cerrarPopupTemporal() {
-  localStorage.setItem('strongman_rechazo_fecha', new Date().toISOString());
-  cerrarPopup();
+    localStorage.setItem('strongman_rechazo_fecha', new Date().toISOString());
+    cerrarPopup();
 }
 
 function mostrarTerminos() {
-  const modal = document.getElementById('modal-terminos');
-  if (modal) modal.classList.add('activo');
+    const modal = document.getElementById('modal-terminos');
+    if (modal) modal.classList.add('activo');
 }
 
 function cerrarTerminos() {
-  const modal = document.getElementById('modal-terminos');
-  if (modal) modal.classList.remove('activo');
+    const modal = document.getElementById('modal-terminos');
+    if (modal) modal.classList.remove('activo');
 }
 
 function registrarSuscriptor(event) {
-  event.preventDefault();
-  
-  const nombre = document.getElementById('nombre').value.trim();
-  const apellido = document.getElementById('apellido').value.trim();
-  const email = document.getElementById('email').value.trim().toLowerCase();
-  
-  if (!validarEmail(email)) {
-    alert('Por favor, ingresa un correo electrónico válido.');
-    return;
-  }
-  
-  const suscriptor = {
-    id: Date.now(),
-    nombre: nombre,
-    apellido: apellido,
-    email: email,
-    fechaRegistro: new Date().toISOString(),
-    activo: true
-  };
-  
-  guardarSuscriptor(suscriptor);
-  localStorage.setItem('strongman_suscrito', 'true');
-  localStorage.removeItem('strongman_rechazo_fecha');
-  
-  cerrarPopup();
-  mostrarMensajeExito();
-  document.getElementById('form-suscripcion').reset();
+    event.preventDefault();
+    
+    const nombre = document.getElementById('nombre').value.trim();
+    const apellido = document.getElementById('apellido').value.trim();
+    const email = document.getElementById('email').value.trim().toLowerCase();
+    
+    if (!validarEmail(email)) {
+        alert('Por favor, ingresa un correo electrónico válido.');
+        return;
+    }
+    
+    const suscriptor = {
+        id: Date.now(),
+        nombre: nombre,
+        apellido: apellido,
+        email: email,
+        fechaRegistro: new Date().toISOString(),
+        activo: true
+    };
+    
+    guardarSuscriptor(suscriptor);
+    localStorage.setItem('strongman_suscrito', 'true');
+    localStorage.removeItem('strongman_rechazo_fecha');
+    
+    cerrarPopup();
+    mostrarMensajeExito();
+    document.getElementById('form-suscripcion').reset();
 }
 
 function guardarSuscriptor(suscriptor) {
-  let suscriptores = JSON.parse(localStorage.getItem('strongman_suscriptores') || '[]');
-  const existe = suscriptores.find(s => s.email === suscriptor.email);
-  if (existe) {
-    alert('Este correo ya está registrado.');
-    return;
-  }
-  suscriptores.push(suscriptor);
-  localStorage.setItem('strongman_suscriptores', JSON.stringify(suscriptores));
+    let suscriptores = JSON.parse(localStorage.getItem('strongman_suscriptores') || '[]');
+    const existe = suscriptores.find(s => s.email === suscriptor.email);
+    if (existe) {
+        alert('Este correo ya está registrado.');
+        return;
+    }
+    suscriptores.push(suscriptor);
+    localStorage.setItem('strongman_suscriptores', JSON.stringify(suscriptores));
 }
 
 function validarEmail(email) {
-  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return regex.test(email);
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
 }
 
 function mostrarMensajeExito() {
-  const mensaje = document.getElementById('mensaje-exito');
-  if (mensaje) mensaje.classList.add('activo');
+    const mensaje = document.getElementById('mensaje-exito');
+    if (mensaje) mensaje.classList.add('activo');
 }
 
 function cerrarMensajeExito() {
-  const mensaje = document.getElementById('mensaje-exito');
-  if (mensaje) mensaje.classList.remove('activo');
+    const mensaje = document.getElementById('mensaje-exito');
+    if (mensaje) mensaje.classList.remove('activo');
 }
 
 // Cerrar popup al hacer clic fuera
 document.addEventListener('click', function(event) {
-  const popup = document.getElementById('popup-suscripcion');
-  if (event.target === popup) {
-    cerrarPopupTemporal();
-  }
+    const popup = document.getElementById('popup-suscripcion');
+    if (event.target === popup) {
+        cerrarPopupTemporal();
+    }
 });
 </script>
 
