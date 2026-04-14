@@ -5454,33 +5454,41 @@ function closeImageZoom() {
 // SISTEMA DE SUSCRIPCIÓN - STRONGMAN URUGUAY
 // ============================================
 
-// Mostrar popup después de 3 segundos
-document.addEventListener('DOMContentLoaded', function() {
-  setTimeout(function() {
+// Variable para controlar si ya se mostró
+let popupMostrado = false;
+
+// Mostrar popup después de 3 segundos (solo una vez)
+setTimeout(function() {
+  if (!popupMostrado) {
     mostrarPopupSiCorresponde();
-  }, 3000);
-});
+    popupMostrado = true;
+  }
+}, 3000);
 
 function mostrarPopupSiCorresponde() {
-  const suscrito = localStorage.getItem('strongman_suscrito');
-  const rechazo = localStorage.getItem('strongman_rechazo_fecha');
-  
-  if (suscrito === 'true') return;
-  
-  if (rechazo) {
-    const fechaRechazo = new Date(rechazo);
-    const ahora = new Date();
-    const diasDiferencia = (ahora - fechaRechazo) / (1000 * 60 * 60 * 24);
-    if (diasDiferencia < 7) return;
+  try {
+    const suscrito = localStorage.getItem('strongman_suscrito');
+    const rechazo = localStorage.getItem('strongman_rechazo_fecha');
+    
+    if (suscrito === 'true') return;
+    
+    if (rechazo) {
+      const fechaRechazo = new Date(rechazo);
+      const ahora = new Date();
+      const diasDiferencia = (ahora - fechaRechazo) / (1000 * 60 * 60 * 24);
+      if (diasDiferencia < 7) return;
+    }
+    
+    mostrarPopup();
+  } catch (e) {
+    console.log('Error en popup:', e);
   }
-  
-  mostrarPopup();
 }
 
 function mostrarPopup() {
   const popup = document.getElementById('popup-suscripcion');
   if (popup) {
-    popup.classList.add('activo');
+    popup.style.display = 'flex';
     document.body.style.overflow = 'hidden';
   }
 }
@@ -5488,7 +5496,7 @@ function mostrarPopup() {
 function cerrarPopup() {
   const popup = document.getElementById('popup-suscripcion');
   if (popup) {
-    popup.classList.remove('activo');
+    popup.style.display = 'none';
     document.body.style.overflow = 'auto';
   }
 }
@@ -5500,12 +5508,12 @@ function cerrarPopupTemporal() {
 
 function mostrarTerminos() {
   const modal = document.getElementById('modal-terminos');
-  if (modal) modal.classList.add('activo');
+  if (modal) modal.style.display = 'flex';
 }
 
 function cerrarTerminos() {
   const modal = document.getElementById('modal-terminos');
-  if (modal) modal.classList.remove('activo');
+  if (modal) modal.style.display = 'none';
 }
 
 function registrarSuscriptor(event) {
@@ -5535,20 +5543,23 @@ function registrarSuscriptor(event) {
   
   cerrarPopup();
   mostrarMensajeExito();
-  enviarCorreoConfirmacion(suscriptor);
   
   document.getElementById('form-suscripcion').reset();
 }
 
 function guardarSuscriptor(suscriptor) {
-  let suscriptores = JSON.parse(localStorage.getItem('strongman_suscriptores') || '[]');
-  const existe = suscriptores.find(s => s.email === suscriptor.email);
-  if (existe) {
-    alert('Este correo ya está registrado.');
-    return;
+  try {
+    let suscriptores = JSON.parse(localStorage.getItem('strongman_suscriptores') || '[]');
+    const existe = suscriptores.find(s => s.email === suscriptor.email);
+    if (existe) {
+      alert('Este correo ya está registrado.');
+      return;
+    }
+    suscriptores.push(suscriptor);
+    localStorage.setItem('strongman_suscriptores', JSON.stringify(suscriptores));
+  } catch (e) {
+    console.log('Error guardando:', e);
   }
-  suscriptores.push(suscriptor);
-  localStorage.setItem('strongman_suscriptores', JSON.stringify(suscriptores));
 }
 
 function validarEmail(email) {
@@ -5558,32 +5569,22 @@ function validarEmail(email) {
 
 function mostrarMensajeExito() {
   const mensaje = document.getElementById('mensaje-exito');
-  if (mensaje) mensaje.classList.add('activo');
+  if (mensaje) mensaje.style.display = 'flex';
 }
 
 function cerrarMensajeExito() {
   const mensaje = document.getElementById('mensaje-exito');
-  if (mensaje) mensaje.classList.remove('activo');
+  if (mensaje) mensaje.style.display = 'none';
 }
 
-function enviarCorreoConfirmacion(suscriptor) {
-  console.log('Correo de confirmación para:', suscriptor.email);
-  // Aquí iría la integración con EmailJS o servicio similar
-}
-
-// Funciones para el panel de admin
-function obtenerSuscriptores() {
-  return JSON.parse(localStorage.getItem('strongman_suscriptores') || '[]');
-}
-
-function obtenerCantidadSuscriptores() {
-  return obtenerSuscriptores().length;
-}
-
-function eliminarSuscriptor(email) {
-  let suscriptores = obtenerSuscriptores();
-  suscriptores = suscriptores.filter(s => s.email !== email);
-  localStorage.setItem
+// Cerrar popup al hacer clic fuera
+document.addEventListener('click', function(event) {
+  const popup = document.getElementById('popup-suscripcion');
+  if (event.target === popup) {
+    cerrarPopupTemporal();
+  }
+});
+</script>
 
 </body>
 </html>
