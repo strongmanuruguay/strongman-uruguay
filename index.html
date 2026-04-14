@@ -5154,51 +5154,38 @@ function closeImageZoom() {
 // SISTEMA DE SUSCRIPCIÓN - STRONGMAN URUGUAY
 // ============================================
 
-// Ejecutar inmediatamente cuando el DOM esté listo
-(function() {
-    // Esperar a que todo cargue
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', iniciarPopup);
-    } else {
-        // Si ya cargó, ejecutar ahora
-        iniciarPopup();
-    }
-    
-    function iniciarPopup() {
-        // Verificar si ya se mostró en esta sesión
-        if (window.popupYaMostrado) return;
-        window.popupYaMostrado = true;
-        
-        // Esperar 2 segundos y mostrar
-        setTimeout(function() {
-            mostrarPopupSiCorresponde();
-        }, 2000);
-    }
-})();
-
-function mostrarPopupSiCorresponde() {
+// FORZAR QUE APAREZCA INMEDIATAMENTE
+window.onload = function() {
+    // Verificar si ya está suscrito
     const suscrito = localStorage.getItem('strongman_suscrito');
     const rechazo = localStorage.getItem('strongman_rechazo_fecha');
     
-    if (suscrito === 'true') return;
+    if (suscrito === 'true') {
+        console.log('Ya suscrito, no mostrar popup');
+        return;
+    }
     
     if (rechazo) {
         const fechaRechazo = new Date(rechazo);
         const ahora = new Date();
         const diasDiferencia = (ahora - fechaRechazo) / (1000 * 60 * 60 * 24);
-        if (diasDiferencia < 7) return;
+        if (diasDiferencia < 7) {
+            console.log('Rechazo reciente, no mostrar');
+            return;
+        }
     }
     
-    mostrarPopup();
-}
-
-function mostrarPopup() {
+    // MOSTRAR INMEDIATAMENTE
+    console.log('Mostrando popup...');
     const popup = document.getElementById('popup-suscripcion');
     if (popup) {
         popup.classList.add('activo');
         document.body.style.overflow = 'hidden';
+        console.log('Popup mostrado');
+    } else {
+        console.log('ERROR: Popup no encontrado');
     }
-}
+};
 
 function cerrarPopup() {
     const popup = document.getElementById('popup-suscripcion');
