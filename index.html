@@ -5541,23 +5541,41 @@ function closeImageZoom() {
 // SISTEMA DE SUSCRIPCIÓN - STRONGMAN URUGUAY
 // ============================================
 
-// Mostrar popup después de 2 segundos
-setTimeout(function() {
-    const suscrito = localStorage.getItem('strongman_suscrito');
-    const rechazo = localStorage.getItem('strongman_rechazo_fecha');
-    
-    if (suscrito === 'true') return;
-    
-    if (rechazo) {
-        const fechaRechazo = new Date(rechazo);
-        const ahora = new Date();
-        const diasDiferencia = (ahora - fechaRechazo) / (1000 * 60 * 60 * 24);
-        if (diasDiferencia < 7) return;
-    }
-    
-    const popup = document.getElementById('popup-suscripcion');
-    if (popup) popup.classList.add('activo');
-}, 2000);
+// Mostrar popup solo al entrar a la página principal
+window.addEventListener('load', function() {
+    // Esperar 2 segundos después de que cargue la página
+    setTimeout(function() {
+        // Verificar que estamos en la página principal (inicio visible)
+        const inicio = document.getElementById('inicio');
+        const inicioVisible = inicio && window.getComputedStyle(inicio).display !== 'none';
+        
+        // Verificar que no hay modales abiertos
+        const adminModal = document.getElementById('adminModal');
+        const adminAbierto = adminModal && adminModal.classList.contains('active');
+        
+        // Verificar si ya está suscrito o rechazó hace poco
+        const yaSuscrito = localStorage.getItem('strongman_suscrito') === 'true';
+        const rechazo = localStorage.getItem('strongman_rechazo_fecha');
+        
+        let puedeMostrar = true;
+        
+        if (yaSuscrito) puedeMostrar = false;
+        if (adminAbierto) puedeMostrar = false;
+        if (!inicioVisible) puedeMostrar = false;
+        
+        if (rechazo && puedeMostrar) {
+            const fechaRechazo = new Date(rechazo);
+            const ahora = new Date();
+            const dias = (ahora - fechaRechazo) / (1000 * 60 * 60 * 24);
+            if (dias < 7) puedeMostrar = false;
+        }
+        
+        if (puedeMostrar) {
+            const popup = document.getElementById('popup-suscripcion');
+            if (popup) popup.classList.add('activo');
+        }
+    }, 2000);
+});
 
 function cerrarPopup() {
     const popup = document.getElementById('popup-suscripcion');
@@ -5586,7 +5604,7 @@ function registrarSuscriptor(event) {
     const apellido = document.getElementById('apellido').value.trim();
     const email = document.getElementById('email').value.trim().toLowerCase();
     
-    if (!validarEmail(email)) {
+    if (!email.includes('@') || !email.includes('.')) {
         alert('Por favor, ingresa un correo electrónico válido.');
         return;
     }
@@ -5600,29 +5618,21 @@ function registrarSuscriptor(event) {
         activo: true
     };
     
-    guardarSuscriptor(suscriptor);
-    localStorage.setItem('strongman_suscrito', 'true');
-    localStorage.removeItem('strongman_rechazo_fecha');
-    
-    cerrarPopup();
-    mostrarMensajeExito();
-    document.getElementById('form-suscripcion').reset();
-}
-
-function guardarSuscriptor(suscriptor) {
     let suscriptores = JSON.parse(localStorage.getItem('strongman_suscriptores') || '[]');
     const existe = suscriptores.find(s => s.email === suscriptor.email);
     if (existe) {
         alert('Este correo ya está registrado.');
         return;
     }
+    
     suscriptores.push(suscriptor);
     localStorage.setItem('strongman_suscriptores', JSON.stringify(suscriptores));
-}
-
-function validarEmail(email) {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(email);
+    localStorage.setItem('strongman_suscrito', 'true');
+    localStorage.removeItem('strongman_rechazo_fecha');
+    
+    cerrarPopup();
+    mostrarMensajeExito();
+    document.getElementById('form-suscripcion').reset();
 }
 
 function mostrarMensajeExito() {
