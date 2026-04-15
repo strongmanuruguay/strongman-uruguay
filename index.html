@@ -5069,6 +5069,8 @@ function closeImageZoom() {
         };
     </script>
 
+</body>
+
 
 <!-- ============================================
      POPUP DE SUSCRIPCIÓN - STRONGMAN URUGUAY
@@ -5147,52 +5149,33 @@ function closeImageZoom() {
     <button onclick="cerrarMensajeExito()">Perfecto</button>
   </div>
 </div>
-<!-- ============================================ -->
 
 <script>
 // ============================================
 // SISTEMA DE SUSCRIPCIÓN - STRONGMAN URUGUAY
 // ============================================
 
-// FORZAR QUE APAREZCA INMEDIATAMENTE
-window.onload = function() {
-    // Verificar si ya está suscrito
+// Mostrar popup después de 2 segundos
+setTimeout(function() {
     const suscrito = localStorage.getItem('strongman_suscrito');
     const rechazo = localStorage.getItem('strongman_rechazo_fecha');
     
-    if (suscrito === 'true') {
-        console.log('Ya suscrito, no mostrar popup');
-        return;
-    }
+    if (suscrito === 'true') return;
     
     if (rechazo) {
         const fechaRechazo = new Date(rechazo);
         const ahora = new Date();
         const diasDiferencia = (ahora - fechaRechazo) / (1000 * 60 * 60 * 24);
-        if (diasDiferencia < 7) {
-            console.log('Rechazo reciente, no mostrar');
-            return;
-        }
+        if (diasDiferencia < 7) return;
     }
     
-    // MOSTRAR INMEDIATAMENTE
-    console.log('Mostrando popup...');
     const popup = document.getElementById('popup-suscripcion');
-    if (popup) {
-        popup.classList.add('activo');
-        document.body.style.overflow = 'hidden';
-        console.log('Popup mostrado');
-    } else {
-        console.log('ERROR: Popup no encontrado');
-    }
-};
+    if (popup) popup.classList.add('activo');
+}, 2000);
 
 function cerrarPopup() {
     const popup = document.getElementById('popup-suscripcion');
-    if (popup) {
-        popup.classList.remove('activo');
-        document.body.style.overflow = 'auto';
-    }
+    if (popup) popup.classList.remove('activo');
 }
 
 function cerrarPopupTemporal() {
@@ -5265,15 +5248,8 @@ function cerrarMensajeExito() {
     const mensaje = document.getElementById('mensaje-exito');
     if (mensaje) mensaje.classList.remove('activo');
 }
-
-// Cerrar popup al hacer clic fuera
-document.addEventListener('click', function(event) {
-    const popup = document.getElementById('popup-suscripcion');
-    if (event.target === popup) {
-        cerrarPopupTemporal();
-    }
-});
 </script>
 
-</body>
+<!-- ============================================ -->
+
 </html>
