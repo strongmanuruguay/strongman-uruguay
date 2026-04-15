@@ -5458,6 +5458,7 @@ function closeImageZoom() {
         };
     </script>
 
+
 <!-- ============================================
      POPUP DE SUSCRIPCIÓN - STRONGMAN URUGUAY
      ============================================ -->
@@ -5541,35 +5542,29 @@ function closeImageZoom() {
 // SISTEMA DE SUSCRIPCIÓN - STRONGMAN URUGUAY
 // ============================================
 
-// Mostrar popup al cargar la página (solo en inicio)
-setTimeout(function() {
-    // Verificar que estamos en la página principal
-    const inicio = document.getElementById('inicio');
-    const inicioVisible = inicio && inicio.style.display !== 'none';
-    
-    // Verificar que no está suscrito
-    const yaSuscrito = localStorage.getItem('strongman_suscrito') === 'true';
-    
-    // Verificar que no rechazó hace poco
-    const rechazo = localStorage.getItem('strongman_rechazo_fecha');
-    let puedeMostrar = true;
-    
-    if (rechazo) {
-        const fechaRechazo = new Date(rechazo);
-        const ahora = new Date();
-        const dias = (ahora - fechaRechazo) / (1000 * 60 * 60 * 24);
-        if (dias < 7) puedeMostrar = false;
-    }
-    
-    // Solo mostrar si cumple todas las condiciones
-    if (inicioVisible && !yaSuscrito && puedeMostrar) {
+// Mostrar popup cuando la página cargue
+window.onload = function() {
+    setTimeout(function() {
+        // Verificar que no está suscrito
+        if (localStorage.getItem('strongman_suscrito') === 'true') return;
+        
+        // Verificar que no rechazó hace poco
+        const rechazo = localStorage.getItem('strongman_rechazo_fecha');
+        if (rechazo) {
+            const fechaRechazo = new Date(rechazo);
+            const ahora = new Date();
+            const dias = (ahora - fechaRechazo) / (1000 * 60 * 60 * 24);
+            if (dias < 7) return;
+        }
+        
+        // Mostrar popup
         const popup = document.getElementById('popup-suscripcion');
         if (popup) {
             popup.style.display = 'flex';
             popup.classList.add('activo');
         }
-    }
-}, 3000);
+    }, 2000);
+};
 
 function cerrarPopup() {
     const popup = document.getElementById('popup-suscripcion');
