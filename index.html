@@ -5363,6 +5363,12 @@ function closeImageZoom() {
 
 <script>
 // POPUP SUSCRIPCIÓN - JAVASCRIPT
+
+// LIMPIAR DATOS DE PRUEBA - BORRAR ESTO DESPUÉS DE PROBAR
+localStorage.removeItem('suscrito');
+localStorage.removeItem('strongman_suscrito');
+localStorage.removeItem('strongman_rechazo_fecha');
+
 setTimeout(function(){
     if(localStorage.getItem('suscrito')=='si')return;
     var p=document.getElementById('popup-suscripcion');
