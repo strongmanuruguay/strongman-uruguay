@@ -5254,5 +5254,118 @@ function closeImageZoom() {
         };
     </script>
 
+<!-- ========== MODAL SUSCRIPCIÓN ========== -->
+<div id="modalSuscripcion" class="modal-suscripcion" onclick="cerrarModalSuscripcionFuera(event)">
+    <div class="modal-contenido-suscripcion" onclick="event.stopPropagation()">
+        <span class="cerrar-modal-suscripcion" onclick="cerrarModalSuscripcion()">&times;</span>
+        
+        <h2>🦍 Únete al Mundo de la Fuerza</h2>
+        <p class="subtitulo">Sé el primero en enterarte de todo</p>
+        
+        <form class="form-suscripcion" onsubmit="return suscribirUsuario(event)">
+            <input type="text" id="nombreSuscriptor" placeholder="Nombre" required>
+            <input type="text" id="apellidoSuscriptor" placeholder="Apellido" required>
+            <input type="email" id="emailSuscriptor" placeholder="Correo electrónico" required>
+            
+            <button type="submit" class="btn-suscribir">
+                Suscribirme Ahora
+            </button>
+        </form>
+        
+        <p class="privacidad-suscripcion">
+            Al suscribirte, aceptas recibir notificaciones de Strongman Uruguay sobre eventos, talleres, cursos e indumentaria. 
+            Puedes darte de baja cuando quieras.
+        </p>
+    </div>
+</div>
+
+<!-- NOTIFICACIÓN DE ÉXITO -->
+<div id="notificacionExito" class="notificacion-exito">
+    <i class="fas fa-check-circle"></i>
+    <span>¡Bienvenido a Strongman Uruguay! 💪 Revisa tu correo.</span>
+</div>
+
+<!-- ========== JAVASCRIPT SUSCRIPCIÓN ========== -->
+<script>
+// Abrir modal
+function abrirModalSuscripcion() {
+    document.getElementById('modalSuscripcion').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+// Cerrar modal
+function cerrarModalSuscripcion() {
+    document.getElementById('modalSuscripcion').style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+// Cerrar al hacer clic fuera
+function cerrarModalSuscripcionFuera(event) {
+    if (event.target.id === 'modalSuscripcion') {
+        cerrarModalSuscripcion();
+    }
+}
+
+// Suscribir usuario
+function suscribirUsuario(event) {
+    event.preventDefault();
+    
+    const nombre = document.getElementById('nombreSuscriptor').value.trim();
+    const apellido = document.getElementById('apellidoSuscriptor').value.trim();
+    const email = document.getElementById('emailSuscriptor').value.trim().toLowerCase();
+    
+    // Validar email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        alert('Por favor ingresa un correo válido');
+        return false;
+    }
+    
+    // Obtener suscriptores existentes
+    let suscriptores = JSON.parse(localStorage.getItem('suscriptoresStrongman')) || [];
+    
+    // Verificar si ya existe
+    if (suscriptores.find(s => s.email === email)) {
+        alert('Este correo ya está suscrito. ¡Gracias por tu interés!');
+        cerrarModalSuscripcion();
+        return false;
+    }
+    
+    // Crear objeto suscriptor
+    const suscriptor = {
+        id: Date.now(),
+        nombre: nombre,
+        apellido: apellido,
+        email: email,
+        fecha: new Date().toISOString(),
+        activo: true
+    };
+    
+    // Guardar
+    suscriptores.push(suscriptor);
+    localStorage.setItem('suscriptoresStrongman', JSON.stringify(suscriptores));
+    
+    // Mostrar notificación
+    mostrarNotificacionExito();
+    
+    // Limpiar y cerrar
+    document.querySelector('.form-suscripcion').reset();
+    cerrarModalSuscripcion();
+    
+    return false;
+}
+
+// Mostrar notificación
+function mostrarNotificacionExito() {
+    const notif = document.getElementById('notificacionExito');
+    notif.style.display = 'block';
+    
+    setTimeout(() => {
+        notif.style.display = 'none';
+    }, 4000);
+}
+</script>
+
 </body>
 </html>
+
