@@ -5366,19 +5366,19 @@ function closeImageZoom() {
 setTimeout(function(){
     if(localStorage.getItem('suscrito')=='si')return;
     var p=document.getElementById('popup-suscripcion');
-    if(P)P.className='activo';
+    if(p)p.className='activo';
 },2000);
 
 function cerrarPopup(){
     document.getElementById('popup-suscripcion').className='';
 }
 
-Function cerrarPopupTemporal(){
+function cerrarPopupTemporal(){
     localStorage.setItem('suscrito','no');
     cerrarPopup();
 }
 
-Function registrarSuscriptor(e){
+function registrarSuscriptor(e){
     e.preventDefault();
     var email=document.getElementById('email').value;
     if(email.indexOf('@')==-1||email.indexOf('.')==-1){
@@ -5389,11 +5389,10 @@ Function registrarSuscriptor(e){
     document.getElementById('mensaje-exito').className='activo';
 }
 
-Function cerrarMensajeExito(){
+function cerrarMensajeExito(){
     document.getElementById('mensaje-exito').className='';
 }
 </script>
-<!-- ============================================ -->
 
 </body>
 </html>
