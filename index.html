@@ -819,36 +819,22 @@
 
 /* ========== SISTEMA DE SUSCRIPCIÓN STRONGMAN URUGUAY ========== */
 
-/* BOTÓN FLOTANTE */
-.btn-flotante-suscripcion {
-    position: fixed;
-    bottom: 100px;
-    right: 30px;
-    background: linear-gradient(135deg, #ffd700 0%, #ff6b35 100%);
-    color: #000;
-    border: none;
-    padding: 15px 25px;
-    border-radius: 50px;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
-    transition: all 0.3s ease;
-    z-index: 998;
-    font-family: 'Oswald', sans-serif;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    animation: pulso-suscripcion 2s infinite;
+/* BOTÓN SUSCRIPCIÓN EN HERO (al lado de "Ver Secciones") */
+.btn-suscripcion-hero {
+    background: linear-gradient(135deg, #ffd700 0%, #ff6b35 100%) !important;
+    color: #000 !important;
+    font-weight: bold !important;
+    border: 3px solid #ffd700 !important;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5) !important;
+    animation: pulso-suscripcion 2s infinite !important;
+    font-family: 'Oswald', sans-serif !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
 }
 
 @keyframes pulso-suscripcion {
-    0%, 100% { transform: scale(1); box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4); }
-    50% { transform: scale(1.05); box-shadow: 0 6px 25px rgba(255, 215, 0, 0.6); }
-}
-
-.btn-flotante-suscripcion:hover {
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 8px 30px rgba(255, 107, 53, 0.5);
+    0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+    50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(255, 215, 0, 0.8); }
 }
 
 /* MODAL SUSCRIPCIÓN */
@@ -1168,7 +1154,7 @@
             </div>
             
                 <a onclick="showHomeSections()" class="btn">Ver Secciones</a>
-            <button onclick="abrirModalSuscripcion()" class="btn btn-gold" style="margin-left: 10px;">
+            <button onclick="abrirModalSuscripcion()" class="btn btn-suscripcion-hero" style="margin-left: 15px;">
                 💪 Suscribirme
             </button>
      
