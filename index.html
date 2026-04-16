@@ -5362,61 +5362,30 @@ function closeImageZoom() {
 </div>
 
 <script>
-// POPUP SUSCRIPCIÓN - JAVASCRIPT
+// POPUP SUSCRIPCIÓN
 
-// Función para mostrar el popup
-function mostrarPopup() {
-    // Limpiar datos de prueba (BORRAR DESPUÉS)
-    localStorage.removeItem('suscrito');
-    localStorage.removeItem('strongman_suscrito');
-    localStorage.removeItem('strongman_rechazo_fecha');
-    
-    // Verificar si ya está suscrito
-    if (localStorage.getItem('suscrito') === 'si') {
-        return;
-    }
-    
-    // Mostrar popup
-    var p = document.getElementById('popup-suscripcion');
-    if (p) {
-        p.className = 'activo';
-    }
-}
-
-// Esperar a que la página cargue completamente
-if (document.readyState === 'complete') {
-    // Si ya cargó, mostrar ahora
-    setTimeout(mostrarPopup, 1000);
-} else {
-    // Si no cargó, esperar al evento load
-    window.onload = function() {
-        setTimeout(mostrarPopup, 1000);
-    };
-}
-
-function cerrarPopup() {
-    document.getElementById('popup-suscripcion').className = '';
-}
+// Mostrar popup cuando todo esté listo
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        var p = document.getElementById('popup-suscripcion');
+        if (p) {
+            p.classList.add('activo');  // Usar clase en lugar de style.display
+        }
+    }, 3000);
+});
 
 function cerrarPopupTemporal() {
-    localStorage.setItem('suscrito', 'no');
-    cerrarPopup();
+    document.getElementById('popup-suscripcion').classList.remove('activo');
 }
 
 function registrarSuscriptor(e) {
     e.preventDefault();
-    var email = document.getElementById('email').value;
-    if (email.indexOf('@') === -1 || email.indexOf('.') === -1) {
-        alert('Email inválido');
-        return;
-    }
-    localStorage.setItem('suscrito', 'si');
-    cerrarPopup();
-    document.getElementById('mensaje-exito').className = 'activo';
+    document.getElementById('popup-suscripcion').classList.remove('activo');
+    document.getElementById('mensaje-exito').classList.add('activo');
 }
 
 function cerrarMensajeExito() {
-    document.getElementById('mensaje-exito').className = '';
+    document.getElementById('mensaje-exito').classList.remove('activo');
 }
 </script>
 
