@@ -941,10 +941,6 @@
     padding: 20px;
 }
 
-.popup-overlay.activo {
-    display: flex !important;
-}
-
 .popup-contenido {
     background: linear-gradient(145deg, #1a1a1a 0%, #0d0d0d 100%);
     border: 2px solid var(--accent);
@@ -5538,52 +5534,32 @@ function closeImageZoom() {
 </div>
 
 <script>
-// ============================================
-// SISTEMA DE SUSCRIPCIÓN - STRONGMAN URUGUAY
-// ============================================
+// POPUP SUSCRIPCIÓN STRONGMAN URUGUAY
 
-// Esperar a que TODO cargue (imágenes, CSS, etc)
-window.onload = function() {
-    // Esperar 1 segundo más
-    setTimeout(function() {
-        // Verificar si ya está suscrito
-        if (localStorage.getItem('strongman_suscrito') === 'true') {
-            console.log('Ya está suscrito');
-            return;
-        }
-        
-        // Verificar si rechazó hace menos de 7 días
-        const rechazo = localStorage.getItem('strongman_rechazo_fecha');
-        if (rechazo) {
-            const fechaRechazo = new Date(rechazo);
-            const ahora = new Date();
-            const dias = (ahora - fechaRechazo) / (1000 * 60 * 60 * 24);
-            if (dias < 7) {
-                console.log('Rechazó hace ' + dias + ' días');
-                return;
-            }
-        }
-        
-        // BUSCAR el popup y mostrarlo
-        const popup = document.getElementById('popup-suscripcion');
-        console.log('Buscando popup:', popup);
-        
-        if (popup) {
-            popup.style.display = 'flex';
-            popup.classList.add('activo');
-            console.log('¡Popup mostrado!');
-        } else {
-            console.log('ERROR: No se encontró el popup');
-        }
-    }, 1000);
-};
+// Mostrar popup después de 3 segundos
+setTimeout(function() {
+    // Verificar si ya está suscrito
+    if (localStorage.getItem('strongman_suscrito') === 'true') return;
+    
+    // Verificar si rechazó hace menos de 7 días
+    var rechazo = localStorage.getItem('strongman_rechazo_fecha');
+    if (rechazo) {
+        var fechaRechazo = new Date(rechazo);
+        var ahora = new Date();
+        var dias = (ahora - fechaRechazo) / (1000 * 60 * 60 * 24);
+        if (dias < 7) return;
+    }
+    
+    // Mostrar el popup (agregando clase .activo)
+    var popup = document.getElementById('popup-suscripcion');
+    if (popup) {
+        popup.classList.add('activo');
+    }
+}, 3000);
 
 function cerrarPopup() {
-    const popup = document.getElementById('popup-suscripcion');
-    if (popup) {
-        popup.style.display = 'none';
-        popup.classList.remove('activo');
-    }
+    var popup = document.getElementById('popup-suscripcion');
+    if (popup) popup.classList.remove('activo');
 }
 
 function cerrarPopupTemporal() {
@@ -5592,81 +5568,63 @@ function cerrarPopupTemporal() {
 }
 
 function mostrarTerminos() {
-    const modal = document.getElementById('modal-terminos');
-    if (modal) {
-        modal.style.display = 'flex';
-        modal.classList.add('activo');
-    }
+    var modal = document.getElementById('modal-terminos');
+    if (modal) modal.classList.add('activo');
 }
 
 function cerrarTerminos() {
-    const modal = document.getElementById('modal-terminos');
-    if (modal) {
-        modal.style.display = 'none';
-        modal.classList.remove('activo');
-    }
+    var modal = document.getElementById('modal-terminos');
+    if (modal) modal.classList.remove('activo');
 }
 
 function registrarSuscriptor(event) {
     event.preventDefault();
     
-    const nombre = document.getElementById('nombre').value.trim();
-    const apellido = document.getElementById('apellido').value.trim();
-    const email = document.getElementById('email').value.trim().toLowerCase();
+    var nombre = document.getElementById('nombre').value.trim();
+    var apellido = document.getElementById('apellido').value.trim();
+    var email = document.getElementById('email').value.trim().toLowerCase();
     
-    // Validación simple de email
-    if (!email || !email.includes('@') || !email.includes('.')) {
+    // Validación simple
+    if (!email || email.indexOf('@') === -1 || email.indexOf('.') === -1) {
         alert('Por favor, ingresa un correo electrónico válido.');
         return;
     }
     
-    // Crear objeto suscriptor
-    const suscriptor = {
+    // Guardar suscriptor
+    var suscriptores = JSON.parse(localStorage.getItem('strongman_suscriptores') || '[]');
+    
+    // Verificar si ya existe
+    for (var i = 0; i < suscriptores.length; i++) {
+        if (suscriptores[i].email === email) {
+            alert('Este correo ya está registrado.');
+            return;
+        }
+    }
+    
+    suscriptores.push({
         id: Date.now(),
         nombre: nombre,
         apellido: apellido,
         email: email,
-        fechaRegistro: new Date().toISOString(),
-        activo: true
-    };
+        fechaRegistro: new Date().toISOString()
+    });
     
-    // Guardar en localStorage
-    let suscriptores = JSON.parse(localStorage.getItem('strongman_suscriptores') || '[]');
-    
-    // Verificar si ya existe
-    const existe = suscriptores.find(s => s.email === email);
-    if (existe) {
-        alert('Este correo ya está registrado.');
-        return;
-    }
-    
-    suscriptores.push(suscriptor);
     localStorage.setItem('strongman_suscriptores', JSON.stringify(suscriptores));
     localStorage.setItem('strongman_suscrito', 'true');
-    localStorage.removeItem('strongman_rechazo_fecha');
     
-    // Cerrar popup y mostrar éxito
     cerrarPopup();
     mostrarMensajeExito();
-    
-    // Limpiar formulario
     document.getElementById('form-suscripcion').reset();
 }
 
 function mostrarMensajeExito() {
-    const mensaje = document.getElementById('mensaje-exito');
-    if (mensaje) {
-        mensaje.style.display = 'flex';
-        mensaje.classList.add('activo');
-    }
+    var mensaje = document.getElementById('mensaje-exito');
+    if (mensaje) mensaje.classList.add('activo');
 }
 
 function cerrarMensajeExito() {
-    const mensaje = document.getElementById('mensaje-exito');
-    if (mensaje) {
-        mensaje.style.display = 'none';
-        mensaje.classList.remove('activo');
-    }
+    var mensaje = document.getElementById('mensaje-exito');
+    if (mensaje) mensaje.classList.remove('activo');
 }
 </script>
 <!-- ============================================ -->
