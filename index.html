@@ -5542,28 +5542,40 @@ function closeImageZoom() {
 // SISTEMA DE SUSCRIPCIÓN - STRONGMAN URUGUAY
 // ============================================
 
-// Mostrar popup cuando la página cargue
+// Esperar a que TODO cargue (imágenes, CSS, etc)
 window.onload = function() {
+    // Esperar 1 segundo más
     setTimeout(function() {
-        // Verificar que no está suscrito
-        if (localStorage.getItem('strongman_suscrito') === 'true') return;
+        // Verificar si ya está suscrito
+        if (localStorage.getItem('strongman_suscrito') === 'true') {
+            console.log('Ya está suscrito');
+            return;
+        }
         
-        // Verificar que no rechazó hace poco
+        // Verificar si rechazó hace menos de 7 días
         const rechazo = localStorage.getItem('strongman_rechazo_fecha');
         if (rechazo) {
             const fechaRechazo = new Date(rechazo);
             const ahora = new Date();
             const dias = (ahora - fechaRechazo) / (1000 * 60 * 60 * 24);
-            if (dias < 7) return;
+            if (dias < 7) {
+                console.log('Rechazó hace ' + dias + ' días');
+                return;
+            }
         }
         
-        // Mostrar popup
+        // BUSCAR el popup y mostrarlo
         const popup = document.getElementById('popup-suscripcion');
+        console.log('Buscando popup:', popup);
+        
         if (popup) {
             popup.style.display = 'flex';
             popup.classList.add('activo');
+            console.log('¡Popup mostrado!');
+        } else {
+            console.log('ERROR: No se encontró el popup');
         }
-    }, 2000);
+    }, 1000);
 };
 
 function cerrarPopup() {
@@ -5581,12 +5593,18 @@ function cerrarPopupTemporal() {
 
 function mostrarTerminos() {
     const modal = document.getElementById('modal-terminos');
-    if (modal) modal.classList.add('activo');
+    if (modal) {
+        modal.style.display = 'flex';
+        modal.classList.add('activo');
+    }
 }
 
 function cerrarTerminos() {
     const modal = document.getElementById('modal-terminos');
-    if (modal) modal.classList.remove('activo');
+    if (modal) {
+        modal.style.display = 'none';
+        modal.classList.remove('activo');
+    }
 }
 
 function registrarSuscriptor(event) {
@@ -5596,11 +5614,13 @@ function registrarSuscriptor(event) {
     const apellido = document.getElementById('apellido').value.trim();
     const email = document.getElementById('email').value.trim().toLowerCase();
     
-    if (!email.includes('@') || !email.includes('.')) {
+    // Validación simple de email
+    if (!email || !email.includes('@') || !email.includes('.')) {
         alert('Por favor, ingresa un correo electrónico válido.');
         return;
     }
     
+    // Crear objeto suscriptor
     const suscriptor = {
         id: Date.now(),
         nombre: nombre,
@@ -5610,8 +5630,11 @@ function registrarSuscriptor(event) {
         activo: true
     };
     
+    // Guardar en localStorage
     let suscriptores = JSON.parse(localStorage.getItem('strongman_suscriptores') || '[]');
-    const existe = suscriptores.find(s => s.email === suscriptor.email);
+    
+    // Verificar si ya existe
+    const existe = suscriptores.find(s => s.email === email);
     if (existe) {
         alert('Este correo ya está registrado.');
         return;
@@ -5622,19 +5645,28 @@ function registrarSuscriptor(event) {
     localStorage.setItem('strongman_suscrito', 'true');
     localStorage.removeItem('strongman_rechazo_fecha');
     
+    // Cerrar popup y mostrar éxito
     cerrarPopup();
     mostrarMensajeExito();
+    
+    // Limpiar formulario
     document.getElementById('form-suscripcion').reset();
 }
 
 function mostrarMensajeExito() {
     const mensaje = document.getElementById('mensaje-exito');
-    if (mensaje) mensaje.classList.add('activo');
+    if (mensaje) {
+        mensaje.style.display = 'flex';
+        mensaje.classList.add('activo');
+    }
 }
 
 function cerrarMensajeExito() {
     const mensaje = document.getElementById('mensaje-exito');
-    if (mensaje) mensaje.classList.remove('activo');
+    if (mensaje) {
+        mensaje.style.display = 'none';
+        mensaje.classList.remove('activo');
+    }
 }
 </script>
 <!-- ============================================ -->
