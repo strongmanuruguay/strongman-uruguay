@@ -923,389 +923,36 @@
     padding: 3rem;
 }
 
-/* ============================================
-   POPUP DE SUSCRIPCIÓN - ESTILOS
-   ============================================ */
-.popup-overlay {
+/* POPUP SUSCRIPCIÓN */
+#popup-suscripcion {
     display: none;
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(5px);
-    z-index: 10000;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
+    background: rgba(0,0,0,0.9);
+    z-index: 99999;
 }
 
-.popup-contenido {
-    background: linear-gradient(145deg, #1a1a1a 0%, #0d0d0d 100%);
-    border: 2px solid var(--accent);
-    border-radius: 20px;
-    max-width: 450px;
-    width: 100%;
-    max-height: 90vh;
-    overflow-y: auto;
-    position: relative;
-    animation: popupEntrada 0.4s ease;
-    box-shadow: 0 20px 60px rgba(0, 102, 204, 0.4);
+#popup-suscripcion.activo {
+    display: block !important;
 }
 
-@keyframes popupEntrada {
-    from {
-        opacity: 0;
-        transform: scale(0.8) translateY(-50px);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-    }
-}
-
-.popup-cerrar {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: none;
-    border: none;
-    color: var(--text-muted);
-    font-size: 28px;
-    cursor: pointer;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s;
-    z-index: 10;
-}
-
-.popup-cerrar:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    transform: rotate(90deg);
-}
-
-.popup-header {
-    text-align: center;
-    padding: 30px 30px 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.popup-icono {
-    font-size: 50px;
-    margin-bottom: 15px;
-    animation: pulse 2s infinite;
-}
-
-.popup-header h2 {
-    color: var(--gold);
-    font-size: 1.8rem;
-    margin-bottom: 10px;
-    font-family: 'Oswald', sans-serif;
-}
-
-.popup-header p {
-    color: var(--text-muted);
-    font-size: 1rem;
-}
-
-.popup-body {
-    padding: 25px 30px;
-}
-
-.campo-form {
-    margin-bottom: 20px;
-}
-
-.campo-form label {
-    display: block;
-    color: var(--text-muted);
-    margin-bottom: 8px;
-    font-size: 0.9rem;
-    font-weight: 500;
-}
-
-.campo-form input {
-    width: 100%;
-    padding: 12px 15px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
-    color: white;
-    font-size: 1rem;
-    transition: all 0.3s;
-}
-
-.campo-form input:focus {
-    outline: none;
-    border-color: var(--accent);
-    background: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 0 15px rgba(0, 102, 204, 0.3);
-}
-
-.campo-form input::placeholder {
-    color: rgba(255, 255, 255, 0.3);
-}
-
-.checkbox-container {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    margin-bottom: 25px;
-    padding: 15px;
-    background: rgba(0, 102, 204, 0.1);
-    border-radius: 10px;
-    border: 1px solid rgba(0, 102, 204, 0.2);
-}
-
-.checkbox-container input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
-    margin-top: 2px;
-    accent-color: var(--accent);
-    cursor: pointer;
-}
-
-.checkbox-container label {
-    color: var(--text-muted);
-    font-size: 0.85rem;
-    line-height: 1.5;
-    cursor: pointer;
-}
-
-.checkbox-container label a {
-    color: var(--accent-light);
-    text-decoration: underline;
-}
-
-.btn-suscribir {
-    width: 100%;
-    padding: 15px;
-    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-size: 1.1rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    cursor: pointer;
-    transition: all 0.3s;
-    font-family: 'Oswald', sans-serif;
-    margin-bottom: 15px;
-}
-
-.btn-suscribir:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 30px rgba(0, 102, 204, 0.4);
-}
-
-.btn-no-gracias {
-    width: 100%;
-    padding: 12px;
-    background: transparent;
-    color: var(--text-muted);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.btn-no-gracias:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: white;
-}
-
-.popup-footer {
-    text-align: center;
-    padding: 15px 30px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 0 0 18px 18px;
-}
-
-.popup-footer p {
-    color: var(--text-muted);
-    font-size: 0.8rem;
-    margin: 0;
-}
-
-/* Modal de términos */
-.modal-terminos {
+#modal-terminos, #mensaje-exito {
     display: none;
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.9);
-    z-index: 10001;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
+    background: rgba(0,0,0,0.9);
+    z-index: 100000;
 }
 
-.modal-terminos.activo {
-    display: flex;
+#modal-terminos.activo, #mensaje-exito.activo {
+    display: block !important;
 }
-
-.modal-contenido {
-    background: var(--secondary);
-    border: 2px solid var(--accent);
-    border-radius: 15px;
-    max-width: 500px;
-    width: 100%;
-    max-height: 80vh;
-    overflow-y: auto;
-    position: relative;
-    padding: 30px;
-}
-
-.modal-cerrar {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: none;
-    border: none;
-    color: var(--text-muted);
-    font-size: 24px;
-    cursor: pointer;
-}
-
-.modal-contenido h3 {
-    color: var(--gold);
-    margin-bottom: 20px;
-    font-family: 'Oswald', sans-serif;
-}
-
-.terminos-texto {
-    color: var(--text);
-    line-height: 1.8;
-    margin-bottom: 20px;
-}
-
-.terminos-texto p {
-    margin-bottom: 15px;
-}
-
-.btn-aceptar {
-    width: 100%;
-    padding: 12px;
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.btn-aceptar:hover {
-    background: var(--accent-light);
-}
-
-/* Mensaje de éxito */
-.mensaje-exito {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.9);
-    z-index: 10002;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-}
-
-.mensaje-exito.activo {
-    display: flex;
-}
-
-.mensaje-contenido {
-    background: linear-gradient(145deg, #1a1a1a 0%, #0d0d0d 100%);
-    border: 2px solid var(--success);
-    border-radius: 20px;
-    padding: 40px;
-    text-align: center;
-    max-width: 400px;
-    width: 100%;
-    animation: popupEntrada 0.4s ease;
-}
-
-.icono-exito {
-    width: 80px;
-    height: 80px;
-    background: var(--success);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 40px;
-    color: white;
-    margin: 0 auto 20px;
-    animation: pulse 2s infinite;
-}
-
-.mensaje-contenido h3 {
-    color: var(--success);
-    font-size: 1.8rem;
-    margin-bottom: 10px;
-    font-family: 'Oswald', sans-serif;
-}
-
-.mensaje-contenido p {
-    color: var(--text-muted);
-    margin-bottom: 25px;
-}
-
-.mensaje-contenido button {
-    padding: 12px 30px;
-    background: var(--success);
-    color: white;
-    border: none;
-    border-radius: 25px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.mensaje-contenido button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 20px rgba(40, 167, 69, 0.4);
-}
-
-/* Responsive */
-@media (max-width: 480px) {
-    .popup-contenido {
-        margin: 10px;
-        max-height: 95vh;
-    }
-    
-    .popup-header {
-        padding: 20px 20px 15px;
-    }
-    
-    .popup-header h2 {
-        font-size: 1.5rem;
-    }
-    
-    .popup-body {
-        padding: 20px;
-    }
-    
-    .popup-icono {
-        font-size: 40px;
-    }
-}
-/* ============================================ */
 
     </style>
 </head>
@@ -5533,98 +5180,217 @@ function closeImageZoom() {
   </div>
 </div>
 
+<!-- ============================================
+     POPUP DE SUSCRIPCIÓN - STRONGMAN URUGUAY
+     ============================================ -->
+<style>
+/* POPUP SUSCRIPCIÓN - CSS MÍNIMO */
+#popup-suscripcion {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.9);
+    z-index: 99999;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+#popup-suscripcion.activo {
+    display: flex !important;
+}
+
+.popup-interno {
+    background: #1a1a1a;
+    border: 2px solid #0066cc;
+    border-radius: 10px;
+    padding: 25px;
+    max-width: 400px;
+    width: 100%;
+    position: relative;
+}
+
+.popup-titulo {
+    color: #ffd700;
+    text-align: center;
+    margin-bottom: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.popup-cerrar {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: #999;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.campo-form {
+    margin-bottom: 15px;
+}
+
+.campo-form label {
+    display: block;
+    color: #ccc;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+.campo-form input {
+    width: 100%;
+    padding: 10px;
+    background: #333;
+    border: 1px solid #555;
+    border-radius: 5px;
+    color: white;
+    box-sizing: border-box;
+}
+
+.popup-botones {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-suscribir {
+    flex: 1;
+    padding: 12px;
+    background: #0066cc;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-cancelar {
+    flex: 1;
+    padding: 12px;
+    background: transparent;
+    color: #999;
+    border: 1px solid #555;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Mensaje de éxito */
+#mensaje-exito {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.9);
+    z-index: 100000;
+    justify-content: center;
+    align-items: center;
+}
+
+#mensaje-exito.activo {
+    display: flex !important;
+}
+
+.mensaje-interno {
+    background: #1a1a1a;
+    border: 2px solid #28a745;
+    border-radius: 10px;
+    padding: 30px;
+    text-align: center;
+    max-width: 300px;
+}
+
+.mensaje-titulo {
+    color: #28a745;
+    margin-bottom: 10px;
+}
+
+.btn-mensaje {
+    padding: 10px 20px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+</style>
+
+<div id="popup-suscripcion" class="popup-overlay">
+  <div class="popup-interno">
+    <button class="popup-cerrar" onclick="cerrarPopup()">×</button>
+    
+    <h2 class="popup-titulo">¡Únete a Strongman Uruguay!</h2>
+    <p style="color:#ccc; text-align:center; margin-bottom:20px;">Recibí noticias de eventos, cursos, talleres y más</p>
+    
+    <form onsubmit="registrarSuscriptor(event)">
+      <div class="campo-form">
+        <label>Nombre</label>
+        <input type="text" id="nombre" required placeholder="Tu nombre">
+      </div>
+      
+      <div class="campo-form">
+        <label>Apellido</label>
+        <input type="text" id="apellido" required placeholder="Tu apellido">
+      </div>
+      
+      <div class="campo-form">
+        <label>Email</label>
+        <input type="email" id="email" required placeholder="tu@email.com">
+      </div>
+      
+      <div class="popup-botones">
+        <button type="submit" class="btn-suscribir">SUSCRIBIRME</button>
+        <button type="button" class="btn-cancelar" onclick="cerrarPopupTemporal()">No por ahora</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="mensaje-exito" class="mensaje-exito">
+  <div class="mensaje-interno">
+    <h3 class="mensaje-titulo">¡Bienvenido!</h3>
+    <p style="color:white;">Gracias por suscribirte. Revisá tu correo.</p>
+    <button class="btn-mensaje" onclick="cerrarMensajeExito()">Perfecto</button>
+  </div>
+</div>
+
 <script>
-// POPUP SUSCRIPCIÓN STRONGMAN URUGUAY
+// POPUP SUSCRIPCIÓN - JAVASCRIPT
+setTimeout(function(){
+    if(localStorage.getItem('suscrito')=='si')return;
+    var p=document.getElementById('popup-suscripcion');
+    if(P)P.className='activo';
+},2000);
 
-// Mostrar popup después de 3 segundos
-setTimeout(function() {
-    // Verificar si ya está suscrito
-    if (localStorage.getItem('strongman_suscrito') === 'true') return;
-    
-    // Verificar si rechazó hace menos de 7 días
-    var rechazo = localStorage.getItem('strongman_rechazo_fecha');
-    if (rechazo) {
-        var fechaRechazo = new Date(rechazo);
-        var ahora = new Date();
-        var dias = (ahora - fechaRechazo) / (1000 * 60 * 60 * 24);
-        if (dias < 7) return;
-    }
-    
-    // Mostrar el popup (agregando clase .activo)
-    var popup = document.getElementById('popup-suscripcion');
-    if (popup) {
-        popup.classList.add('activo');
-    }
-}, 3000);
-
-function cerrarPopup() {
-    var popup = document.getElementById('popup-suscripcion');
-    if (popup) popup.classList.remove('activo');
+function cerrarPopup(){
+    document.getElementById('popup-suscripcion').className='';
 }
 
-function cerrarPopupTemporal() {
-    localStorage.setItem('strongman_rechazo_fecha', new Date().toISOString());
+Function cerrarPopupTemporal(){
+    localStorage.setItem('suscrito','no');
     cerrarPopup();
 }
 
-function mostrarTerminos() {
-    var modal = document.getElementById('modal-terminos');
-    if (modal) modal.classList.add('activo');
-}
-
-function cerrarTerminos() {
-    var modal = document.getElementById('modal-terminos');
-    if (modal) modal.classList.remove('activo');
-}
-
-function registrarSuscriptor(event) {
-    event.preventDefault();
-    
-    var nombre = document.getElementById('nombre').value.trim();
-    var apellido = document.getElementById('apellido').value.trim();
-    var email = document.getElementById('email').value.trim().toLowerCase();
-    
-    // Validación simple
-    if (!email || email.indexOf('@') === -1 || email.indexOf('.') === -1) {
-        alert('Por favor, ingresa un correo electrónico válido.');
-        return;
+Function registrarSuscriptor(e){
+    e.preventDefault();
+    var email=document.getElementById('email').value;
+    if(email.indexOf('@')==-1||email.indexOf('.')==-1){
+        alert('Email inválido');return;
     }
-    
-    // Guardar suscriptor
-    var suscriptores = JSON.parse(localStorage.getItem('strongman_suscriptores') || '[]');
-    
-    // Verificar si ya existe
-    for (var i = 0; i < suscriptores.length; i++) {
-        if (suscriptores[i].email === email) {
-            alert('Este correo ya está registrado.');
-            return;
-        }
-    }
-    
-    suscriptores.push({
-        id: Date.now(),
-        nombre: nombre,
-        apellido: apellido,
-        email: email,
-        fechaRegistro: new Date().toISOString()
-    });
-    
-    localStorage.setItem('strongman_suscriptores', JSON.stringify(suscriptores));
-    localStorage.setItem('strongman_suscrito', 'true');
-    
+    localStorage.setItem('suscrito','si');
     cerrarPopup();
-    mostrarMensajeExito();
-    document.getElementById('form-suscripcion').reset();
+    document.getElementById('mensaje-exito').className='activo';
 }
 
-function mostrarMensajeExito() {
-    var mensaje = document.getElementById('mensaje-exito');
-    if (mensaje) mensaje.classList.add('activo');
-}
-
-function cerrarMensajeExito() {
-    var mensaje = document.getElementById('mensaje-exito');
-    if (mensaje) mensaje.classList.remove('activo');
+Function cerrarMensajeExito(){
+    document.getElementById('mensaje-exito').className='';
 }
 </script>
 <!-- ============================================ -->
