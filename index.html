@@ -922,38 +922,6 @@
     color: var(--text-muted);
     padding: 3rem;
 }
-
-/* POPUP SUSCRIPCIÓN */
-#popup-suscripcion {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.9);
-    z-index: 99999;
-}
-
-#popup-suscripcion.activo {
-    display: block !important;
-}
-
-#modal-terminos, #mensaje-exito {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.9);
-    z-index: 100000;
-}
-
-#modal-terminos.activo, #mensaje-exito.activo {
-    display: block !important;
-}
-
     </style>
 </head>
 <body>
@@ -1271,7 +1239,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2026 Strongman Uruguay - A.C.A.F. Todos los derechos reservados.</p>
+            <p>&copy; 2024 Strongman Uruguay - A.C.A.F. Todos los derechos reservados.</p>
         </div>
     </footer>
 
@@ -5100,129 +5068,6 @@ function closeImageZoom() {
             }
         };
     </script>
-
-
-<!-- ============================================
-     POPUP DE SUSCRIPCIÓN - STRONGMAN URUGUAY
-     ============================================ -->
-<div id="popup-suscripcion" class="popup-overlay">
-  <div class="popup-contenido">
-    <button class="popup-cerrar" onclick="cerrarPopup()">&times;</button>
-    
-    <div class="popup-header">
-      <div class="popup-icono">💪</div>
-      <h2>¡Únete a Strongman Uruguay!</h2>
-      <p>Recibí noticias de eventos, cursos, talleres y más</p>
-    </div>
-    
-    <div class="popup-body">
-      <form id="form-suscripcion" onsubmit="registrarSuscriptor(event)">
-        <div class="campo-form">
-          <label for="nombre">Nombre</label>
-          <input type="text" id="nombre" name="nombre" required placeholder="Tu nombre">
-        </div>
-        
-        <div class="campo-form">
-          <label for="apellido">Apellido</label>
-          <input type="text" id="apellido" name="apellido" required placeholder="Tu apellido">
-        </div>
-        
-        <div class="campo-form">
-          <label for="email">Correo Electrónico</label>
-          <input type="email" id="email" name="email" required placeholder="tu@email.com">
-        </div>
-        
-        <div class="checkbox-container">
-          <input type="checkbox" id="acepto" name="acepto" required>
-          <label for="acepto">
-            Acepto recibir notificaciones sobre eventos, talleres, cursos e indumentaria de Strongman Uruguay.
-            <a href="#" onclick="mostrarTerminos(); return false;">Ver términos</a>
-          </label>
-        </div>
-        
-        <button type="submit" class="btn-suscribir">SUSCRIBIRME</button>
-      </form>
-      
-      <button class="btn-no-gracias" onclick="cerrarPopupTemporal()">
-        No por ahora
-      </button>
-    </div>
-    
-    <div class="popup-footer">
-      <p>🔒 Tu información está protegida</p>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL DE TÉRMINOS Y CONDICIONES -->
-<div id="modal-terminos" class="modal-terminos">
-  <div class="modal-contenido">
-    <button class="modal-cerrar" onclick="cerrarTerminos()">&times;</button>
-    <h3>Términos y Condiciones</h3>
-    <div class="terminos-texto">
-      <p><strong>1. Datos:</strong> Nombre, apellido y correo electrónico.</p>
-      <p><strong>2. Uso:</strong> Envío de información sobre eventos, competencias, talleres, cursos e indumentaria.</p>
-      <p><strong>3. Frecuencia:</strong> Máximo 2-3 correos por semana.</p>
-      <p><strong>4. Derechos:</strong> Podés cancelar tu suscripción en cualquier momento.</p>
-      <p><strong>5. Protección:</strong> Cumplimos con la Ley N° 18.331 de Protección de Datos Personales de Uruguay.</p>
-    </div>
-    <button class="btn-aceptar" onclick="cerrarTerminos()">Entendido</button>
-  </div>
-</div>
-
-<!-- MENSAJE DE ÉXITO -->
-<div id="mensaje-exito" class="mensaje-exito">
-  <div class="mensaje-contenido">
-    <div class="icono-exito">✓</div>
-    <h3>¡Bienvenido!</h3>
-    <p>Gracias por suscribirte. Revisá tu correo.</p>
-    <button onclick="cerrarMensajeExito()">Perfecto</button>
-  </div>
-</div>
-
-<!-- POPUP SUSCRIPCIÓN -->
-<div id="popup-suscripcion" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:99999; justify-content:center; align-items:center;">
-  <div style="background:#1a1a1a; border:2px solid #0066cc; border-radius:10px; padding:20px; max-width:400px; text-align:center;">
-    <h2 style="color:#ffd700; margin-top:0;">¡Únete a Strongman Uruguay!</h2>
-    <form onsubmit="registrarSuscriptor(event)">
-      <input type="text" id="nombre" placeholder="Nombre" required style="width:100%; padding:10px; margin:5px 0; background:#333; color:white; border:1px solid #555;">
-      <input type="text" id="apellido" placeholder="Apellido" required style="width:100%; padding:10px; margin:5px 0; background:#333; color:white; border:1px solid #555;">
-      <input type="email" id="email" placeholder="Email" required style="width:100%; padding:10px; margin:5px 0; background:#333; color:white; border:1px solid #555;">
-      <button type="submit" style="width:100%; padding:12px; margin:5px 0; background:#0066cc; color:white; border:none; cursor:pointer;">SUSCRIBIRME</button>
-      <button type="button" onclick="cerrarPopup()" style="width:100%; padding:12px; margin:5px 0; background:transparent; color:#999; border:1px solid #555; cursor:pointer;">No por ahora</button>
-    </form>
-  </div>
-</div>
-
-<div id="mensaje-exito" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:100000; justify-content:center; align-items:center;">
-  <div style="background:#1a1a1a; border:2px solid #28a745; border-radius:10px; padding:30px; text-align:center; max-width:300px;">
-    <h3 style="color:#28a745; margin-top:0;">¡Bienvenido!</h3>
-    <p style="color:white;">Gracias por suscribirte.</p>
-    <button onclick="cerrarMensaje()" style="padding:10px 20px; background:#28a745; color:white; border:none; cursor:pointer;">Perfecto</button>
-  </div>
-</div>
-
-<script>
-// POPUP SUSCRIPCIÓN
-setTimeout(function(){
-  var p=document.getElementById('popup-suscripcion');
-  if(p)p.style.display='flex';
-},2000);
-
-function cerrarPopup(){
-  document.getElementById('popup-suscripcion').style.display='none';
-}
-
-function registrarSuscriptor(e){
-  e.preventDefault();
-  document.getElementById('popup-suscripcion').style.display='none';
-  document.getElementById('mensaje-exito').style.display='flex';
-}
-
-function cerrarMensaje(){
-  document.getElementById('mensaje-exito').style.display='none';
-}
-</script>
 
 </body>
 </html>
