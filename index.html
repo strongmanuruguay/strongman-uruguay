@@ -5275,8 +5275,11 @@ function closeImageZoom() {
 <script>
 // Abrir modal
 function abrirModalSuscripcion() {
-    document.getElementById('modalSuscripcion').style.display = 'block';
+    const modal = document.getElementById('modalSuscripcion');
+    modal.style.display = 'block';
+    modal.style.zIndex = '10000';
     document.body.style.overflow = 'hidden';
+    console.log('Modal abierto'); // para debug
 }
 
 // Cerrar modal
