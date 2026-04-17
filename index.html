@@ -821,8 +821,8 @@
 
 /* BOTÓN SUSCRIPCIÓN EN HERO (al lado de "Ver Secciones") */
 .btn-suscripcion-hero {
-    position: relative !important;   /* ← AGREGAR ESTA */
-    z-index: 10000 !important;       /* ← AGREGAR ESTA */
+    position: relative !important;   
+    z-index: 10000 !important;       
     background: linear-gradient(135deg, #ffd700 0%, #ff6b35 100%) !important;
     color: #000 !important;
     font-weight: bold !important;
@@ -1155,11 +1155,10 @@
                 </div>
             </div>
             
-                       <a onclick="showHomeSections()" class="btn">Ver Secciones</a>
-            <a onclick="abrirModalSuscripcion(); return false;" class="btn btn-suscripcion-hero" style="margin-left: 15px; cursor: pointer;">
-                💪 Suscribirme
-            </a> 
-     
+        <a onclick="document.getElementById('modalSuscripcion').style.display='block'; return false;" class="btn btn-suscripcion-hero" style="margin-left: 15px; cursor: pointer;">
+    💪 Suscribirme
+</a>  
+ 
         </div>
     </section>
 
