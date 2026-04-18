@@ -819,10 +819,8 @@
 
 /* ========== SISTEMA DE SUSCRIPCIÓN STRONGMAN URUGUAY ========== */
 
-/* BOTÓN SUSCRIPCIÓN EN HERO (al lado de "Ver Secciones") */
+/* BOTÓN SUSCRIPCIÓN EN HERO */
 .btn-suscripcion-hero {
-    position: relative !important;   
-    z-index: 10000 !important;       
     background: linear-gradient(135deg, #ffd700 0%, #ff6b35 100%) !important;
     color: #000 !important;
     font-weight: bold !important;
@@ -988,7 +986,7 @@
     to { transform: translateX(0); opacity: 1; }
 }
 
-/* PANEL ADMIN SUSCRIPTORES */
+/* PANEL ADMIN SUSCRIPTORES - NUEVO */
 .admin-suscriptores {
     background: rgba(0,0,0,0.3);
     padding: 30px;
@@ -1000,6 +998,10 @@
 .contador-suscriptores {
     text-align: center;
     margin: 20px 0;
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(255,107,53,0.1) 100%);
+    border-radius: 15px;
+    border: 2px solid rgba(255,215,0,0.3);
 }
 
 .contador-suscriptores .numero {
@@ -1068,6 +1070,26 @@
     background: rgba(0,0,0,0.3);
 }
 
+.tabla-suscriptores tr:hover {
+    background: rgba(255,255,255,0.05);
+}
+
+.btn-exportar {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.btn-exportar:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+}
+
 /* RESPONSIVE */
 @media (max-width: 768px) {
     .btn-suscripcion-hero {
@@ -1090,7 +1112,12 @@
         bottom: 20px;
         max-width: none;
     }
+    
+    .contador-suscriptores .numero {
+        font-size: 48px;
+    }
 }
+
     </style>
 </head>
 
@@ -1448,6 +1475,7 @@
                         <button class="admin-tab" onclick="switchTab('judges')">Jueces</button>
                         <button class="admin-tab" onclick="switchTab('sponsors')">Sponsors</button>
                         <button class="admin-tab" onclick="switchTab('contacts')">Contactos</button>
+                        <button class="admin-tab" onclick="switchTab('suscriptores')">📧 Suscriptores</button>
                         <button class="admin-tab" onclick="switchTab('settings')">Apariencia</button>
                         <button class="admin-tab" onclick="openShopModal()">Tienda</button>
                         <button class="admin-tab" onclick="openCompetenciasModal()">Competencias</button>
@@ -1920,6 +1948,67 @@
     <h4 style="margin-top: 2rem; margin-bottom: 1rem;">Contactos Actuales</h4>
     <div id="contactsListAdmin"></div>
 </div>
+
+<!-- PANEL SUSCRIPTORES -->
+<div id="panel-suscriptores" class="admin-panel">
+    <h3>📧 Gestión de Suscriptores</h3>
+    <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+        Administra los suscriptores al newsletter y envía notificaciones masivas.
+    </p>
+    
+    <!-- Contador -->
+    <div class="contador-suscriptores">
+        <span class="numero" id="totalSuscriptores">0</span>
+        <span class="label">Suscriptores Totales</span>
+    </div>
+    
+    <!-- Envío masivo -->
+    <div class="envio-masivo">
+        <h4>📢 Enviar Notificación Masiva</h4>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+            Simulador de envío. En producción, esto se conectaría a un servicio de email.
+        </p>
+        
+        <select id="tipoNotificacion" onchange="cambiarTemplateNotificacion()">
+            <option value="">Seleccionar tipo de notificación...</option>
+            <option value="nuevo-evento">🎯 Nuevo Evento/Torneo</option>
+            <option value="nuevo-curso">📚 Nuevo Curso o Taller</option>
+            <option value="nueva-mercaderia">👕 Nueva Mercadería en Tienda</option>
+            <option value="seminario">🎓 Seminario o Charla</option>
+            <option value="general">📰 Noticia General</option>
+        </select>
+        
+        <input type="text" id="asuntoNotificacion" placeholder="Asunto del mensaje" style="width: 100%; padding: 0.8rem; margin: 0.5rem 0; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px;">
+        
+        <textarea id="mensajeNotificacion" placeholder="Escribe tu mensaje aquí..." style="width: 100%; padding: 0.8rem; margin: 0.5rem 0; min-height: 100px; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px; resize: vertical;"></textarea>
+        
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.5rem;">
+            <button class="btn btn-success" onclick="simularEnvioNotificacion()">
+                <i class="fas fa-paper-plane"></i> Simular Envío
+            </button>
+            <button class="btn btn-outline" onclick="previsualizarNotificacion()">
+                <i class="fas fa-eye"></i> Previsualizar
+            </button>
+        </div>
+        
+        <div id="resultadoEnvio" style="margin-top: 1rem; padding: 1rem; border-radius: 8px; display: none;"></div>
+    </div>
+    
+    <!-- Lista de suscriptores -->
+    <div style="margin-top: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h4>👥 Lista de Suscriptores</h4>
+            <button class="btn-exportar" onclick="exportarSuscriptores()">
+                <i class="fas fa-download"></i> Exportar CSV
+            </button>
+        </div>
+        
+        <div id="listaSuscriptoresContainer">
+            <p style="color: var(--text-muted);">Cargando suscriptores...</p>
+        </div>
+    </div>
+</div>
+
                     <!-- PANEL CONFIGURACIÓN -->
                     <div id="panel-settings" class="admin-panel">
                         <h3>Configuración de Apariencia</h3>
@@ -3763,7 +3852,8 @@ function getPlaceholder(tipo) {
             // Cargar datos específicos según la pestaña
             if (tab === 'ranking') updateRankingAthletesSelect();
             if (tab === 'records') loadRecordAthletesSelect();
-            
+            if (tab === 'suscriptores') cargarSuscriptoresAdmin();
+
             loadAdminList(tab);
         }
 
@@ -5272,15 +5362,13 @@ function closeImageZoom() {
     <span>¡Bienvenido a Strongman Uruguay! 💪 Revisa tu correo.</span>
 </div>
 
-<!-- ========== JAVASCRIPT SUSCRIPCIÓN ========== -->
-<script>
+// ========== JAVASCRIPT SUSCRIPCIÓN ==========
+
 // Abrir modal
 function abrirModalSuscripcion() {
     const modal = document.getElementById('modalSuscripcion');
     modal.style.display = 'block';
-    modal.style.zIndex = '10000';
     document.body.style.overflow = 'hidden';
-    console.log('Modal abierto'); // para debug
 }
 
 // Cerrar modal
@@ -5345,7 +5433,7 @@ function suscribirUsuario(event) {
     return false;
 }
 
-// Mostrar notificación
+// Mostrar notificación de éxito
 function mostrarNotificacionExito() {
     const notif = document.getElementById('notificacionExito');
     notif.style.display = 'block';
@@ -5354,8 +5442,321 @@ function mostrarNotificacionExito() {
         notif.style.display = 'none';
     }, 4000);
 }
-</script>
 
-</body>
-</html>
+// ========== PANEL ADMIN SUSCRIPTORES ==========
 
+// Cargar datos de suscriptores en el panel admin
+function cargarSuscriptoresAdmin() {
+    const suscriptores = JSON.parse(localStorage.getItem('suscriptoresStrongman')) || [];
+    
+    // Actualizar contador
+    document.getElementById('totalSuscriptores').textContent = suscriptores.length;
+    
+    // Renderizar lista
+    const container = document.getElementById('listaSuscriptoresContainer');
+    
+    if (suscriptores.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state" style="padding: 2rem;">
+                <i class="fas fa-inbox" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
+                <p style="color: var(--text-muted);">Aún no hay suscriptores</p>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Los usuarios pueden suscribirse desde el botón en la página de inicio</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Ordenar por fecha (más reciente primero)
+    suscriptores.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+    
+    let html = `
+        <table class="tabla-suscriptores">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Fecha de suscripción</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    
+    suscriptores.forEach((s, index) => {
+        const fecha = new Date(s.fecha).toLocaleDateString('es-UY', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        html += `
+            <tr>
+                <td><strong>${s.nombre} ${s.apellido}</strong></td>
+                <td>${s.email}</td>
+                <td>${fecha}</td>
+                <td>
+                    <button class="btn btn-small btn-danger" onclick="eliminarSuscriptor(${index})" title="Eliminar">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+    
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+
+// Eliminar suscriptor
+function eliminarSuscriptor(index) {
+    if (!confirm('¿Eliminar este suscriptor?')) return;
+    
+    let suscriptores = JSON.parse(localStorage.getItem('suscriptoresStrongman')) || [];
+    suscriptores.splice(index, 1);
+    localStorage.setItem('suscriptoresStrongman', JSON.stringify(suscriptores));
+    
+    cargarSuscriptoresAdmin();
+}
+
+// Exportar suscriptores a CSV
+function exportarSuscriptores() {
+    const suscriptores = JSON.parse(localStorage.getItem('suscriptoresStrongman')) || [];
+    
+    if (suscriptores.length === 0) {
+        alert('No hay suscriptores para exportar');
+        return;
+    }
+    
+    // Crear contenido CSV
+    let csv = 'ID,Nombre,Apellido,Email,Fecha Suscripción\n';
+    
+    suscriptores.forEach(s => {
+        const fecha = new Date(s.fecha).toLocaleDateString('es-UY');
+        csv += `${s.id},"${s.nombre}","${s.apellido}","${s.email}","${fecha}"\n`;
+    });
+    
+    // Crear blob y descargar
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `suscriptores-strongman-${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    alert(`✅ Exportados ${suscriptores.length} suscriptores`);
+}
+
+// Templates de notificaciones
+const templatesNotificacion = {
+    'nuevo-evento': {
+        asunto: '🏆 ¡Nuevo Torneo de Strongman en Uruguay!',
+        mensaje: `¡Hola [NOMBRE]!
+
+Tenemos el agrado de invitarte a nuestro próximo evento de Strongman.
+
+📅 Fecha: [FECHA]
+📍 Lugar: [LUGAR]
+💰 Inscripción: [PRECIO]
+
+Categorías habilitadas para todas las divisiones de peso.
+
+¡No te lo pierdas! Las inscripciones están abiertas.
+
+Saludos,
+Equipo Strongman Uruguay`
+    },
+    'nuevo-curso': {
+        asunto: '📚 Nuevo Curso de Formación en Strongman',
+        mensaje: `¡Hola [NOMBRE]!
+
+Te contamos que abrimos las inscripciones para nuestro nuevo curso:
+
+📚 Curso: [NOMBRE CURSO]
+📅 Fecha: [FECHA]
+📍 Lugar: [LUGAR]
+⏰ Duración: [DURACION]
+💰 Inversión: [PRECIO]
+
+Cupos limitados. ¡Reserva tu lugar!
+
+Strongman Uruguay`
+    },
+    'nueva-mercaderia': {
+        asunto: '👕 ¡Nueva Indumentaria Strongman Disponible!',
+        mensaje: `¡Hola [NOMBRE]!
+
+Acabamos de cargar nuevos productos en nuestra tienda oficial:
+
+👕 Remeras de entrenamiento
+🧤 Muñequeras y straps
+🎽 Buzos y camperas
+🏋️ Accesorios para strongman
+
+¡Stock limitado! Visitá nuestra tienda online.
+
+Strongman Uruguay`
+    },
+    'seminario': {
+        asunto: '🎓 Seminario Especial con Referentes del Strongman',
+        mensaje: `¡Hola [NOMBRE]!
+
+Tenemos el honor de anunciar un seminario especial con atletas y entrenadores de nivel internacional.
+
+🎓 Tema: [TEMA]
+👨‍🏫 Expositores: [EXPOSITORES]
+📅 Fecha: [FECHA]
+📍 Lugar: [LUGAR]
+
+Ideal para atletas, entrenadores y aficionados al deporte de la fuerza.
+
+¡Te esperamos!
+
+Strongman Uruguay`
+    },
+    'general': {
+        asunto: '📰 Noticias de Strongman Uruguay',
+        mensaje: `¡Hola [NOMBRE]!
+
+[TU MENSAJE AQUÍ]
+
+Saludos,
+Equipo Strongman Uruguay`
+    }
+};
+
+// Cambiar template según selección
+function cambiarTemplateNotificacion() {
+    const tipo = document.getElementById('tipoNotificacion').value;
+    const template = templatesNotificacion[tipo];
+    
+    if (template) {
+        document.getElementById('asuntoNotificacion').value = template.asunto;
+        document.getElementById('mensajeNotificacion').value = template.mensaje;
+    }
+}
+
+// Simular envío de notificación
+function simularEnvioNotificacion() {
+    const tipo = document.getElementById('tipoNotificacion').value;
+    const asunto = document.getElementById('asuntoNotificacion').value.trim();
+    const mensaje = document.getElementById('mensajeNotificacion').value.trim();
+    const resultadoDiv = document.getElementById('resultadoEnvio');
+    
+    if (!tipo) {
+        alert('Seleccioná un tipo de notificación');
+        return;
+    }
+    if (!asunto || !mensaje) {
+        alert('Completá el asunto y el mensaje');
+        return;
+    }
+    
+    const suscriptores = JSON.parse(localStorage.getItem('suscriptoresStrongman')) || [];
+    
+    if (suscriptores.length === 0) {
+        resultadoDiv.innerHTML = `
+            <div style="background: var(--danger); color: white; padding: 1rem; border-radius: 8px;">
+                <i class="fas fa-exclamation-circle"></i> No hay suscriptores para enviar notificaciones
+            </div>
+        `;
+        resultadoDiv.style.display = 'block';
+        return;
+    }
+    
+    // Simular envío
+    resultadoDiv.innerHTML = `
+        <div style="background: rgba(40, 167, 69, 0.2); border: 1px solid var(--success); color: var(--success); padding: 1rem; border-radius: 8px;">
+            <i class="fas fa-check-circle"></i> <strong>Simulación de envío exitoso</strong><br><br>
+            <div style="font-size: 0.9rem; color: var(--text);">
+                📧 Tipo: ${document.querySelector('#tipoNotificacion option:checked').text}<br>
+                👥 Destinatarios: ${suscriptores.length} suscriptores<br>
+                ✉️ Asunto: ${asunto}<br><br>
+                <em>En producción, esto enviaría emails reales mediante un servicio como SendGrid, Mailgun, o EmailJS.</em>
+            </div>
+        </div>
+    `;
+    resultadoDiv.style.display = 'block';
+    
+    // Guardar en historial de envíos
+    guardarHistorialEnvio(tipo, asunto, suscriptores.length);
+}
+
+// Guardar historial de envíos
+function guardarHistorialEnvio(tipo, asunto, cantidad) {
+    let historial = JSON.parse(localStorage.getItem('historialEnviosStrongman')) || [];
+    
+    historial.unshift({
+        fecha: new Date().toISOString(),
+        tipo: tipo,
+        asunto: asunto,
+        cantidad: cantidad
+    });
+    
+    // Mantener solo últimos 50
+    if (historial.length > 50) historial = historial.slice(0, 50);
+    
+    localStorage.setItem('historialEnviosStrongman', JSON.stringify(historial));
+}
+
+// Previsualizar notificación
+function previsualizarNotificacion() {
+    const asunto = document.getElementById('asuntoNotificacion').value;
+    const mensaje = document.getElementById('mensajeNotificacion').value;
+    
+    if (!asunto || !mensaje) {
+        alert('Completá el asunto y el mensaje para previsualizar');
+        return;
+    }
+    
+    // Simular mensaje con datos de ejemplo
+    const preview = mensaje.replace('[NOMBRE]', 'Juan Pérez').replace('[FECHA]', '15 de Marzo de 2024');
+    
+    const ventana = window.open('', '_blank', 'width=600,height=700');
+    ventana.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Previsualización - Strongman Uruguay</title>
+            <style>
+                body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f5f5f5; }
+                .email-container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+                .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: #ffd700; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; margin: -30px -30px 20px -30px; }
+                .header h1 { margin: 0; font-family: 'Oswald', sans-serif; }
+                .content { line-height: 1.6; color: #333; white-space: pre-line; }
+                .footer { margin-top: 30px; padding-top: 20px; border-top: 2px solid #eee; color: #666; font-size: 0.9rem; text-align: center; }
+                .legal { margin-top: 20px; padding: 15px; background: #f9f9f9; border-radius: 5px; font-size: 0.8rem; color: #999; }
+            </style>
+        </head>
+        <body>
+            <div class="email-container">
+                <div class="header">
+                    <h1>💪 STRONGMAN URUGUAY</h1>
+                </div>
+                <div class="content">
+                    <h2>${asunto}</h2>
+                    ${preview.replace(/\n/g, '<br>')}
+                </div>
+                <div class="footer">
+                    <p><strong>Strongman Uruguay - A.C.A.F</strong></p>
+                    <p>Asociación Civil de Atletismo de Fuerza</p>
+                    <p>📧 strongmanuruguay@gmail.com | 📱 +598 99 404 435</p>
+                    
+                    <div class="legal">
+                        <p>Recibiste este correo porque te suscribiste a Strongman Uruguay.</p>
+                        <p>© 2026 Strongman Uruguay. Todos los derechos reservados.</p>
+                        <p>Si no deseás recibir más notificaciones, podés darte de baja respondiendo a este email.</p>
+                        <p>Este mensaje es confidencial y puede contener información privilegiada.</p>
+                    </div>
+                </div>
+            </div>
+        </body>
+        </html>
+    `);
+}
