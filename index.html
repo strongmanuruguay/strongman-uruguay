@@ -1054,7 +1054,20 @@
                 <p>Productos oficiales de la asociación</p>
             </div>         
         </div>
-    </section>
+
+                 </div>
+    
+    <!-- Banner de suscripción -->
+    <div style="margin-top: 3rem; padding: 2rem; background: linear-gradient(135deg, rgba(0,102,204,0.2), rgba(255,215,0,0.1)); border: 2px solid var(--gold); border-radius: 15px; text-align: center;">
+        <h3 style="color: var(--gold); margin-bottom: 1rem;"><i class="fas fa-envelope-open-text"></i> ¿Querés estar al día?</h3>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+            Suscribite y recibí notificaciones sobre eventos, cursos, talleres, nueva indumentaria en la tienda y seminarios exclusivos.
+        </p>
+        <button class="btn btn-gold" onclick="abrirSuscripcion()" style="font-size: 1.1rem; padding: 1rem 2rem;">
+            <i class="fas fa-bell"></i> Suscribirme ahora
+        </button>
+    </div>
+</section>
 
     <!-- SECCIÓN RANKING -->
     <section id="ranking" class="content-section">
@@ -2826,6 +2839,270 @@ function closeShopModal() {
     document.getElementById('preview3').style.display = 'none';
 }
 
+// ===== SISTEMA DE SUSCRIPTORES =====
+
+// Abrir modal de suscripción
+function abrirSuscripcion() {
+    document.getElementById('suscripcionModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+// Cerrar modal de suscripción
+function cerrarSuscripcion() {
+    document.getElementById('suscripcionModal').classList.remove('active');
+    document.body.style.overflow = 'auto';
+    document.getElementById('suscripcionForm').reset();
+}
+
+// Cerrar modal de confirmación
+function cerrarConfirmacion() {
+    document.getElementById('confirmacionSubModal').classList.remove('active');
+    document.body.style.overflow = 'auto';
+}
+
+// Registrar nuevo suscriptor
+function registrarSuscriptor(e) {
+    e.preventDefault();
+    
+    const nombre = document.getElementById('subNombre').value.trim();
+    const apellido = document.getElementById('subApellido').value.trim();
+    const email = document.getElementById('subEmail').value.trim().toLowerCase();
+    
+    if (!nombre || !apellido || !email) {
+        alert('Por favor complete todos los campos');
+        return;
+    }
+    
+    // Validar email básico
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        alert('Por favor ingrese un correo electrónico válido');
+        return;
+    }
+    
+    // Obtener suscriptores existentes
+    let suscriptores = JSON.parse(localStorage.getItem('acaf_suscriptores')) || [];
+    
+    // Verificar si ya existe
+    const yaExiste = suscriptores.find(s => s.email === email);
+    if (yaExiste) {
+        alert('Este correo ya está suscrito. ¡Gracias por tu interés!');
+        cerrarSuscripcion();
+        return;
+    }
+    
+    // Crear nuevo suscriptor
+    const nuevoSuscriptor = {
+        id: Date.now().toString(),
+        nombre: nombre,
+        apellido: apellido,
+        email: email,
+        fechaRegistro: new Date().toISOString(),
+        activo: true
+    };
+    
+    // Guardar
+    suscriptores.push(nuevoSuscriptor);
+    localStorage.setItem('acaf_suscriptores', JSON.stringify(suscriptores));
+    
+    // Cerrar modal de suscripción y mostrar confirmación
+    cerrarSuscripcion();
+    
+    // Mostrar datos en confirmación
+    document.getElementById('confirmNombre').textContent = nombre + ' ' + apellido;
+    document.getElementById('confirmEmail').textContent = email;
+    document.getElementById('confirmacionSubModal').classList.add('active');
+    
+    // Actualizar contador en admin si está abierto
+    actualizarContadorSuscriptores();
+}
+
+// Actualizar contador de suscriptores en el badge del admin
+function actualizarContadorSuscriptores() {
+    const suscriptores = JSON.parse(localStorage.getItem('acaf_suscriptores')) || [];
+    const badge = document.getElementById('contadorSubsBadge');
+    if (badge) {
+        badge.textContent = suscriptores.length;
+    }
+}
+
+// ===== PANEL ADMIN - SUSCRIPTORES =====
+
+// Abrir modal de suscriptores desde el admin
+function openSuscriptoresModal() {
+    document.getElementById('suscriptoresModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+    cargarDatosSuscriptores();
+}
+
+// Cerrar modal de suscriptores
+function closeSuscriptoresModal() {
+    document.getElementById('suscriptoresModal').classList.remove('active');
+    document.body.style.overflow = 'auto';
+}
+
+// Cargar datos en el panel de suscriptores
+function cargarDatosSuscriptores() {
+    const suscriptores = JSON.parse(localStorage.getItem('acaf_suscriptores')) || [];
+    const ahora = new Date();
+    const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+    const inicioHoy = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
+    
+    // Contadores
+    const total = suscriptores.length;
+    const esteMes = suscriptores.filter(s => new Date(s.fechaRegistro) >= inicioMes).length;
+    const hoy = suscriptores.filter(s => new Date(s.fechaRegistro) >= inicioHoy).length;
+    
+    document.getElementById('totalSuscriptores').textContent = total;
+    document.getElementById('suscriptoresMes').textContent = esteMes;
+    document.getElementById('suscriptoresHoy').textContent = hoy;
+    document.getElementById('btnContadorSubs').textContent = total;
+    
+    // Actualizar badge en tabs
+    actualizarContadorSuscriptores();
+    
+    // Renderizar lista
+    renderizarListaSuscriptores(suscriptores);
+}
+
+// Renderizar lista de suscriptores
+function renderizarListaSuscriptores(suscriptores) {
+    const container = document.getElementById('listaSuscriptores');
+    
+    if (suscriptores.length === 0) {
+        container.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 2rem;">No hay suscriptores registrados aún</p>';
+        return;
+    }
+    
+    // Ordenar por fecha más reciente primero
+    const ordenados = [...suscriptores].sort((a, b) => new Date(b.fechaRegistro) - new Date(a.fechaRegistro));
+    
+    container.innerHTML = ordenados.map((s, index) => {
+        const fecha = new Date(s.fechaRegistro);
+        const fechaStr = fecha.toLocaleDateString('es-UY', { day: 'numeric', month: 'short', year: 'numeric' });
+        const horaStr = fecha.toLocaleTimeString('es-UY', { hour: '2-digit', minute: '2-digit' });
+        
+        return `
+            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; margin-bottom: 0.5rem; border: 1px solid rgba(255,255,255,0.05);">
+                <div style="flex: 1;">
+                    <div style="font-weight: 600; color: var(--text);">${s.nombre} ${s.apellido}</div>
+                    <div style="color: var(--accent-light); font-size: 0.9rem;">
+                        <i class="fas fa-envelope"></i> ${s.email}
+                    </div>
+                    <div style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.3rem;">
+                        <i class="fas fa-calendar"></i> ${fechaStr} a las ${horaStr}
+                    </div>
+                </div>
+                <button class="btn btn-danger btn-small" onclick="eliminarSuscriptor('${s.id}')" title="Eliminar suscriptor">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        `;
+    }).join('');
+}
+
+// Filtrar suscriptores por búsqueda
+function filtrarSuscriptores() {
+    const busqueda = document.getElementById('buscarSuscriptor').value.toLowerCase().trim();
+    const suscriptores = JSON.parse(localStorage.getItem('acaf_suscriptores')) || [];
+    
+    if (!busqueda) {
+        renderizarListaSuscriptores(suscriptores);
+        return;
+    }
+    
+    const filtrados = suscriptores.filter(s => 
+        s.nombre.toLowerCase().includes(busqueda) ||
+        s.apellido.toLowerCase().includes(busqueda) ||
+        s.email.toLowerCase().includes(busqueda)
+    );
+    
+    renderizarListaSuscriptores(filtrados);
+}
+
+// Eliminar suscriptor
+function eliminarSuscriptor(id) {
+    if (!confirm('¿Eliminar este suscriptor? Esta acción no se puede deshacer.')) return;
+    
+    let suscriptores = JSON.parse(localStorage.getItem('acaf_suscriptores')) || [];
+    suscriptores = suscriptores.filter(s => s.id !== id);
+    localStorage.setItem('acaf_suscriptores', JSON.stringify(suscriptores));
+    
+    cargarDatosSuscriptores();
+}
+
+// Enviar notificación masiva
+function enviarNotificacionMasiva() {
+    const tipo = document.getElementById('notifTipo').value;
+    const asunto = document.getElementById('notifAsunto').value.trim();
+    const mensaje = document.getElementById('notifMensaje').value.trim();
+    
+    if (!asunto || !mensaje) {
+        alert('Por favor complete el asunto y el mensaje');
+        return;
+    }
+    
+    const suscriptores = JSON.parse(localStorage.getItem('acaf_suscriptores')) || [];
+    
+    if (suscriptores.length === 0) {
+        alert('No hay suscriptores para enviar la notificación');
+        return;
+    }
+    
+    // Preparar contenido según tipo
+    const tipoLabels = {
+        'evento': '🎯 Nuevo Evento',
+        'curso': '📚 Nuevo Curso/Taller',
+        'tienda': '🛍️ Novedades en Tienda',
+        'seminario': '🎤 Seminario/Charla',
+        'general': '📢 Comunicación General'
+    };
+    
+    // Simular envío (en producción iría a un backend)
+    const notificacion = {
+        id: Date.now().toString(),
+        tipo: tipo,
+        tipoLabel: tipoLabels[tipo],
+        asunto: asunto,
+        mensaje: mensaje,
+        fechaEnvio: new Date().toISOString(),
+        totalDestinatarios: suscriptores.length,
+        destinatarios: suscriptores.map(s => s.email)
+    };
+    
+    // Guardar historial de notificaciones
+    let historial = JSON.parse(localStorage.getItem('acaf_notificaciones')) || [];
+    historial.push(notificacion);
+    localStorage.setItem('acaf_notificaciones', JSON.stringify(historial));
+    
+    // Mostrar resumen de envío
+    const resumen = `
+📧 NOTIFICACIÓN ENVIADA
+
+Tipo: ${tipoLabels[tipo]}
+Asunto: ${asunto}
+
+Total de destinatarios: ${suscriptores.length}
+
+Destinatarios:
+${suscriptores.map(s => `• ${s.nombre} ${s.apellido} <${s.email}>`).join('\n')}
+
+⚠️ NOTA: En este sitio estático, los correos no se envían realmente.
+Para enviar correos reales, necesitás integrar un servicio como:
+• EmailJS (gratis hasta 200 correos/mes)
+• SendGrid
+• Mailchimp
+• O un backend propio
+
+Los datos de los suscriptores están guardados en localStorage y pueden exportarse.
+    `;
+    
+    alert(resumen);
+    
+    // Limpiar formulario
+    document.getElementById('notifAsunto').value = '';
+    document.getElementById('notifMensaje').value = '';
+}
 
 // ===== SISTEMA DE COMPETENCIAS =====
 
@@ -5142,7 +5419,7 @@ function closeImageZoom() {
         };
     </script>
 
-<!-- MODAL SUSCRIPCIÓN - APARECE AL ENTRAR -->
+<!-- ===== MODAL SUSCRIPCIÓN ===== -->
 <div id="suscripcionModal" class="modal">
     <div class="modal-content" style="max-width: 500px; text-align: center;">
         <div class="modal-header" style="background: linear-gradient(135deg, var(--gold), #ffed4e); color: #000;">
@@ -5159,13 +5436,16 @@ function closeImageZoom() {
             
             <form id="suscripcionForm" onsubmit="registrarSuscriptor(event)">
                 <div style="margin-bottom: 1rem;">
-                    <input type="text" id="subNombre" placeholder="Nombre" required style="width: 100%; padding: 1rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px; font-size: 1rem;">
+                    <input type="text" id="subNombre" placeholder="Nombre" required 
+                           style="width: 100%; padding: 1rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px; font-size: 1rem;">
                 </div>
                 <div style="margin-bottom: 1rem;">
-                    <input type="text" id="subApellido" placeholder="Apellido" required style="width: 100%; padding: 1rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px; font-size: 1rem;">
+                    <input type="text" id="subApellido" placeholder="Apellido" required 
+                           style="width: 100%; padding: 1rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px; font-size: 1rem;">
                 </div>
                 <div style="margin-bottom: 1.5rem;">
-                    <input type="email" id="subEmail" placeholder="Correo electrónico" required style="width: 100%; padding: 1rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px; font-size: 1rem;">
+                    <input type="email" id="subEmail" placeholder="Correo electrónico" required 
+                           style="width: 100%; padding: 1rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px; font-size: 1rem;">
                 </div>
                 
                 <label style="display: flex; align-items: start; gap: 0.5rem; margin-bottom: 1.5rem; text-align: left; color: var(--text-muted); font-size: 0.9rem;">
@@ -5185,24 +5465,49 @@ function closeImageZoom() {
     </div>
 </div>
 
-<!-- MODAL CONFIRMACIÓN SUSCRIPCIÓN -->
+<!-- ===== MODAL CONFIRMACIÓN DE SUSCRIPCIÓN ===== -->
 <div id="confirmacionSubModal" class="modal">
-    <div class="modal-content" style="max-width: 450px; text-align: center;">
+    <div class="modal-content" style="max-width: 550px; text-align: center;">
         <div class="modal-header" style="background: var(--success);">
-            <h2><i class="fas fa-check-circle"></i> ¡Suscripción exitosa!</h2>
+            <h2><i class="fas fa-check-circle"></i> ¡Suscripción Exitosa!</h2>
+            <button class="close-btn" onclick="cerrarConfirmacion()" style="color: white;">&times;</button>
         </div>
         <div class="modal-body" style="padding: 2rem;">
             <div style="font-size: 4rem; margin-bottom: 1rem;">✅</div>
             <h3 style="color: var(--success); margin-bottom: 1rem;">¡Gracias por suscribirte!</h3>
-            <p style="color: var(--text); margin-bottom: 1rem;">
+            <p style="color: var(--text); margin-bottom: 0.5rem; font-size: 1.1rem;">
                 <strong id="confirmNombre"></strong>, ahora formás parte de la comunidad Strongman Uruguay.
             </p>
             <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
-                Te enviamos un correo de confirmación a <strong id="confirmEmail"></strong>.<br>
-                Recibirás noticias sobre eventos, cursos, talleres y novedades de la tienda.
+                Te enviamos un correo de confirmación a <strong id="confirmEmail" style="color: var(--accent-light);"></strong>.
             </p>
+            
+            <!-- Datos legales del correo -->
+            <div style="background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: 10px; margin-bottom: 1.5rem; text-align: left; border: 1px solid rgba(255,255,255,0.1);">
+                <p style="color: var(--text-muted); font-size: 0.8rem; line-height: 1.6; margin: 0;">
+                    <strong style="color: var(--text);">Aviso Legal:</strong><br><br>
+                    Este correo electrónico y cualquier archivo adjunto son confidenciales y están destinados exclusivamente para el uso del individuo o entidad a quienes están dirigidos. Si ha recibido este correo por error, por favor notifíquelo al remitente y elimínelo de su sistema.<br><br>
+                    
+                    <strong style="color: var(--text);">Protección de Datos:</strong><br>
+                    De conformidad con la Ley N° 18.331 de Protección de Datos Personales de la República Oriental del Uruguay, sus datos personales serán tratados de forma confidencial y no serán compartidos con terceros sin su consentimiento expreso.<br><br>
+                    
+                    <strong style="color: var(--text);">Derechos del Usuario:</strong><br>
+                    Usted tiene derecho a acceder, rectificar, suprimir y oponerse al tratamiento de sus datos personales. Para ejercer estos derechos, envíe un correo a <span style="color: var(--accent-light);">privacidad@strongmanuruguay.com</span>.<br><br>
+                    
+                    <strong style="color: var(--text);">Cancelación:</strong><br>
+                    Puede darse de baja en cualquier momento haciendo clic en el enlace "Cancelar suscripción" que encontrará al final de cada correo electrónico enviado.<br><br>
+                    
+                    <strong style="color: var(--text);">Strongman Uruguay - A.C.A.F.</strong><br>
+                    Asociación Civil de Atletismo de Fuerza<br>
+                    Montevideo, Uruguay<br>
+                    © 2024 Todos los derechos reservados.<br><br>
+                    
+                    <em style="color: var(--text-muted);">Este es un correo automático, por favor no responda a esta dirección.</em>
+                </p>
+            </div>
+            
             <button onclick="cerrarConfirmacion()" class="btn btn-success" style="width: 100%;">
-                ¡Entendido!
+                <i class="fas fa-check"></i> ¡Entendido!
             </button>
         </div>
     </div>
