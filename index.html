@@ -831,9 +831,6 @@
                 </button>
             </form>
             
-            <div class="suscripcion-contador">
-                <i class="fas fa-users"></i> Ya somos <span id="contadorPublico">0</span> suscriptores
-            </div>
         </div>
     </section>
 
@@ -2015,9 +2012,7 @@
             countVisit();
             if (data.events.length === 0) loadSampleData();
             
-            // Actualizar contador de suscriptores público
-            actualizarContadorPublico();
-            
+                      
             if (window.innerWidth <= 768) {
                 document.querySelector('.menu-toggle').style.display = 'block';
             }
@@ -2535,19 +2530,12 @@
             document.getElementById('subPublicApellido').value = '';
             document.getElementById('subPublicEmail').value = '';
             
-            actualizarContadorPublico();
-        }
-
+           
         function cerrarConfirmacion() {
             document.getElementById('confirmacionSubModal').classList.remove('active');
         }
 
-        function actualizarContadorPublico() {
-            const suscriptores = JSON.parse(localStorage.getItem('acaf_suscriptores')) || [];
-            const contador = document.getElementById('contadorPublico');
-            if (contador) contador.textContent = suscriptores.length;
-        }
-
+      
                  // ===== ADMIN MODAL =====
         function openAdminModal() {
             document.getElementById('adminModal').classList.add('active');
