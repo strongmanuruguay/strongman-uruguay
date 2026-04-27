@@ -127,6 +127,42 @@
             align-items: center;
             gap: 0.5rem;
         }
+
+        /* Botón volver arriba fijo */
+        .scroll-top-btn {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            color: white;
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 900;
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.4);
+            transition: all 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+        }
+        .scroll-top-btn.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .scroll-top-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 102, 204, 0.6);
+            background: linear-gradient(135deg, var(--accent-light), var(--accent));
+        }
+        .scroll-top-btn i {
+            font-size: 1.2rem;
+        }
         
         .stats-bar {
             background: var(--secondary);
@@ -162,10 +198,179 @@
         .nav-logo { display: flex; align-items: center; gap: 1rem; }
         .nav-logo img { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--accent); }
         .nav-logo span { font-family: 'Oswald', sans-serif; font-size: 1.5rem; font-weight: 700; }
-        .nav-links { display: flex; gap: 2rem; list-style: none; }
-        .nav-links a { color: var(--text); text-decoration: none; font-weight: 500; transition: color 0.3s; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; cursor: pointer; }
-        .nav-links a:hover { color: var(--accent-light); }
-        .admin-btn { background: var(--gold); color: var(--primary) !important; padding: 0.5rem 1rem; border-radius: 20px; font-weight: 700 !important; }
+        /* ===== MENÚ DESPLEGABLE ESTILO MODERNO ===== */
+        .nav-links { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            right: 0; 
+            width: 320px; 
+            height: 100vh;
+            background: linear-gradient(180deg, rgba(10,10,15,0.98) 0%, rgba(20,20,30,0.98) 100%); 
+            backdrop-filter: blur(20px);
+            list-style: none; 
+            flex-direction: column; 
+            padding: 5rem 0 2rem 0; 
+            gap: 0; 
+            border-left: 1px solid rgba(0,102,204,0.3);
+            box-shadow: -10px 0 50px rgba(0,0,0,0.8);
+            z-index: 998;
+            overflow-y: auto;
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .nav-links.active { 
+            display: flex; 
+            transform: translateX(0);
+        }
+        .nav-links::before {
+            content: 'MENÚ';
+            position: absolute;
+            top: 1.5rem;
+            left: 2rem;
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.2rem;
+            color: var(--accent);
+            letter-spacing: 3px;
+            font-weight: 600;
+        }
+        .nav-links::after {
+            content: '';
+            position: absolute;
+            top: 3.5rem;
+            left: 2rem;
+            right: 2rem;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent), transparent);
+        }
+        .nav-links li { width: 100%; }
+        .nav-links a { 
+            color: var(--text); 
+            text-decoration: none; 
+            font-weight: 500; 
+            transition: all 0.3s ease; 
+            text-transform: uppercase; 
+            font-size: 0.9rem; 
+            letter-spacing: 1.5px; 
+            cursor: pointer; 
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            position: relative;
+            overflow: hidden;
+        }
+        .nav-links a::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: var(--accent);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+        .nav-links a:hover { 
+            color: var(--accent-light); 
+            background: rgba(0, 102, 204, 0.08);
+            padding-left: 2.5rem;
+        }
+        .nav-links a:hover::before {
+            transform: scaleY(1);
+        }
+        .nav-links a i {
+            width: 20px;
+            text-align: center;
+            color: var(--accent);
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        .nav-links a:hover i {
+            color: var(--accent-light);
+            transform: scale(1.2);
+        }
+        .nav-links li:last-child a { border-bottom: none; margin-top: 0.5rem; }
+        .admin-btn { 
+            background: linear-gradient(135deg, var(--gold), #ffed4e) !important; 
+            color: var(--primary) !important; 
+            padding: 0.8rem 1.5rem !important; 
+            border-radius: 50px; 
+            font-weight: 700 !important; 
+            margin: 0.5rem 2rem;
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            border-bottom: none !important;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+            transition: all 0.3s !important;
+        }
+        .admin-btn:hover { 
+            background: linear-gradient(135deg, #ffed4e, var(--gold)) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+            padding-left: 1.5rem !important;
+        }
+        .admin-btn::before { display: none !important; }
+
+        /* Overlay oscuro cuando el menú está abierto */
+        .menu-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(3px);
+            z-index: 997;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        .menu-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Botón hamburguesa mejorado */
+        .menu-toggle {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 102, 204, 0.2);
+            border: 2px solid rgba(0, 102, 204, 0.5);
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 999;
+        }
+        .menu-toggle:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 102, 204, 0.4);
+        }
+        .menu-toggle i {
+            transition: all 0.3s ease;
+        }
+        .menu-toggle.active {
+            background: var(--danger);
+            border-color: var(--danger);
+        }
+        .menu-toggle.active i {
+            transform: rotate(180deg);
+        }
+        .menu-toggle.active:hover {
+            background: #ff4444;
+            box-shadow: 0 0 20px rgba(220, 53, 69, 0.4);
+        }
         
         .section-title { text-align: center; font-size: 3rem; margin-bottom: 3rem; position: relative; display: inline-block; width: 100%; }
         .section-title::after { content: ''; display: block; width: 100px; height: 4px; background: var(--accent); margin: 1rem auto; border-radius: 2px; }
@@ -393,10 +598,11 @@
             .menu-grid { grid-template-columns: 1fr; gap: 1rem; }
             .ranking-table { font-size: 0.8rem; }
             .rank-athlete img { width: 30px; height: 30px; }
-            .nav-links { display: none; position: absolute; top: 100%; left: 0; width: 100%; background: rgba(0,0,0,0.95); flex-direction: column; padding: 1rem; gap: 0.5rem; }
-            .nav-links.active { display: flex; }
-            .nav-links a { padding: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
-            .menu-toggle { display: block !important; background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+            .nav-links { 
+                width: 280px; 
+            }
+            .nav-links a { padding: 0.9rem 1.5rem; }
+            .admin-btn { margin: 0.5rem 1.5rem; }
             .hero { height: auto; min-height: 100vh; padding: 6rem 1rem 2rem 1rem; }
             .logo-container { width: 150px; height: 150px; }
             .hero h1 { font-size: 1.8rem; }
@@ -675,8 +881,10 @@
             text-align: center;
         }
     </style>
+<base target="_blank">
 </head>
 <body>
+    <div class="menu-overlay" id="menuOverlay" onclick="closeMenu()"></div>
     <div class="admin-float-btn" onclick="openAdminModal()" title="Panel de Administración">
         <i class="fas fa-lock"></i>
     </div>
@@ -687,23 +895,23 @@
             <img src="https://via.placeholder.com/50/0066cc/ffffff?text=ACAF" alt="ACAF">
             <span>STRONGMAN URUGUAY</span>
         </div>
-        <button class="menu-toggle" onclick="toggleMenu()" style="display: none;">
+        <button class="menu-toggle" onclick="toggleMenu()" title="Menú">
             <i class="fas fa-bars"></i>
         </button>
         <ul class="nav-links" id="navLinks">
-            <li><a onclick="showHome()">Inicio</a></li>
-            <li><a onclick="showSection('ranking')">Ranking</a></li>
-            <li><a onclick="showSection('atletas')">Atletas</a></li>
-            <li><a onclick="showSection('records')">Récords</a></li>
-            <li><a onclick="showSection('eventos')">Eventos</a></li>             
-            <li><a onclick="showSection('gimnasios')">Gimnasios</a></li>
-            <li><a onclick="showSection('galeria')">Galería</a></li>
-            <li><a onclick="showSection('reglas')">Reglas</a></li>
-            <li><a onclick="showSection('cursos')">Cursos</a></li>
-            <li><a onclick="showSection('jueces')">Jueces</a></li>
-            <li><a onclick="showSection('tienda')">Tienda</a></li>
-            <li><a onclick="showSection('competencias-publico')">Competencias</a></li>
-            <li><a onclick="openAdminModal(); return false;" class="admin-btn"><i class="fas fa-lock"></i> Admin</a></li>
+            <li><a onclick="showHome(); closeMenu();"><i class="fas fa-home"></i> Inicio</a></li>
+            <li><a onclick="showSection('ranking'); closeMenu();"><i class="fas fa-trophy"></i> Ranking</a></li>
+            <li><a onclick="showSection('atletas'); closeMenu();"><i class="fas fa-users"></i> Atletas</a></li>
+            <li><a onclick="showSection('records'); closeMenu();"><i class="fas fa-medal"></i> Récords</a></li>
+            <li><a onclick="showSection('eventos'); closeMenu();"><i class="fas fa-calendar-alt"></i> Eventos</a></li>             
+            <li><a onclick="showSection('gimnasios'); closeMenu();"><i class="fas fa-dumbbell"></i> Gimnasios</a></li>
+            <li><a onclick="showSection('galeria'); closeMenu();"><i class="fas fa-images"></i> Galería</a></li>
+            <li><a onclick="showSection('reglas'); closeMenu();"><i class="fas fa-book"></i> Reglas</a></li>
+            <li><a onclick="showSection('cursos'); closeMenu();"><i class="fas fa-graduation-cap"></i> Cursos</a></li>
+            <li><a onclick="showSection('jueces'); closeMenu();"><i class="fas fa-gavel"></i> Jueces</a></li>
+            <li><a onclick="showSection('tienda'); closeMenu();"><i class="fas fa-shopping-cart"></i> Tienda</a></li>
+            <li><a onclick="showSection('competencias-publico'); closeMenu();"><i class="fas fa-clipboard-list"></i> Competencias</a></li>
+            <li><a onclick="openAdminModal(); closeMenu(); return false;" class="admin-btn"><i class="fas fa-lock"></i> Panel Admin</a></li>
         </ul>
     </div>
 </nav>
@@ -836,7 +1044,7 @@
 
     <!-- SECCIÓN RANKING -->
     <section id="ranking" class="content-section">
-        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-arrow-left"></i> Volver al Inicio</button>
+        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-home"></i> Volver al Inicio</button>
         <h2 class="section-title">Ranking Nacional Strongman</h2>
         <div class="ranking-filters">
             <button class="btn btn-gold" onclick="filterRanking('male')">Masculino</button>
@@ -853,7 +1061,7 @@
 
     <!-- SECCIÓN ATLETAS -->
     <section id="atletas" class="content-section" style="background: rgba(255,255,255,0.02);">
-        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-arrow-left"></i> Volver al Inicio</button>
+        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-home"></i> Volver al Inicio</button>
         <h2 class="section-title">Nuestros Atletas</h2>
         <div style="text-align: center; margin-bottom: 2rem;">
             <button class="btn" onclick="filterAthletes('all')">Todos</button>
@@ -865,70 +1073,70 @@
 
     <!-- SECCIÓN RÉCORDS -->
     <section id="records" class="content-section">
-        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-arrow-left"></i> Volver al Inicio</button>
+        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-home"></i> Volver al Inicio</button>
         <h2 class="section-title">Récords Nacionales</h2>
         <div class="grid" id="recordsContainer"></div>
     </section>
 
     <!-- SECCIÓN EVENTOS -->
     <section id="eventos" class="content-section">
-        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-arrow-left"></i> Volver al Inicio</button>
+        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-home"></i> Volver al Inicio</button>
         <h2 class="section-title">Próximos Eventos</h2>
         <div class="grid" id="eventsContainer"></div>
     </section>
 
     <!-- SECCIÓN GIMNASIOS -->
     <section id="gimnasios" class="content-section" style="background: rgba(255,255,255,0.02);">
-        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-arrow-left"></i> Volver al Inicio</button>
+        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-home"></i> Volver al Inicio</button>
         <h2 class="section-title">Gimnasios Afiliados</h2>
         <div class="grid" id="gymsContainer"></div>
     </section>
 
     <!-- SECCIÓN GALERÍA -->
     <section id="galeria" class="content-section">
-        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-arrow-left"></i> Volver al Inicio</button>
+        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-home"></i> Volver al Inicio</button>
         <h2 class="section-title">Galería de Eventos</h2>
         <div class="gallery-grid" id="galleryContainer"></div>
     </section>
 
     <!-- SECCIÓN REGLAS -->
     <section id="reglas" class="content-section" style="background: rgba(255,255,255,0.02);">
-        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-arrow-left"></i> Volver al Inicio</button>
+        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-home"></i> Volver al Inicio</button>
         <h2 class="section-title">Reglas Oficiales Strongman</h2>
         <div class="rules-container" id="rulesContainer"></div>
     </section>
 
     <!-- SECCIÓN CURSOS -->
     <section id="cursos" class="content-section">
-        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-arrow-left"></i> Volver al Inicio</button>
+        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-home"></i> Volver al Inicio</button>
         <h2 class="section-title">Cursos y Seminarios</h2>
         <div class="grid" id="coursesContainer"></div>
     </section>
 
     <!-- SECCIÓN JUECES -->
     <section id="jueces" class="content-section" style="background: rgba(255,255,255,0.02);">
-        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-arrow-left"></i> Volver al Inicio</button>
+        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-home"></i> Volver al Inicio</button>
         <h2 class="section-title">Cuerpo de Jueces</h2>
         <div class="grid" id="judgesContainer"></div>
     </section>
 
     <!-- SECCIÓN SPONSORS -->
     <section id="sponsors" class="content-section">
-        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-arrow-left"></i> Volver al Inicio</button>
+        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-home"></i> Volver al Inicio</button>
         <h2 class="section-title">Sponsors</h2>
         <div class="sponsors-grid" id="sponsorsContainer"></div>
     </section>
 
     <!-- SECCIÓN TIENDA -->
     <section id="tienda" class="content-section">
-        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-arrow-left"></i> Volver al Inicio</button>
+        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-home"></i> Volver al Inicio</button>
         <h2 class="section-title">Tienda Oficial</h2>
         <div id="productsContainer"></div>
     </section>
 
     <!-- SECCIÓN COMPETENCIAS PÚBLICO -->
     <section id="competencias-publico" class="content-section">
-        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-arrow-left"></i> Volver al Inicio</button>
+        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-home"></i> Volver al Inicio</button>
         <h2 class="section-title">Competencias y Resultados</h2>
         <div style="margin-bottom: 2rem;">
             <label style="color: var(--text-muted);">Seleccionar Torneo</label>
@@ -975,6 +1183,10 @@
             </div>
         </div>
     </div>
+
+    <button class="scroll-top-btn" id="scrollTopBtn" onclick="scrollToTop()" title="Volver arriba">
+        <i class="fas fa-arrow-up"></i>
+    </button>
 
     <footer>
         <div class="footer-content">
@@ -3437,18 +3649,71 @@
 
         // MENÚ RESPONSIVE
         function toggleMenu() {
-            document.getElementById('navLinks').classList.toggle('active');
+            const navLinks = document.getElementById('navLinks');
+            const menuToggle = document.querySelector('.menu-toggle');
+            const overlay = document.getElementById('menuOverlay');
+
+            navLinks.classList.toggle('active');
+            menuToggle.classList.toggle('active');
+            overlay.classList.toggle('active');
+
+            // Cambiar icono
+            const icon = menuToggle.querySelector('i');
+            if (navLinks.classList.contains('active')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+                document.body.style.overflow = 'hidden';
+            } else {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+                document.body.style.overflow = '';
+            }
         }
 
-        window.addEventListener('resize', function() {
+        function closeMenu() {
+            const navLinks = document.getElementById('navLinks');
             const menuToggle = document.querySelector('.menu-toggle');
-            if (window.innerWidth <= 768) {
-                menuToggle.style.display = 'block';
-            } else {
-                menuToggle.style.display = 'none';
-                document.getElementById('navLinks').classList.remove('active');
+            const overlay = document.getElementById('menuOverlay');
+
+            navLinks.classList.remove('active');
+            menuToggle.classList.remove('active');
+            overlay.classList.remove('active');
+
+            const icon = menuToggle.querySelector('i');
+            icon.classList.remove('fa-times');
+            icon.classList.add('fa-bars');
+            document.body.style.overflow = '';
+        }
+
+        // Cerrar menú con tecla Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeMenu();
             }
-        });       
+        });
+
+        // Cerrar menú al hacer scroll
+        window.addEventListener('scroll', function() {
+            const navLinks = document.getElementById('navLinks');
+            if (navLinks.classList.contains('active')) {
+                closeMenu();
+            }
+
+            // Mostrar/ocultar botón volver arriba
+            const scrollBtn = document.getElementById('scrollTopBtn');
+            if (window.scrollY > 400) {
+                scrollBtn.classList.add('visible');
+            } else {
+                scrollBtn.classList.remove('visible');
+            }
+        });
+
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }       
        
                // ===== TIENDA Y CARRITO =====
         let cart = JSON.parse(localStorage.getItem('cartStrongman')) || [];
