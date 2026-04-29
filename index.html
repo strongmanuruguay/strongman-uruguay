@@ -880,6 +880,158 @@
             color: #666;
             text-align: center;
         }
+
+/* ===== NOTICIAS/BLOG ===== */
+.news-section {
+    padding: 5rem 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+.news-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+.news-card {
+    background: var(--secondary);
+    border-radius: 15px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.1);
+    transition: all 0.3s;
+    cursor: pointer;
+}
+.news-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0, 102, 204, 0.2);
+    border-color: var(--accent);
+}
+.news-image {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    background: linear-gradient(45deg, #1a1a1a, #2a2a2a);
+}
+.news-content {
+    padding: 1.5rem;
+}
+.news-date {
+    color: var(--accent-light);
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.news-category {
+    display: inline-block;
+    padding: 0.2rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+}
+.news-category-evento { background: rgba(0, 102, 204, 0.2); color: var(--accent-light); border: 1px solid var(--accent); }
+.news-category-resultado { background: rgba(40, 167, 69, 0.2); color: var(--success); border: 1px solid var(--success); }
+.news-category-entrevista { background: rgba(255, 215, 0, 0.2); color: var(--gold); border: 1px solid var(--gold); }
+.news-category-general { background: rgba(255, 255, 255, 0.1); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.3); }
+.news-title {
+    font-size: 1.3rem;
+    color: var(--text);
+    margin-bottom: 0.8rem;
+    line-height: 1.3;
+}
+.news-excerpt {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+.news-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+.news-author {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+.news-author img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.news-read-more {
+    color: var(--accent-light);
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: color 0.3s;
+}
+.news-read-more:hover {
+    color: var(--gold);
+}
+
+/* Noticia destacada (hero card) */
+.news-featured {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    min-height: 400px;
+}
+.news-featured .news-image {
+    height: 100%;
+    min-height: 400px;
+}
+.news-featured .news-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+@media (max-width: 768px) {
+    .news-featured {
+        grid-template-columns: 1fr;
+    }
+    .news-featured .news-image {
+        min-height: 200px;
+    }
+}
+
+/* Modal de noticia completa */
+.news-modal-body {
+    padding: 2rem;
+}
+.news-modal-body img {
+    width: 100%;
+    max-height: 400px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+}
+.news-modal-body h2 {
+    color: var(--gold);
+    margin-bottom: 1rem;
+}
+.news-modal-body .news-meta {
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.news-modal-body p {
+    color: var(--text);
+    line-height: 1.8;
+    margin-bottom: 1rem;
+    font-size: 1.05rem;
+}
+
     </style>
 <base target="_blank">
 </head>
@@ -1051,6 +1203,46 @@
             
                    </div>
     </section>
+
+<!-- SECCIÓN NOTICIAS/BLOG -->
+<section class="news-section" id="noticias">
+    <h2 class="section-title">Últimas Noticias</h2>
+    <div class="news-grid" id="newsContainer">
+        <div class="empty-state" style="grid-column: 1/-1;">
+            <i class="fas fa-newspaper"></i>
+            <p>No hay noticias publicadas aún</p>
+        </div>
+    </div>
+    <div style="text-align: center; margin-top: 3rem;">
+        <button class="btn btn-outline" onclick="showSection('noticias-todas')">
+            <i class="fas fa-newspaper"></i> Ver Todas las Noticias
+        </button>
+    </div>
+</section>
+
+<!-- SECCIÓN TODAS LAS NOTICIAS -->
+<section id="noticias-todas" class="content-section">
+    <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-home"></i> Volver al Inicio</button>
+    <h2 class="section-title">Todas las Noticias</h2>
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <button class="btn" onclick="filterNews('all')">Todas</button>
+        <button class="btn btn-outline" onclick="filterNews('evento')">Eventos</button>
+        <button class="btn btn-outline" onclick="filterNews('resultado')">Resultados</button>
+        <button class="btn btn-outline" onclick="filterNews('entrevista')">Entrevistas</button>
+    </div>
+    <div class="news-grid" id="newsAllContainer"></div>
+</section>
+
+<!-- MODAL NOTICIA COMPLETA -->
+<div id="newsModal" class="modal">
+    <div class="modal-content" style="max-width: 800px; max-height: 90vh; overflow-y: auto;">
+        <div class="modal-header">
+            <h2><i class="fas fa-newspaper"></i> Noticia</h2>
+            <button class="close-btn" onclick="closeNewsModal()">&times;</button>
+        </div>
+        <div class="news-modal-body" id="newsModalBody"></div>
+    </div>
+</div>
 
     <!-- SECCIÓN RANKING -->
     <section id="ranking" class="content-section">
@@ -1292,6 +1484,7 @@
                         <button class="admin-tab" onclick="switchTab('sponsors')">Sponsors</button>
                         <button class="admin-tab" onclick="switchTab('contacts')">Contactos</button>
                         <button class="admin-tab" onclick="switchTab('settings')">Apariencia</button>
+                        <button class="admin-tab" onclick="switchTab('news')">Noticias</button>
                         <button class="admin-tab" onclick="openShopModal()">Tienda</button>
                         <button class="admin-tab" onclick="openCompetenciasModal()">Competencias</button>
                         <button class="admin-tab" onclick="openSuscriptoresModal()">
@@ -1873,6 +2066,59 @@
         </div>
     </div>
 
+<!-- PANEL NOTICIAS -->
+<div id="panel-news" class="admin-panel">
+    <h3>Gestionar Noticias/Blog</h3>
+    <form id="newsForm" onsubmit="saveNews(event)">
+        <input type="hidden" id="newsId">
+        <div class="form-group">
+            <label>Título *</label>
+            <input type="text" id="newsTitle" required placeholder="Título de la noticia">
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Categoría *</label>
+                <select id="newsCategory" required>
+                    <option value="evento">🎯 Evento</option>
+                    <option value="resultado">🏆 Resultado</option>
+                    <option value="entrevista">🎤 Entrevista</option>
+                    <option value="general">📢 General</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Fecha de publicación *</label>
+                <input type="date" id="newsDate" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Imagen destacada *</label>
+            <input type="file" id="newsImage" accept="image/*">
+            <div id="newsImagePreview" style="margin-top: 0.5rem; display: none;">
+                <img src="" style="max-width: 200px; max-height: 150px; border-radius: 8px; border: 2px solid var(--accent);">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Resumen/Extracto *</label>
+            <textarea id="newsExcerpt" rows="2" required placeholder="Breve resumen de la noticia (aparece en la tarjeta)"></textarea>
+        </div>
+        <div class="form-group">
+            <label>Contenido completo *</label>
+            <textarea id="newsContent" rows="6" required placeholder="Contenido completo de la noticia (aparece al abrir)"></textarea>
+        </div>
+        <div class="form-group">
+            <label>Autor</label>
+            <input type="text" id="newsAuthor" placeholder="Nombre del autor">
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="newsFeatured">
+            <label for="newsFeatured">Marcar como noticia destacada (aparece grande arriba)</label>
+        </div>
+        <button type="submit" class="btn btn-success">Guardar Noticia</button>
+        <button type="button" class="btn btn-outline" onclick="resetNewsForm()">Cancelar</button>
+    </form>
+    <div id="newsListAdmin" style="margin-top: 2rem;"></div>
+</div>
+
     <!-- MODAL TIENDA -->
     <div id="shopModal" class="modal">
         <div class="modal-content" style="max-width: 1000px; max-height: 90vh;">
@@ -2236,6 +2482,8 @@
             
             // Actualizar contador de suscriptores público
             actualizarContadorPublico();
+
+            renderNews();
             
             if (window.innerWidth <= 768) {
                 document.querySelector('.menu-toggle').style.display = 'block';
@@ -2808,6 +3056,7 @@
             document.getElementById(`panel-${tab}`).classList.add('active');
             if (tab === 'ranking') updateRankingAthletesSelect();
             if (tab === 'records') loadRecordAthletesSelect();
+            if (tab === 'news') renderNewsAdmin(document.getElementById('newsListAdmin'));
             loadAdminList(tab);
         }
 
@@ -2830,6 +3079,7 @@
                 judges: 'judgesListAdmin',
                 sponsors: 'sponsorsListAdmin',
                 contacts: 'contactsListAdmin'
+                news: 'newsListAdmin'
             };
             if (!lists[type]) return;
             const container = document.getElementById(lists[type]);
@@ -2842,6 +3092,8 @@
                 renderRankingAdmin(container);
             } else if (type === 'contacts') {
                 renderContactsAdmin(container);
+            } else {
+                renderNewsAdmin(container);
             } else {
                 container.innerHTML = items.map(item => `
                     <div class="list-item">
@@ -5103,6 +5355,232 @@
             loadProducts();
             updateCartUI();
         });
+
+// ===== SISTEMA DE NOTICIAS/BLOG =====
+let currentNewsFilter = 'all';
+
+function renderNews() {
+    const news = JSON.parse(localStorage.getItem('acaf_news')) || [];
+    const container = document.getElementById('newsContainer');
+    const allContainer = document.getElementById('newsAllContainer');
+    
+    if (news.length === 0) {
+        const empty = '<div class="empty-state" style="grid-column: 1/-1;"><i class="fas fa-newspaper"></i><p>No hay noticias publicadas aún</p></div>';
+        if (container) container.innerHTML = empty;
+        if (allContainer) allContainer.innerHTML = empty;
+        return;
+    }
+    
+    // Ordenar por fecha descendente
+    const sortedNews = [...news].sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    // Filtrar si es necesario
+    let filteredNews = sortedNews;
+    if (currentNewsFilter !== 'all') {
+        filteredNews = sortedNews.filter(n => n.category === currentNewsFilter);
+    }
+    
+    const generateCard = (item, isFeatured = false) => {
+        const catClass = `news-category-${item.category}`;
+        const catLabels = { evento: 'Evento', resultado: 'Resultado', entrevista: 'Entrevista', general: 'General' };
+        const dateStr = new Date(item.date).toLocaleDateString('es-UY', { day: 'numeric', month: 'long', year: 'numeric' });
+        
+        return `
+            <div class="news-card ${isFeatured ? 'news-featured' : ''}" onclick="openNewsModal(${item.id})">
+                <div class="news-image" style="${item.image ? `background: url('${item.image}') center/cover;` : ''} display: flex; align-items: center; justify-content: center;">
+                    ${!item.image ? '<i class="fas fa-newspaper" style="font-size: 3rem; color: var(--accent);"></i>' : ''}
+                </div>
+                <div class="news-content">
+                    <div class="news-date"><i class="fas fa-calendar-alt"></i> ${dateStr}</div>
+                    <span class="news-category ${catClass}">${catLabels[item.category] || item.category}</span>
+                    <h3 class="news-title">${item.title}</h3>
+                    <p class="news-excerpt">${item.excerpt}</p>
+                    <div class="news-footer">
+                        <div class="news-author">
+                            <i class="fas fa-user-circle"></i>
+                            <span>${item.author || 'Strongman Uruguay'}</span>
+                        </div>
+                        <span class="news-read-more">Leer más <i class="fas fa-arrow-right"></i></span>
+                    </div>
+                </div>
+            </div>
+        `;
+    };
+    
+    // Renderizar en home (máximo 3, la primera destacada si hay)
+    if (container) {
+        const homeNews = sortedNews.slice(0, 3);
+        let html = '';
+        if (homeNews.length > 0 && homeNews[0].featured) {
+            html += generateCard(homeNews[0], true);
+            html += homeNews.slice(1).map(n => generateCard(n)).join('');
+        } else {
+            html += homeNews.map(n => generateCard(n)).join('');
+        }
+        container.innerHTML = html;
+    }
+    
+    // Renderizar en página de todas las noticias
+    if (allContainer) {
+        allContainer.innerHTML = filteredNews.map(n => generateCard(n)).join('');
+    }
+}
+
+function filterNews(category) {
+    currentNewsFilter = category;
+    renderNews();
+}
+
+function openNewsModal(id) {
+    const news = JSON.parse(localStorage.getItem('acaf_news')) || [];
+    const item = news.find(n => n.id === id);
+    if (!item) return;
+    
+    const catLabels = { evento: 'Evento', resultado: 'Resultado', entrevista: 'Entrevista', general: 'General' };
+    const dateStr = new Date(item.date).toLocaleDateString('es-UY', { day: 'numeric', month: 'long', year: 'numeric' });
+    
+    document.getElementById('newsModalBody').innerHTML = `
+        ${item.image ? `<img src="${item.image}" alt="${item.title}">` : ''}
+        <div class="news-meta">
+            <span class="news-category news-category-${item.category}">${catLabels[item.category]}</span>
+            <span style="margin-left: 1rem; color: var(--text-muted);"><i class="fas fa-calendar-alt"></i> ${dateStr}</span>
+            <span style="margin-left: 1rem; color: var(--text-muted);"><i class="fas fa-user"></i> ${item.author || 'Strongman Uruguay'}</span>
+        </div>
+        <h2>${item.title}</h2>
+        <p style="font-size: 1.1rem; color: var(--text-muted); font-style: italic; margin-bottom: 2rem;">${item.excerpt}</p>
+        <div style="line-height: 1.8; font-size: 1.05rem;">
+            ${item.content.replace(/\n/g, '<br>')}
+        </div>
+    `;
+    document.getElementById('newsModal').classList.add('active');
+}
+
+function closeNewsModal() {
+    document.getElementById('newsModal').classList.remove('active');
+}
+
+// ADMIN NOTICIAS
+function saveNews(e) {
+    e.preventDefault();
+    const id = document.getElementById('newsId').value;
+    const newsData = {
+        id: id ? parseInt(id) : Date.now(),
+        title: document.getElementById('newsTitle').value,
+        category: document.getElementById('newsCategory').value,
+        date: document.getElementById('newsDate').value,
+        excerpt: document.getElementById('newsExcerpt').value,
+        content: document.getElementById('newsContent').value,
+        author: document.getElementById('newsAuthor').value,
+        featured: document.getElementById('newsFeatured').checked,
+        image: null
+    };
+    
+    const fileInput = document.getElementById('newsImage');
+    if (fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            newsData.image = e.target.result;
+            finishSaveNews(newsData, id);
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+    } else {
+        if (id) {
+            const existing = (JSON.parse(localStorage.getItem('acaf_news')) || []).find(n => n.id === parseInt(id));
+            if (existing) newsData.image = existing.image;
+        }
+        finishSaveNews(newsData, id);
+    }
+}
+
+function finishSaveNews(newsData, id) {
+    let news = JSON.parse(localStorage.getItem('acaf_news')) || [];
+    if (id) {
+        const index = news.findIndex(n => n.id === parseInt(id));
+        if (index !== -1) news[index] = newsData;
+    } else {
+        news.push(newsData);
+    }
+    localStorage.setItem('acaf_news', JSON.stringify(news));
+    renderNews();
+    loadAdminList('news');
+    resetNewsForm();
+    alert('Noticia guardada correctamente');
+}
+
+function editNews(id) {
+    const news = JSON.parse(localStorage.getItem('acaf_news')) || [];
+    const item = news.find(n => n.id === id);
+    if (!item) return;
+    document.getElementById('newsId').value = item.id;
+    document.getElementById('newsTitle').value = item.title;
+    document.getElementById('newsCategory').value = item.category;
+    document.getElementById('newsDate').value = item.date;
+    document.getElementById('newsExcerpt').value = item.excerpt;
+    document.getElementById('newsContent').value = item.content;
+    document.getElementById('newsAuthor').value = item.author || '';
+    document.getElementById('newsFeatured').checked = item.featured || false;
+    
+    const preview = document.getElementById('newsImagePreview');
+    if (item.image) {
+        preview.querySelector('img').src = item.image;
+        preview.style.display = 'block';
+    } else {
+        preview.style.display = 'none';
+    }
+}
+
+function deleteNews(id) {
+    if (!confirm('¿Eliminar esta noticia?')) return;
+    let news = JSON.parse(localStorage.getItem('acaf_news')) || [];
+    news = news.filter(n => n.id !== id);
+    localStorage.setItem('acaf_news', JSON.stringify(news));
+    renderNews();
+    loadAdminList('news');
+}
+
+function resetNewsForm() {
+    document.getElementById('newsForm').reset();
+    document.getElementById('newsId').value = '';
+    document.getElementById('newsImagePreview').style.display = 'none';
+}
+
+// Preview de imagen
+document.getElementById('newsImage').addEventListener('change', function() {
+    const preview = document.getElementById('newsImagePreview');
+    if (this.files && this.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.querySelector('img').src = e.target.result;
+            preview.style.display = 'block';
+        };
+        reader.readAsDataURL(this.files[0]);
+    }
+});
+
+// Agregar a loadAdminList para noticias
+function renderNewsAdmin(container) {
+    const news = JSON.parse(localStorage.getItem('acaf_news')) || [];
+    if (news.length === 0) {
+        container.innerHTML = '<p style="color: var(--text-muted); text-align: center;">No hay noticias registradas</p>';
+        return;
+    }
+    container.innerHTML = news.map(item => {
+        const catLabels = { evento: 'Evento', resultado: 'Resultado', entrevista: 'Entrevista', general: 'General' };
+        return `
+            <div class="list-item">
+                <div class="list-item-info">
+                    <div class="list-item-title">${item.title}</div>
+                    <div class="list-item-subtitle">${catLabels[item.category]} | ${new Date(item.date).toLocaleDateString('es-UY')} ${item.featured ? '| ⭐ Destacada' : ''}</div>
+                </div>
+                <div class="list-item-actions">
+                    <button class="btn btn-small btn-icon" onclick="editNews(${item.id})"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-small btn-icon btn-danger" onclick="deleteNews(${item.id})"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
     </script>
 </body>
 </html>
