@@ -946,7 +946,10 @@
     </section>
 
     <!-- MENÚ PRINCIPAL DE SECCIONES -->
-    <section class="main-menu" id="mainMenu" style="display: none;">
+    <section class="main-menu" id="mainMenu" style="display: none; padding-top: 8rem;">
+        <button class="btn btn-outline back-btn" onclick="showHome()" style="margin-bottom: 2rem;">
+            <i class="fas fa-home"></i> Volver al Inicio
+        </button>
         <h2 class="section-title">Explora Strongman Uruguay</h2>
         <div class="menu-grid">
             <div class="menu-item" onclick="showSection('ranking')">
@@ -1004,6 +1007,13 @@
                 <h3>Tienda</h3>
                 <p>Productos oficiales de la asociación</p>
             </div>
+        </div>
+
+        <!-- BOTÓN VOLVER AL INICIO -->
+        <div style="text-align: center; margin-top: 3rem;">
+            <button class="btn btn-outline" onclick="showHome()" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 1rem 2.5rem;">
+                <i class="fas fa-home"></i> Volver al Inicio
+            </button>
         </div>
 
         <!-- ===== SECCIÓN SUSCRIPCIÓN EN EL MENÚ ===== -->
