@@ -880,475 +880,7 @@
             color: #666;
             text-align: center;
         }
-    
-/* ===== SISTEMA DE PUNTUACIÓN V2 ===== */
-.scoring-admin-header{background:linear-gradient(135deg,#1a1a1a 0%,#2a2a2a 100%);padding:1rem 2rem;border-bottom:2px solid var(--gold);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin:-2rem -2rem 1.5rem -2rem;border-radius:20px 20px 0 0}
-.scoring-admin-header h2{color:var(--gold);font-size:1.3rem;display:flex;align-items:center;gap:0.5rem;font-family:'Oswald',sans-serif}
-.scoring-tabs{display:flex;gap:0.5rem;padding:1rem 0;border-bottom:1px solid rgba(255,255,255,0.1);overflow-x:auto;flex-wrap:wrap}
-.scoring-tab{padding:0.7rem 1.2rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text-muted);cursor:pointer;white-space:nowrap;transition:all 0.3s;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:1px;font-size:0.85rem}
-.scoring-tab:hover{background:rgba(255,255,255,0.1);color:var(--text)}
-.scoring-tab.active{background:var(--accent);color:white;border-color:var(--accent)}
-.scoring-panel{display:none;padding:1rem 0}
-.scoring-panel.active{display:block}
-.scoring-card{background:var(--secondary);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:1.5rem;margin-bottom:1rem}
-.scoring-card-title{color:var(--gold);font-size:1.1rem;margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;font-family:'Oswald',sans-serif}
-.scoring-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-.scoring-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem}
-.scoring-grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
-.scoring-form-group{margin-bottom:1rem}
-.scoring-form-group label{display:block;margin-bottom:0.4rem;color:var(--text-muted);font-size:0.9rem}
-.scoring-form-control{width:100%;padding:0.7rem;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.2);border-radius:6px;color:white;font-size:0.95rem;font-family:'Roboto',sans-serif}
-.scoring-form-control:focus{outline:none;border-color:var(--accent)}
-select.scoring-form-control{cursor:pointer}
-.scoring-table-container{overflow-x:auto}
-.scoring-table{width:100%;border-collapse:collapse;min-width:600px}
-.scoring-table th{background:rgba(0,102,204,0.2);padding:0.8rem;text-align:left;font-weight:600;color:var(--accent-light);border-bottom:2px solid var(--accent);font-family:'Oswald',sans-serif;text-transform:uppercase;font-size:0.85rem;letter-spacing:1px}
-.scoring-table td{padding:0.8rem;border-bottom:1px solid rgba(255,255,255,0.05)}
-.scoring-table tr:hover{background:rgba(255,255,255,0.02)}
-.scoring-pos-1{color:var(--gold);font-weight:bold}
-.scoring-pos-2{color:#C0C0C0;font-weight:bold}
-.scoring-pos-3{color:#CD7F32;font-weight:bold}
-.scoring-live-badge{display:inline-flex;align-items:center;gap:0.4rem;background:rgba(220,53,69,0.2);color:#ff6b6b;padding:0.3rem 0.8rem;border-radius:20px;font-size:0.85rem;font-weight:600;animation:pulseLive 2s infinite}
-@keyframes pulseLive{0%,100%{opacity:1}50%{opacity:0.6}}
-.scoring-public-view{background:linear-gradient(135deg,#0f0f0f 0%,#1a1a1a 100%);min-height:100vh;padding:2rem}
-.scoring-public-header{text-align:center;margin-bottom:2rem}
-.scoring-public-header h1{color:var(--gold);font-size:2.5rem;margin-bottom:0.5rem;font-family:'Oswald',sans-serif}
-.scoring-public-rank{display:grid;gap:1rem;max-width:1000px;margin:0 auto}
-.scoring-rank-item{display:grid;grid-template-columns:60px 1fr 100px;align-items:center;background:rgba(255,255,255,0.05);border-radius:12px;padding:1rem 1.5rem;border:1px solid rgba(255,255,255,0.1)}
-.scoring-rank-pos{font-size:1.8rem;font-weight:bold;text-align:center;font-family:'Oswald',sans-serif}
-.scoring-rank-info h3{color:white;margin-bottom:0.2rem;font-family:'Oswald',sans-serif}
-.scoring-rank-info p{color:var(--text-muted);font-size:0.9rem}
-.scoring-rank-points{text-align:right;font-size:1.5rem;font-weight:bold;color:var(--gold);font-family:'Oswald',sans-serif}
-.scoring-toast{position:fixed;bottom:2rem;right:2rem;background:var(--success);color:white;padding:1rem 1.5rem;border-radius:8px;font-weight:600;z-index:3000;transform:translateY(100px);transition:transform 0.3s}
-.scoring-toast.show{transform:translateY(0)}
-.scoring-hidden{display:none !important}
-/* Banderas como imágenes */
-.scoring-flag-img{width:28px;height:20px;border-radius:3px;object-fit:cover;vertical-align:middle;margin-right:0.4rem;box-shadow:0 1px 3px rgba(0,0,0,0.3)}
-.scoring-flag-img-small{width:22px;height:16px;border-radius:2px;object-fit:cover;vertical-align:middle;margin-right:0.3rem}
-.scoring-flag-img-inline{width:24px;height:18px;border-radius:2px;object-fit:cover;vertical-align:middle;margin-left:0.3rem}
-@media (max-width:768px){.scoring-grid-2,.scoring-grid-3,.scoring-grid-4{grid-template-columns:1fr}.scoring-admin-header{flex-direction:column;text-align:center}.scoring-public-header h1{font-size:1.8rem}.scoring-rank-item{grid-template-columns:50px 1fr 80px;padding:0.8rem}.scoring-rank-pos{font-size:1.3rem}.scoring-rank-points{font-size:1.2rem}}
-
-/* ===== TIMER / CONTADOR DE TIEMPO ===== */
-.scoring-timer-container {
-    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
-    border: 2px solid var(--accent);
-    border-radius: 15px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-}
-.scoring-timer-container::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(0,102,204,0.1) 0%, transparent 70%);
-    animation: rotateTimer 10s linear infinite;
-}
-@keyframes rotateTimer {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-.scoring-timer-display {
-    font-family: 'Oswald', sans-serif;
-    font-size: 4rem;
-    font-weight: 700;
-    color: var(--accent-light);
-    text-shadow: 0 0 20px rgba(0, 102, 204, 0.5);
-    position: relative;
-    z-index: 1;
-    letter-spacing: 3px;
-}
-.scoring-timer-display.warning {
-    color: var(--warning);
-    text-shadow: 0 0 20px rgba(255, 193, 7, 0.5);
-    animation: pulseTimer 0.5s ease infinite;
-}
-.scoring-timer-display.danger {
-    color: var(--danger);
-    text-shadow: 0 0 30px rgba(220, 53, 69, 0.8);
-    animation: pulseTimer 0.3s ease infinite;
-}
-@keyframes pulseTimer {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-}
-.scoring-timer-label {
-    color: var(--text-muted);
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-bottom: 0.5rem;
-    position: relative;
-    z-index: 1;
-}
-.scoring-timer-controls {
-    display: flex;
-    gap: 0.5rem;
-    justify-content: center;
-    margin-top: 1rem;
-    position: relative;
-    z-index: 1;
-    flex-wrap: wrap;
-}
-.scoring-timer-btn {
-    padding: 0.6rem 1.2rem;
-    border: none;
-    border-radius: 25px;
-    font-family: 'Oswald', sans-serif;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    cursor: pointer;
-    transition: all 0.3s;
-    font-size: 0.9rem;
-}
-.scoring-timer-btn.start {
-    background: var(--success);
-    color: white;
-}
-.scoring-timer-btn.start:hover {
-    background: #2ecc71;
-    transform: translateY(-2px);
-}
-.scoring-timer-btn.pause {
-    background: var(--warning);
-    color: #000;
-}
-.scoring-timer-btn.pause:hover {
-    background: #ffed4e;
-    transform: translateY(-2px);
-}
-.scoring-timer-btn.stop {
-    background: var(--danger);
-    color: white;
-}
-.scoring-timer-btn.stop:hover {
-    background: #ff4444;
-    transform: translateY(-2px);
-}
-.scoring-timer-btn.reset {
-    background: rgba(255,255,255,0.1);
-    color: var(--text);
-    border: 1px solid rgba(255,255,255,0.3);
-}
-.scoring-timer-btn.reset:hover {
-    background: rgba(255,255,255,0.2);
-}
-.scoring-timer-status {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.3rem 1rem;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    margin-top: 0.5rem;
-    position: relative;
-    z-index: 1;
-}
-.scoring-timer-status.running {
-    background: rgba(40, 167, 69, 0.2);
-    color: var(--success);
-    border: 1px solid var(--success);
-}
-.scoring-timer-status.paused {
-    background: rgba(255, 193, 7, 0.2);
-    color: var(--warning);
-    border: 1px solid var(--warning);
-}
-.scoring-timer-status.stopped {
-    background: rgba(220, 53, 69, 0.2);
-    color: var(--danger);
-    border: 1px solid var(--danger);
-}
-.scoring-timer-status.finished {
-    background: rgba(108, 117, 125, 0.2);
-    color: #6c757d;
-    border: 1px solid #6c757d;
-}
-.scoring-timer-progress {
-    width: 100%;
-    height: 6px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 3px;
-    margin-top: 1rem;
-    overflow: hidden;
-    position: relative;
-    z-index: 1;
-}
-.scoring-timer-progress-bar {
-    height: 100%;
-    background: linear-gradient(90deg, var(--accent), var(--accent-light));
-    border-radius: 3px;
-    transition: width 1s linear;
-}
-.scoring-timer-progress-bar.warning {
-    background: linear-gradient(90deg, var(--warning), #ffed4e);
-}
-.scoring-timer-progress-bar.danger {
-    background: linear-gradient(90deg, var(--danger), #ff6b6b);
-}
-.scoring-timer-null-alert {
-    background: rgba(220, 53, 69, 0.15);
-    border: 2px solid var(--danger);
-    border-radius: 10px;
-    padding: 1rem;
-    margin-top: 1rem;
-    color: var(--danger);
-    font-weight: 600;
-    display: none;
-    position: relative;
-    z-index: 1;
-}
-.scoring-timer-null-alert.show {
-    display: block;
-    animation: shakeAlert 0.5s ease;
-}
-@keyframes shakeAlert {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    75% { transform: translateX(5px); }
-}
-.scoring-timer-atleta-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr 120px;
-    gap: 1rem;
-    align-items: center;
-    padding: 0.8rem;
-    background: rgba(0,0,0,0.2);
-    border-radius: 8px;
-    margin-bottom: 0.5rem;
-}
-.scoring-timer-atleta-row.null {
-    background: rgba(220, 53, 69, 0.1);
-    border: 1px solid rgba(220, 53, 69, 0.3);
-}
-.scoring-timer-atleta-row.completed {
-    background: rgba(40, 167, 69, 0.1);
-    border: 1px solid rgba(40, 167, 69, 0.3);
-}
-.scoring-timer-input-group {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-}
-.scoring-timer-input-group input {
-    width: 100px;
-    text-align: center;
-}
-.scoring-timer-null-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-    background: var(--danger);
-    color: white;
-    padding: 0.2rem 0.6rem;
-    border-radius: 15px;
-    font-size: 0.75rem;
-    font-weight: 600;
-}
-.scoring-timer-completed-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-    background: var(--success);
-    color: white;
-    padding: 0.2rem 0.6rem;
-    border-radius: 15px;
-    font-size: 0.75rem;
-    font-weight: 600;
-}
-@media (max-width: 768px) {
-    .scoring-timer-display { font-size: 2.5rem; }
-    .scoring-timer-controls { flex-direction: column; }
-    .scoring-timer-btn { width: 100%; }
-    .scoring-timer-atleta-row { grid-template-columns: 1fr; gap: 0.5rem; }
-}
-
-/* ===== MODO MANUAL DE TIEMPO ===== */
-.scoring-manual-time-container {
-    background: linear-gradient(135deg, rgba(0,102,204,0.1) 0%, rgba(0,0,0,0.3) 100%);
-    border: 2px solid var(--accent);
-    border-radius: 15px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-}
-.scoring-manual-time-title {
-    color: var(--accent-light);
-    font-family: 'Oswald', sans-serif;
-    font-size: 1.2rem;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-.scoring-manual-time-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1rem;
-}
-.scoring-manual-time-row {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    background: rgba(0,0,0,0.2);
-    padding: 0.8rem 1rem;
-    border-radius: 10px;
-    border: 1px solid rgba(255,255,255,0.1);
-}
-.scoring-manual-time-row.null {
-    background: rgba(220, 53, 69, 0.1);
-    border: 1px solid rgba(220, 53, 69, 0.3);
-}
-.scoring-manual-time-row.completed {
-    background: rgba(40, 167, 69, 0.1);
-    border: 1px solid rgba(40, 167, 69, 0.3);
-}
-.scoring-manual-time-atleta {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-.scoring-manual-time-atleta strong {
-    color: var(--text);
-    font-size: 0.95rem;
-}
-.scoring-manual-time-input-group {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-}
-.scoring-manual-time-input {
-    width: 70px;
-    padding: 0.5rem;
-    background: rgba(0,0,0,0.4);
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 6px;
-    color: white;
-    text-align: center;
-    font-size: 1rem;
-    font-family: 'Oswald', sans-serif;
-}
-.scoring-manual-time-input:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 10px rgba(0,102,204,0.3);
-}
-.scoring-manual-time-sep {
-    color: var(--text-muted);
-    font-weight: bold;
-    font-size: 1.2rem;
-}
-.scoring-manual-time-unit {
-    color: var(--text-muted);
-    font-size: 0.75rem;
-    text-transform: uppercase;
-}
-.scoring-manual-time-actions {
-    display: flex;
-    gap: 0.3rem;
-}
-.scoring-manual-time-btn {
-    width: 32px;
-    height: 32px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.85rem;
-    transition: all 0.2s;
-}
-.scoring-manual-time-btn.null-btn {
-    background: var(--danger);
-    color: white;
-}
-.scoring-manual-time-btn.null-btn:hover {
-    background: #ff4444;
-    transform: scale(1.1);
-}
-.scoring-manual-time-btn.null-btn.active {
-    background: #ff4444;
-    box-shadow: 0 0 10px rgba(220,53,69,0.5);
-}
-.scoring-manual-time-btn.undo-btn {
-    background: rgba(255,255,255,0.1);
-    color: var(--text-muted);
-}
-.scoring-manual-time-btn.undo-btn:hover {
-    background: rgba(255,255,255,0.2);
-    color: white;
-}
-.scoring-manual-time-mode-selector {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-    flex-wrap: wrap;
-}
-.scoring-manual-time-mode-btn {
-    padding: 0.6rem 1.2rem;
-    border: 2px solid var(--accent);
-    background: transparent;
-    color: var(--accent);
-    border-radius: 25px;
-    cursor: pointer;
-    font-family: 'Oswald', sans-serif;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-size: 0.85rem;
-    transition: all 0.3s;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-}
-.scoring-manual-time-mode-btn:hover {
-    background: rgba(0,102,204,0.1);
-}
-.scoring-manual-time-mode-btn.active {
-    background: var(--accent);
-    color: white;
-}
-.scoring-manual-time-mode-btn i {
-    font-size: 1rem;
-}
-.scoring-manual-time-total-display {
-    background: rgba(0,0,0,0.3);
-    border-radius: 8px;
-    padding: 0.5rem 1rem;
-    text-align: center;
-    min-width: 100px;
-}
-.scoring-manual-time-total-display .value {
-    font-family: 'Oswald', sans-serif;
-    font-size: 1.3rem;
-    color: var(--accent-light);
-    font-weight: bold;
-}
-.scoring-manual-time-total-display .label {
-    font-size: 0.7rem;
-    color: var(--text-muted);
-    text-transform: uppercase;
-}
-@media (max-width: 768px) {
-    .scoring-manual-time-row {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
-    }
-    .scoring-manual-time-input {
-        width: 60px;
-    }
-}
-</style>
-<base target="_blank">
-<base target="_blank">
-<base target="_blank">
+    </style>
 <base target="_blank">
 </head>
 <body>
@@ -1613,20 +1145,22 @@ select.scoring-form-control{cursor:pointer}
     </section>
 
     <!-- SECCIÓN COMPETENCIAS PÚBLICO -->
-        <!-- SECCIÓN COMPETENCIAS PÚBLICO V2 -->
     <section id="competencias-publico" class="content-section">
         <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-home"></i> Volver al Inicio</button>
         <h2 class="section-title">Competencias y Resultados</h2>
+        <div style="margin-bottom: 2rem;">
+            <label style="color: var(--text-muted);">Seleccionar Torneo</label>
+            <select id="publicCompSelect" onchange="cargarCompetenciaPublica()" style="width: 100%; max-width: 500px; padding: 1rem; margin-top: 0.5rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px; font-size: 1rem;">
+                <option value="">Seleccione un torneo...</option>
+            </select>
+        </div>
         <div id="publicCompContainer">
             <div class="empty-state">
                 <i class="fas fa-clipboard-list"></i>
-                <p>Cargando resultados...</p>
+                <p>Seleccione un torneo para ver los resultados oficiales</p>
             </div>
         </div>
     </section>
-
-    <!-- SECCIÓN SUSCRIPTORES - PÚBLICO (NUEVO) -->
-
 
         <!-- CARRITO -->
     <div class="cart-float-btn" onclick="openCart()" id="cartBtn">
@@ -2410,224 +1944,143 @@ select.scoring-form-control{cursor:pointer}
     </div>
 
     <!-- MODAL COMPETENCIAS -->
-        <!-- MODAL COMPETENCIAS V2 -->
     <div id="competenciasModal" class="modal">
-        <div class="modal-content" style="max-width:1200px;max-height:95vh;">
-            <div class="modal-header" style="background:var(--accent);">
-                <h2><i class="fas fa-clipboard-list"></i> Sistema de Puntuación - Competencias</h2>
+        <div class="modal-content" style="max-width: 1200px; max-height: 95vh;">
+            <div class="modal-header" style="background: var(--accent);">
+                <h2><i class="fas fa-clipboard-list"></i> Gestión de Competencias</h2>
                 <button class="close-btn" onclick="closeCompetenciasModal()">&times;</button>
             </div>
-            <div class="modal-body" style="overflow-y:auto;padding:0;">
-                <div style="padding:1.5rem 2rem;">
-                    <button class="btn btn-outline" onclick="closeCompetenciasModal()" style="margin-bottom:1rem;"><i class="fas fa-arrow-left"></i> Volver al Panel</button>
+            <div class="modal-body" style="overflow-y: auto;">
+                <button class="btn btn-outline" onclick="closeCompetenciasModal()" style="margin-bottom: 1.5rem;">
+                    <i class="fas fa-arrow-left"></i> Volver al Panel de Administrador
+                </button>
+                <div class="admin-tabs">
+                    <button class="admin-tab active" onclick="switchCompTab('torneos')">Torneos</button>
+                    <button class="admin-tab" onclick="switchCompTab('nuevo')">Nueva Competencia</button>
+                    <button class="admin-tab" onclick="switchCompTab('resultados')">Resultados Públicos</button>
                 </div>
-                <div id="scoringAdminView">
-                    <div class="scoring-admin-header" style="margin:0 2rem 1.5rem 2rem;border-radius:12px;">
-                        <h2><i class="fas fa-dumbbell"></i> <span id="scoringTorneoNombre">Configurar Torneo</span></h2>
-                        <div class="header-actions" style="display:flex;gap:0.5rem;flex-wrap:wrap;">
-                            <button class="btn btn-outline" onclick="scoringShowPublicView()"><i class="fas fa-eye"></i> Ver Planilla Pública</button>
-                            <button class="btn btn-success" onclick="scoringSaveToStorage()"><i class="fas fa-save"></i> Guardar</button>
-                            <button class="btn btn-danger" onclick="scoringResetAll()"><i class="fas fa-trash"></i> Reiniciar</button>
+
+                <!-- PANEL TORNEOS EXISTENTES -->
+                <div id="comp-panel-torneos" class="admin-panel active">
+                    <h3>Torneos Realizados</h3>
+                    <div id="torneosList">
+                        <p style="color: var(--text-muted);">Cargando torneos...</p>
+                    </div>
+                </div>
+
+                <!-- PANEL NUEVA COMPETENCIA -->
+                <div id="comp-panel-nuevo" class="admin-panel">
+                    <h3>Crear Nueva Competencia</h3>
+                    <div class="admin-card" style="margin-bottom: 2rem;">
+                        <h4>Información del Torneo</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div>
+                                <label>Nombre del Torneo *</label>
+                                <input type="text" id="compNombre" placeholder="Ej: Campeonato Nacional 2026" style="width: 100%; padding: 0.8rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px;">
+                            </div>
+                            <div>
+                                <label>Fecha *</label>
+                                <input type="date" id="compFecha" style="width: 100%; padding: 0.8rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px;">
+                            </div>
+                            <div>
+                                <label>Hora de Inicio *</label>
+                                <input type="time" id="compHora" style="width: 100%; padding: 0.8rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px;">
+                            </div>
+                            <div>
+                                <label>Lugar *</label>
+                                <input type="text" id="compLugar" placeholder="Ej: Estadio Centenario" style="width: 100%; padding: 0.8rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px;">
+                            </div>
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <label>Jueces del Torneo</label>
+                            <div id="compJuecesList" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;"></div>
                         </div>
                     </div>
-                    <div style="padding:0 2rem 2rem 2rem;">
-                        <div class="scoring-tabs">
-                            <div class="scoring-tab active" onclick="scoringSwitchTab('config')" data-scoring-tab="config"><i class="fas fa-cog"></i> Configuración</div>
-                            <div class="scoring-tab" onclick="scoringSwitchTab('atletas')" data-scoring-tab="atletas"><i class="fas fa-users"></i> Atletas</div>
-                            <div class="scoring-tab" onclick="scoringSwitchTab('pruebas')" data-scoring-tab="pruebas"><i class="fas fa-list"></i> Pruebas</div>
-                            <div class="scoring-tab" onclick="scoringSwitchTab('resultados')" data-scoring-tab="resultados"><i class="fas fa-keyboard"></i> Resultados</div>
-                            <div class="scoring-tab" onclick="scoringSwitchTab('ranking')" data-scoring-tab="ranking"><i class="fas fa-trophy"></i> Ranking</div>
-                            <div class="scoring-tab" onclick="scoringSwitchTab('estadisticas')" data-scoring-tab="estadisticas"><i class="fas fa-chart-bar"></i> Estadísticas</div>
-                        </div>
-                        <div id="scoring-panel-config" class="scoring-panel active">
-                            <div class="scoring-card">
-                                <div class="scoring-card-title"><i class="fas fa-cog"></i> Configuración del Torneo</div>
-                                <div class="scoring-grid-2">
-                                    <div class="scoring-form-group"><label>Nombre del Torneo *</label><input type="text" id="scCfgNombre" class="scoring-form-control" placeholder="Ej: Strongman Cup 2026"></div>
-                                    <div class="scoring-form-group"><label>Criterio de Desempate *</label><select id="scCfgDesempate" class="scoring-form-control"><option value="primeros">Mayor cantidad de primeros puestos</option><option value="peso">Menor peso corporal</option></select></div>
+                    <div class="admin-card" style="margin-bottom: 2rem;">
+                        <h4>Categorías Habilitadas</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div>
+                                <h5 style="color: var(--accent-light);">Masculino</h5>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="comp_male_light" value="male_lightweight">
+                                    <label for="comp_male_light">Ligero (-80kg)</label>
                                 </div>
-                                <div class="scoring-grid-2">
-                                    <div class="scoring-form-group"><label>Sistema de Puntos por Prueba</label><select id="scCfgSistemaPuntos" class="scoring-form-control" onchange="scoringToggleCustomPoints()"><option value="auto">Automático (N atletas = N pts para el 1°)</option><option value="custom">Personalizado (definir por prueba)</option></select></div>
-                                    <div class="scoring-form-group"><label>Estado del Torneo</label><select id="scCfgEstado" class="scoring-form-control"><option value="activo">En curso</option><option value="finalizado">Finalizado</option></select></div>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="comp_male_middle" value="male_middleweight">
+                                    <label for="comp_male_middle">Medio (80-95kg)</label>
                                 </div>
-                                <div style="margin-top:1rem;"><button class="btn btn-primary" onclick="scoringSaveConfig()"><i class="fas fa-save"></i> Guardar Configuración</button></div>
-                            </div>
-                            <div class="scoring-card" id="scoringCustomPointsPanel" style="display:none;">
-                                <div class="scoring-card-title"><i class="fas fa-star"></i> Tabla de Puntos Personalizada</div>
-                                <p style="color:var(--text-muted);margin-bottom:1rem;">Define cuántos puntos recibe cada posición (1°, 2°, 3°, etc.)</p>
-                                <div id="scoringCustomPointsContainer">
-                                    <div class="scoring-grid-4" id="scoringPointsRow1">
-                                        <div class="scoring-form-group"><label>1° lugar</label><input type="number" class="scoring-form-control scoring-custom-point" data-pos="1" value="5" min="0"></div>
-                                        <div class="scoring-form-group"><label>2° lugar</label><input type="number" class="scoring-form-control scoring-custom-point" data-pos="2" value="4" min="0"></div>
-                                        <div class="scoring-form-group"><label>3° lugar</label><input type="number" class="scoring-form-control scoring-custom-point" data-pos="3" value="3" min="0"></div>
-                                        <div class="scoring-form-group"><label>4° lugar</label><input type="number" class="scoring-form-control scoring-custom-point" data-pos="4" value="2" min="0"></div>
-                                    </div>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="comp_male_lightheavy" value="male_lightheavy">
+                                    <label for="comp_male_lightheavy">Semipesado (95-105kg)</label>
                                 </div>
-                                <button class="btn btn-outline btn-small" onclick="scoringAddPointRow()" style="margin-top:0.5rem;"><i class="fas fa-plus"></i> Agregar más posiciones</button>
-                            </div>
-                        </div>
-                        <div id="scoring-panel-atletas" class="scoring-panel">
-                            <div class="scoring-card">
-                                <div class="scoring-card-title"><i class="fas fa-user-plus"></i> Agregar/Editar Atleta</div>
-                                <div class="scoring-grid-3">
-                                    <div class="scoring-form-group"><label>Nombre Completo *</label><input type="text" id="scAtlNombre" class="scoring-form-control" placeholder="Nombre y apellido"></div>
-                                    <div class="scoring-form-group"><label>País (código ISO de 2 letras)</label><input type="text" id="scAtlPais" class="scoring-form-control" placeholder="Ej: UY, AR, BR, US" maxlength="2" style="text-transform:uppercase;"><small style="color:var(--text-muted);">Ingresá el código de 2 letras (UY=Uruguay, AR=Argentina, etc.)</small></div>
-                                    <div class="scoring-form-group"><label>Peso Corporal (kg) *</label><input type="number" id="scAtlPeso" class="scoring-form-control" placeholder="Ej: 95.5" step="0.1"></div>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="comp_male_heavy" value="male_heavyweight">
+                                    <label for="comp_male_heavy">Pesado (105-120kg)</label>
                                 </div>
-                                <div class="scoring-grid-2">
-                                    <div class="scoring-form-group"><label>Sexo *</label><select id="scAtlSexo" class="scoring-form-control"><option value="">Seleccionar...</option><option value="M">Masculino</option><option value="F">Femenino</option></select></div>
-                                    <div class="scoring-form-group" style="display:flex;align-items:flex-end;"><button class="btn btn-primary" onclick="scoringSaveAtleta()" style="width:100%;"><i class="fas fa-plus"></i> Agregar Atleta</button></div>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="comp_male_super" value="male_superheavy">
+                                    <label for="comp_male_super">Superpesado (+120kg)</label>
                                 </div>
                             </div>
-                            <div class="scoring-card">
-                                <div class="scoring-card-title"><i class="fas fa-users"></i> Atletas Inscritos</div>
-                                <div class="scoring-table-container">
-                                    <table class="scoring-table"><thead><tr><th>#</th><th>Nombre</th><th>País</th><th>Peso</th><th>Sexo</th><th>Acciones</th></tr></thead><tbody id="scoringAtletasTable"></tbody></table>
+                            <div>
+                                <h5 style="color: var(--accent-light);">Femenino</h5>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="comp_female_light" value="female_lightweight">
+                                    <label for="comp_female_light">Ligero (-60kg)</label>
                                 </div>
-                            </div>
-                        </div>
-                        <div id="scoring-panel-pruebas" class="scoring-panel">
-                            <div class="scoring-card">
-                                <div class="scoring-card-title"><i class="fas fa-plus-circle"></i> Agregar Prueba</div>
-                                <div class="scoring-grid-2">
-                                    <div class="scoring-form-group"><label>Nombre de la Prueba *</label><input type="text" id="scPrbNombre" class="scoring-form-control" placeholder="Ej: Prensa de tronco"></div>
-                                    <div class="scoring-form-group"><label>Tipo de Medición *</label><select id="scPrbTipo" class="scoring-form-control"><option value="">Seleccionar...</option><option value="tiempo">Tiempo (menor = mejor)</option><option value="distancia">Distancia (mayor = mejor)</option><option value="reps">Repeticiones (mayor = mejor)</option><option value="peso">Peso levantado (mayor = mejor)</option></select></div>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="comp_female_middle" value="female_middleweight">
+                                    <label for="comp_female_middle">Medio (60-70kg)</label>
                                 </div>
-                                <div class="scoring-grid-2">
-                                    <div class="scoring-form-group"><label>Implementos Usados</label><input type="text" id="scPrbImplemento" class="scoring-form-control" placeholder="Ej: Piedra de 100 kg, Husafell 150 kg"></div>
-                                    <div class="scoring-form-group"><label>Distancia / Objetivo a completar <span style="color:var(--gold)">*</span></label><input type="number" id="scPrbDistancia" class="scoring-form-control" placeholder="Ej: 15 (metros)" step="0.1" min="0"><small style="color:var(--text-muted)">Si el atleta no alcanza esta distancia → 0 puntos automáticamente</small></div>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="comp_female_heavy" value="female_heavyweight">
+                                    <label for="comp_female_heavy">Pesado (70-82kg)</label>
                                 </div>
-                                <div class="scoring-grid-2">
-                                    <div class="scoring-form-group"><label style="display:flex;align-items:center;gap:0.5rem;"><input type="checkbox" id="scPrbRequiereDistancia" style="width:20px;height:20px;accent-color:var(--gold);" checked><span><strong>¿Requiere completar distancia para puntuar?</strong></span></label><small style="color:var(--text-muted);display:block;margin-top:0.3rem">Si está marcado: atletas que no alcancen la distancia mínima reciben 0 puntos</small></div>
-                                    <div class="scoring-form-group"><label style="display:flex;align-items:center;gap:0.5rem;margin-top:1.8rem;"><input type="checkbox" id="scPrbCombinada" style="width:20px;height:20px;accent-color:var(--gold);"><span>¿Prueba Combinada?</span></label></div>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="comp_female_super" value="female_superheavy">
+                                    <label for="comp_female_super">Superpesado (+82kg)</label>
                                 </div>
-                                <div class="scoring-form-group" id="scPrbCombinadaDesc" style="display:none;"><label>Descripción de Sub-pruebas</label><textarea id="scPrbSubpruebas" class="scoring-form-control" rows="2" placeholder="Ej: Serie 1: 200kg, Serie 2: 220kg, Serie 3: 240kg"></textarea></div>
-                                
-                                <div class="scoring-grid-2">
-                                    <div class="scoring-form-group">
-                                        <label>Tiempo Límite para la Prueba (segundos) <span style="color:var(--gold)">*</span></label>
-                                        <input type="number" id="scPrbTiempoLimite" class="scoring-form-control" placeholder="Ej: 60" min="1" step="1">
-                                        <small style="color:var(--text-muted)">Tiempo máximo que tiene el atleta para completar la prueba. Si se agota → 0 puntos automáticamente.</small>
-                                    </div>
-                                    <div class="scoring-form-group">
-                                        <label>Modo de Registro de Tiempo *</label>
-                                        <select id="scPrbModoTiempo" class="scoring-form-control" onchange="scoringToggleModoTiempo()">
-                                            <option value="sin_timer">Sin control de tiempo</option>
-                                            <option value="timer_vivo">Timer en vivo (automático)</option>
-                                            <option value="manual">Ingreso manual de tiempo</option>
-                                        </select>
-                                        <small style="color:var(--text-muted)">
-                                            <strong>Sin control:</strong> solo se registra la marca.<br>
-                                            <strong>Timer en vivo:</strong> contador automático con límite de tiempo.<br>
-                                            <strong>Manual:</strong> se escribe el tiempo que hizo cada atleta (MM:SS o segundos).
-                                        </small>
-                                    </div>
-                                </div>
-<div class="scoring-grid-2" id="scPrbPuntosContainer">
-                                    <div class="scoring-form-group"><label>Puntos para el 1° lugar *</label><input type="number" id="scPrbPuntos" class="scoring-form-control" value="5" min="1" placeholder="Ej: 5"><small style="color:var(--text-muted);">El 2° llevará 1 punto menos, etc.</small></div>
-                                </div>
-                                <button class="btn btn-primary" onclick="scoringSavePrueba()"><i class="fas fa-plus"></i> Agregar Prueba</button>
-                            </div>
-                            <div class="scoring-card">
-                                <div class="scoring-card-title"><i class="fas fa-list-ol"></i> Pruebas del Torneo</div>
-                                <div class="scoring-table-container">
-                                    <table class="scoring-table"><thead><tr><th>#</th><th>Nombre</th><th>Tipo</th><th>Implemento</th><th>1° Puntos</th><th>Combinada</th><th>Tiempo Límite</th><th>Acciones</th></tr></thead><tbody id="scoringPruebasTable"></tbody></table>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="scoring-panel-resultados" class="scoring-panel">
-                            <div class="scoring-card">
-                                <div class="scoring-card-title"><i class="fas fa-keyboard"></i> Ingresar Resultados</div>
-                                <div class="scoring-form-group"><label>Seleccionar Prueba</label><select id="scResPrueba" class="scoring-form-control" onchange="scoringLoadResultadosForm()"><option value="">Seleccionar prueba...</option></select></div>
-                            </div>
-                            <div id="scoringResultadosForm" style="display:none;">
-                            <div id="scoringTimerPanel" style="display:none;">
-                                <div class="scoring-timer-container">
-                                    <div class="scoring-timer-label"><i class="fas fa-stopwatch"></i> TIMER EN VIVO</div>
-                                    <div class="scoring-timer-display" id="scoringTimerDisplay">00:00</div>
-                                    <div class="scoring-timer-progress">
-                                        <div class="scoring-timer-progress-bar" id="scoringTimerProgress" style="width:100%"></div>
-                                    </div>
-                                    <div class="scoring-timer-status running" id="scoringTimerStatus"><i class="fas fa-play-circle"></i> Listo para iniciar</div>
-                                    <div class="scoring-timer-controls">
-                                        <button class="scoring-timer-btn start" id="scoringTimerStart" onclick="scoringTimerStart()"><i class="fas fa-play"></i> Iniciar</button>
-                                        <button class="scoring-timer-btn pause" id="scoringTimerPause" onclick="scoringTimerPause()" style="display:none;"><i class="fas fa-pause"></i> Pausar</button>
-                                        <button class="scoring-timer-btn stop" id="scoringTimerStop" onclick="scoringTimerStop()" style="display:none;"><i class="fas fa-stop"></i> Detener</button>
-                                        <button class="scoring-timer-btn reset" id="scoringTimerReset" onclick="scoringTimerReset()"><i class="fas fa-undo"></i> Reiniciar</button>
-                                    </div>
-                                    <div class="scoring-timer-null-alert" id="scoringTimerNullAlert">
-                                        <i class="fas fa-exclamation-triangle"></i> <strong>TIEMPO AGOTADO</strong> — La prueba se marca como NULO (0 puntos) automáticamente.
-                                    </div>
-                                </div>
-                                <div class="scoring-card" style="margin-bottom:1rem;">
-                                    <div class="scoring-card-title"><i class="fas fa-user-clock"></i> Estado de Atletas en esta Prueba</div>
-                                    <div id="scoringTimerAtletasStatus"></div>
-                                </div>
-                            </div>
-                            <div id="scoringManualTimePanel" style="display:none;">
-                                <div class="scoring-manual-time-container">
-                                    <div class="scoring-manual-time-title">
-                                        <i class="fas fa-keyboard"></i> INGRESO MANUAL DE TIEMPO
-                                    </div>
-                                    <div style="color:var(--text-muted);margin-bottom:1rem;font-size:0.9rem;">
-                                        Escribí el tiempo que hizo cada atleta. Formato: <strong>minutos : segundos</strong> (ej: 01:45) o solo <strong>segundos</strong> (ej: 105).
-                                        Si el tiempo supera el límite, se marca automáticamente como NULO.
-                                    </div>
-                                    <div id="scoringManualTimeContent"></div>
-                                    <div style="margin-top:1rem;display:flex;gap:1rem;flex-wrap:wrap;">
-                                        <button class="btn btn-success" onclick="scoringSaveManualTimes()">
-                                            <i class="fas fa-save"></i> Guardar Tiempos Manuales
-                                        </button>
-                                        <button class="btn btn-outline" onclick="scoringClearManualTimes()">
-                                            <i class="fas fa-eraser"></i> Limpiar Tiempos
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-
-                                <div class="scoring-card">
-                                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;"><h3 id="scResPruebaNombre" style="color:var(--gold);font-family:'Oswald',sans-serif;"></h3><span id="scResPruebaTipo" class="scoring-live-badge"></span></div>
-                                    <div class="scoring-table-container">
-                                        <table class="scoring-table"><thead><tr><th>Atleta</th><th>País</th><th>Peso</th><th>Tiempo</th><th>Resultado</th><th>Unidad</th><th>Puntos</th></tr></thead><tbody id="scoringResultadosTable"></tbody></table>
-                                    </div>
-                                    <div style="margin-top:1.5rem;display:flex;gap:1rem;flex-wrap:wrap;">
-                                        <button class="btn btn-success" onclick="scoringSaveResultados()"><i class="fas fa-save"></i> Guardar Resultados</button>
-                                        <button class="btn btn-gold" onclick="scoringPublishToPublic()"><i class="fas fa-upload"></i> Subir a Planilla Pública</button>
-                                        <button class="btn btn-outline" onclick="scoringClearResultadosPrueba()"><i class="fas fa-eraser"></i> Limpiar esta prueba</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="scoring-panel-ranking" class="scoring-panel">
-                            <div class="scoring-card">
-                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:1rem;">
-                                    <div class="scoring-card-title" style="margin:0;"><i class="fas fa-trophy"></i> Ranking General</div>
-                                    <button class="btn btn-gold" onclick="scoringPublishToPublic()"><i class="fas fa-upload"></i> Subir a Planilla Pública</button>
-                                </div>
-                                <div id="scoringRankingInfo" style="color:var(--text-muted);margin-bottom:1rem;"></div>
-                                <div class="scoring-table-container">
-                                    <table class="scoring-table"><thead><tr><th>Pos</th><th>Atleta</th><th>País</th><th>Peso</th><th>Puntos Totales</th><th>1° Puestos</th><th>Desglose por Prueba</th></tr></thead><tbody id="scoringRankingTable"></tbody></table>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="scoring-panel-estadisticas" class="scoring-panel">
-                            <div class="scoring-card">
-                                <div class="scoring-card-title"><i class="fas fa-chart-bar"></i> Estadísticas del Torneo</div>
-                                <div id="scoringEstadisticasContent"></div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div id="scoringPublicView" class="scoring-hidden">
-                    <div class="scoring-public-view" style="border-radius:0 0 20px 20px;">
-                        <div class="scoring-public-header">
-                            <h1><i class="fas fa-trophy"></i> <span id="scPubNombreTorneo">Torneo</span></h1>
-                            <div class="scoring-live-badge"><i class="fas fa-circle"></i> EN VIVO</div>
-                            <p style="color:var(--text-muted);margin-top:0.5rem;" id="scPubInfoTorneo"></p>
+                    <div class="admin-card" style="margin-bottom: 2rem;">
+                        <h4>Pruebas del Torneo</h4>
+                        <div id="pruebasContainer"></div>
+                        <button class="btn btn-outline" onclick="agregarPrueba()" style="margin-top: 1rem;">
+                            <i class="fas fa-plus"></i> Agregar Prueba
+                        </button>
+                    </div>
+                    <div class="admin-card" style="margin-bottom: 2rem;">
+                        <h4>Atletas Inscritos</h4>
+                        <div style="margin-bottom: 1rem;">
+                            <label>Agregar Atleta</label>
+                            <select id="compAtletaSelect" style="width: 100%; padding: 0.8rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px;">
+                                <option value="">Seleccionar atleta...</option>
+                            </select>
+                            <button class="btn btn-success" onclick="agregarAtletaComp()" style="margin-top: 0.5rem;">
+                                <i class="fas fa-plus"></i> Agregar a Competencia
+                            </button>
                         </div>
-                        <div class="scoring-public-rank" id="scoringPublicRanking"></div>
-                        <div style="text-align:center;margin-top:2rem;"><button class="btn btn-outline" onclick="scoringShowAdminView()"><i class="fas fa-lock"></i> Volver al Admin</button></div>
+                        <div id="compAtletasList">
+                            <p style="color: var(--text-muted);">No hay atletas inscritos</p>
+                        </div>
+                    </div>
+                    <button class="btn btn-success" onclick="guardarCompetencia()">
+                        <i class="fas fa-save"></i> Crear Competencia
+                    </button>
+                </div>
+
+                <!-- PANEL RESULTADOS PÚBLICOS -->
+                <div id="comp-panel-resultados" class="admin-panel">
+                    <h3>Resultados de Competencias</h3>
+                    <div style="margin-bottom: 1rem;">
+                        <label>Seleccionar Torneo</label>
+                        <select id="resultadoTorneoSelect" onchange="cargarResultadosPublicos()" style="width: 100%; padding: 0.8rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px;">
+                            <option value="">Seleccionar torneo...</option>
+                        </select>
+                    </div>
+                    <div id="resultadosPublicosContainer">
+                        <p style="color: var(--text-muted);">Seleccione un torneo para ver los resultados</p>
                     </div>
                 </div>
             </div>
@@ -2635,7 +2088,7 @@ select.scoring-form-control{cursor:pointer}
     </div>
 
     <!-- MODAL SUSCRIPTORES - ADMIN (NUEVO) -->
-<div id="suscriptoresModal" class="modal">
+    <div id="suscriptoresModal" class="modal">
         <div class="modal-content" style="max-width: 900px; max-height: 90vh;">
             <div class="modal-header" style="background: var(--success);">
                 <h2><i class="fas fa-users"></i> Gestión de Suscriptores</h2>
@@ -5039,7 +4492,7 @@ select.scoring-form-control{cursor:pointer}
             let html = `
                 <div class="modal-content" style="max-width: 95%; width: 1200px; max-height: 95vh;">
                     <div class="modal-header" style="background: var(--success);">
-                        <h2><i class="fas fa-clipboard-check"></i> ${scoringTorneo.nombre} - Planilla de Puntuación</h2>
+                        <h2><i class="fas fa-clipboard-check"></i> ${comp.nombre} - Planilla de Puntuación</h2>
                         <button class="close-btn" onclick="cerrarPlanilla()">&times;</button>
                     </div>
                     <div class="modal-body" style="overflow-x: auto;">
@@ -5059,7 +4512,7 @@ select.scoring-form-control{cursor:pointer}
                                 <tr style="background: var(--secondary);">
                                     <th style="padding: 1rem; text-align: left; border-bottom: 2px solid var(--accent);">Atleta</th>
                                     <th style="padding: 1rem; text-align: left; border-bottom: 2px solid var(--accent);">Categoría</th>
-                                    ${scoringTorneo.pruebas.map(p => `
+                                    ${comp.pruebas.map(p => `
                                         <th style="padding: 1rem; text-align: center; border-bottom: 2px solid var(--accent); min-width: 150px;">
                                             ${p.nombre}<br>
                                             <small style="color: var(--text-muted);">${p.implemento} ${p.pesoImplemento ? '('+p.pesoImplemento+'kg)' : ''}</small>
@@ -5070,7 +4523,7 @@ select.scoring-form-control{cursor:pointer}
                                 </tr>
                             </thead>
                             <tbody>
-                                ${scoringTorneo.atletas.map((a, idx) => `
+                                ${comp.atletas.map((a, idx) => `
                                     <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
                                         <td style="padding: 1rem;">
                                             <strong>#${a.numero}</strong> ${a.nombre}
@@ -5078,7 +4531,7 @@ select.scoring-form-control{cursor:pointer}
                                         <td style="padding: 1rem;">
                                             ${getCategoriaLabel(a.categoria)}
                                         </td>
-                                        ${scoringTorneo.pruebas.map(p => {
+                                        ${comp.pruebas.map(p => {
                                             const resultado = a.resultados[p.id] || { marca: '', puntos: 0 };
                                             return `
                                                 <td style="padding: 0.5rem;">
@@ -5121,8 +4574,8 @@ select.scoring-form-control{cursor:pointer}
             if (compIndex === -1) return;
             const comp = competencias[compIndex];
             
-            scoringTorneo.atletas.forEach((a, idx) => {
-                scoringTorneo.pruebas.forEach(p => {
+            comp.atletas.forEach((a, idx) => {
+                comp.pruebas.forEach(p => {
                     const input = document.getElementById(`marca-${compId}-${idx}-${p.id}`);
                     if (input) {
                         const marca = input.value.trim();
@@ -5151,8 +4604,8 @@ select.scoring-form-control{cursor:pointer}
             
             const comp = competencias[compIndex];
             
-            scoringTorneo.atletas.forEach((a, idx) => {
-                scoringTorneo.pruebas.forEach(p => {
+            comp.atletas.forEach((a, idx) => {
+                comp.pruebas.forEach(p => {
                     const input = document.getElementById(`marca-${compId}-${idx}-${p.id}`);
                     if (input) {
                         const marca = input.value.trim();
@@ -5165,8 +4618,8 @@ select.scoring-form-control{cursor:pointer}
                 });
             });
             
-            scoringTorneo.pruebas.forEach(p => {
-                const conMarca = scoringTorneo.atletas.filter(a => a.resultados[p.id] && a.resultados[p.id].marca);
+            comp.pruebas.forEach(p => {
+                const conMarca = comp.atletas.filter(a => a.resultados[p.id] && a.resultados[p.id].marca);
                 if (conMarca.length === 0) return;
                 
                 conMarca.sort((a, b) => {
@@ -5186,20 +4639,20 @@ select.scoring-form-control{cursor:pointer}
                 });
             });
             
-            scoringTorneo.atletas.forEach(a => {
+            comp.atletas.forEach(a => {
                 a.totalPuntos = Object.values(a.resultados || {}).reduce((sum, r) => sum + (r.puntos || 0), 0);
             });
             
-            const categoriasUnicas = [...new Set(scoringTorneo.atletas.map(a => a.categoria))];
+            const categoriasUnicas = [...new Set(comp.atletas.map(a => a.categoria))];
             categoriasUnicas.forEach(cat => {
-                const deCategoria = scoringTorneo.atletas.filter(a => a.categoria === cat);
+                const deCategoria = comp.atletas.filter(a => a.categoria === cat);
                 deCategoria.sort((a, b) => b.totalPuntos - a.totalPuntos);
                 deCategoria.forEach((a, pos) => {
                     a.posicion = pos + 1;
                 });
             });
             
-            scoringTorneo.estado = 'finalizada';
+            comp.estado = 'finalizada';
             competencias[compIndex] = comp;
             localStorage.setItem('acaf_competencias', JSON.stringify(competencias));
             
@@ -5234,11 +4687,11 @@ select.scoring-form-control{cursor:pointer}
             const comp = competencias.find(c => c.id === compId);
             if (!comp) return;
             
-            const categorias = [...new Set(scoringTorneo.atletas.map(a => a.categoria))];
+            const categorias = [...new Set(comp.atletas.map(a => a.categoria))];
             
             container.innerHTML = `
                 <div style="margin-bottom: 2rem;">
-                    <h3 style="color: var(--gold);">${scoringTorneo.nombre}</h3>
+                    <h3 style="color: var(--gold);">${comp.nombre}</h3>
                     <p style="color: var(--text-muted);">
                         <i class="fas fa-calendar"></i> ${formatearFecha(comp.fecha)} | 
                         <i class="fas fa-map-marker-alt"></i> ${comp.lugar}
@@ -5246,7 +4699,7 @@ select.scoring-form-control{cursor:pointer}
                     <p><strong>Jueces:</strong> ${comp.jueces.join(', ')}</p>
                 </div>
                 ${categorias.map(cat => {
-                    const deCategoria = scoringTorneo.atletas.filter(a => a.categoria === cat).sort((a, b) => a.posicion - b.posicion);
+                    const deCategoria = comp.atletas.filter(a => a.categoria === cat).sort((a, b) => a.posicion - b.posicion);
                     return `
                         <div class="admin-card" style="margin-bottom: 2rem;">
                             <h4 style="color: var(--accent-light); margin-bottom: 1rem;">${getCategoriaLabel(cat)}</h4>
@@ -5255,7 +4708,7 @@ select.scoring-form-control{cursor:pointer}
                                     <tr style="background: rgba(0,0,0,0.3);">
                                         <th style="padding: 0.8rem; text-align: center;">Pos</th>
                                         <th style="padding: 0.8rem; text-align: left;">Atleta</th>
-                                        ${scoringTorneo.pruebas.map(p => `<th style="padding: 0.8rem; text-align: center;">${p.nombre}</th>`).join('')}
+                                        ${comp.pruebas.map(p => `<th style="padding: 0.8rem; text-align: center;">${p.nombre}</th>`).join('')}
                                         <th style="padding: 0.8rem; text-align: center;">Total</th>
                                     </tr>
                                 </thead>
@@ -5263,12 +4716,12 @@ select.scoring-form-control{cursor:pointer}
                                     ${deCategoria.map(a => `
                                         <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
                                             <td style="padding: 0.8rem; text-align: center; font-weight: bold; color: ${a.posicion === 1 ? 'var(--gold)' : 'var(--text)'};">
-                                                ${(scoringTorneo.pruebas.some(p=>scoringTorneo.resultados[p.id]&&Object.keys(scoringTorneo.resultados[p.id]).length>0)&&a.posicion<=3?['🥇','🥈','🥉'][a.posicion-1]:a.posicion)}
+                                                ${a.posicion === 1 ? '🥇' : a.posicion === 2 ? '🥈' : a.posicion === 3 ? '🥉' : a.posicion}
                                             </td>
                                             <td style="padding: 0.8rem;">
                                                 <strong>#${a.numero}</strong> ${a.nombre}
                                             </td>
-                                            ${scoringTorneo.pruebas.map(p => {
+                                            ${comp.pruebas.map(p => {
                                                 const r = a.resultados[p.id];
                                                 return `<td style="padding: 0.8rem; text-align: center;">
                                                     ${r ? `${r.marca} <span style="color: var(--gold);">(${r.puntos})</span>` : '-'}
@@ -5306,22 +4759,22 @@ select.scoring-form-control{cursor:pointer}
             const comp = competencias.find(c => c.id === compId);
             if (!comp) return;
             
-            const categorias = [...new Set(scoringTorneo.atletas.map(a => a.categoria))].filter(c => c);
+            const categorias = [...new Set(comp.atletas.map(a => a.categoria))].filter(c => c);
             
             container.innerHTML = `
                 <div style="background: var(--secondary); padding: 2rem; border-radius: 15px; margin-bottom: 2rem; border: 1px solid rgba(255,255,255,0.1);">
-                    <h3 style="color: var(--gold); font-size: 2rem; margin-bottom: 1rem;">${scoringTorneo.nombre}</h3>
+                    <h3 style="color: var(--gold); font-size: 2rem; margin-bottom: 1rem;">${comp.nombre}</h3>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; color: var(--text-muted); margin-bottom: 1rem;">
                         <span><i class="fas fa-calendar" style="color: var(--accent);"></i> ${formatearFecha(comp.fecha)}</span>
                         <span><i class="fas fa-clock" style="color: var(--accent);"></i> ${comp.hora} hs</span>
                         <span><i class="fas fa-map-marker-alt" style="color: var(--accent);"></i> ${comp.lugar}</span>
-                        <span><i class="fas fa-users" style="color: var(--accent);"></i> ${scoringTorneo.atletas.length} atletas</span>
+                        <span><i class="fas fa-users" style="color: var(--accent);"></i> ${comp.atletas.length} atletas</span>
                     </div>
                     <p><strong style="color: var(--accent-light);">Jueces:</strong> ${comp.jueces.join(', ')}</p>
-                    <p><strong style="color: var(--accent-light);">Estado:</strong> <span style="color: ${scoringTorneo.estado === 'finalizada' ? 'var(--success)' : 'var(--warning)'}; text-transform: uppercase;">${scoringTorneo.estado === 'finalizada' ? '✅ Finalizada' : '⏳ En curso'}</span></p>
+                    <p><strong style="color: var(--accent-light);">Estado:</strong> <span style="color: ${comp.estado === 'finalizada' ? 'var(--success)' : 'var(--warning)'}; text-transform: uppercase;">${comp.estado === 'finalizada' ? '✅ Finalizada' : '⏳ En curso'}</span></p>
                 </div>
                 
-                ${scoringTorneo.estado !== 'finalizada' ? `
+                ${comp.estado !== 'finalizada' ? `
                     <div style="background: rgba(255,193,7,0.1); border: 1px solid var(--warning); padding: 1rem; border-radius: 10px; margin-bottom: 2rem; text-align: center;">
                         <i class="fas fa-exclamation-triangle" style="color: var(--warning);"></i>
                         <span style="color: var(--warning);"> Esta competencia aún no ha finalizado. Los resultados son parciales.</span>
@@ -5331,7 +4784,7 @@ select.scoring-form-control{cursor:pointer}
                 <h3 style="color: var(--accent-light); margin-bottom: 1.5rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem;">Resultados por Categoría</h3>
                 
                 ${categorias.length === 0 ? '<p style="color: var(--text-muted);">No hay atletas clasificados por categoría</p>' : categorias.map(cat => {
-                    const deCategoria = scoringTorneo.atletas
+                    const deCategoria = comp.atletas
                         .filter(a => a.categoria === cat)
                         .sort((a, b) => (a.posicion || 999) - (b.posicion || 999));
                     
@@ -5346,7 +4799,7 @@ select.scoring-form-control{cursor:pointer}
                                         <tr style="background: rgba(0,102,204,0.2);">
                                             <th style="padding: 1rem; text-align: center; border-bottom: 2px solid var(--accent);">Posición</th>
                                             <th style="padding: 1rem; text-align: left; border-bottom: 2px solid var(--accent);">Atleta</th>
-                                            ${scoringTorneo.pruebas.map(p => `
+                                            ${comp.pruebas.map(p => `
                                                 <th style="padding: 1rem; text-align: center; border-bottom: 2px solid var(--accent);">
                                                     ${p.nombre}
                                                     <small style="display: block; color: var(--text-muted); font-weight: normal;">${p.implemento}</small>
@@ -5359,13 +4812,13 @@ select.scoring-form-control{cursor:pointer}
                                         ${deCategoria.map((a, idx) => `
                                             <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); ${idx < 3 ? 'background: rgba(255,215,0,0.05);' : ''}">
                                                 <td style="padding: 1rem; text-align: center; font-size: 1.5rem;">
-                                                    ${(() => { const hayRes = scoringTorneo.pruebas.some(p => scoringTorneo.resultados[p.id] && Object.keys(scoringTorneo.resultados[p.id]).length > 0); return hayRes && a.posicion <= 3 ? ['🥇','🥈','🥉'][a.posicion-1] : `<span style="color: var(--text-muted);">${a.posicion || '-'}</span>`; })()}
+                                                    ${a.posicion === 1 ? '🥇' : a.posicion === 2 ? '🥈' : a.posicion === 3 ? '🥉' : `<span style="color: var(--text-muted);">${a.posicion || '-'}</span>`}
                                                 </td>
                                                 <td style="padding: 1rem;">
                                                     <div style="font-weight: bold; color: var(--text);">${a.nombre}</div>
                                                     <small style="color: var(--text-muted);">#${a.numero}</small>
                                                 </td>
-                                                ${scoringTorneo.pruebas.map(p => {
+                                                ${comp.pruebas.map(p => {
                                                     const r = a.resultados?.[p.id];
                                                     return `
                                                         <td style="padding: 1rem; text-align: center;">
@@ -5388,11 +4841,11 @@ select.scoring-form-control{cursor:pointer}
                     `;
                 }).join('')}
                 
-                ${scoringTorneo.pruebas.length > 0 ? `
+                ${comp.pruebas.length > 0 ? `
                     <div style="background: var(--secondary); padding: 1.5rem; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); margin-top: 2rem;">
                         <h4 style="color: var(--accent-light); margin-bottom: 1rem;">Detalle de Pruebas</h4>
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
-                            ${scoringTorneo.pruebas.map((p, idx) => `
+                            ${comp.pruebas.map((p, idx) => `
                                 <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 10px;">
                                     <strong style="color: var(--gold);">${idx + 1}. ${p.nombre}</strong>
                                     <p style="color: var(--text-muted); margin: 0.5rem 0 0 0; font-size: 0.9rem;">
@@ -5650,524 +5103,6 @@ select.scoring-form-control{cursor:pointer}
             loadProducts();
             updateCartUI();
         });
-    
-
-        // ===== SISTEMA DE PUNTUACIÓN V2 =====
-        let scoringTorneo={nombre:'',desempate:'primeros',sistemaPuntos:'auto',customPoints:{},estado:'activo',atletas:[],pruebas:[],resultados:{}};
-        let scoringEditingAtleta=null,scoringEditingPrueba=null;
-
-        // BANDERAS: usamos imágenes de flagcdn.com (funciona en todos los navegadores)
-        function getFlagImg(cc,cls){if(!cc||cc.length!==2)return'';const c=cc.toLowerCase();const cl=cls||'scoring-flag-img';return`<img src="https://flagcdn.com/w40/${c}.png" alt="${cc}" class="${cl}" onerror="this.style.display='none'">`}
-
-        function scoringSaveToStorage(){localStorage.setItem('sm_uy_torneo_v2',JSON.stringify(scoringTorneo));scoringShowToast('💾 Datos guardados')}
-        function scoringLoadFromStorage(){const s=localStorage.getItem('sm_uy_torneo_v2');if(s){scoringTorneo=JSON.parse(s);scoringApplyConfig();scoringRenderAtletas();scoringRenderPruebas();scoringUpdateResPruebaSelect();scoringRenderRanking();scoringRenderEstadisticas();scoringRenderPublicSection()}}
-        function scoringResetAll(){if(!confirm('¿Reiniciar TODO?'))return;scoringTorneo={nombre:'',desempate:'primeros',sistemaPuntos:'auto',customPoints:{},estado:'activo',atletas:[],pruebas:[],resultados:{}};localStorage.removeItem('sm_uy_torneo_v2');scoringApplyConfig();scoringRenderAtletas();scoringRenderPruebas();scoringUpdateResPruebaSelect();scoringRenderRanking();scoringRenderEstadisticas();scoringRenderPublicSection();scoringShowToast('🗑️ Reiniciado')}
-        function scoringShowToast(m){let t=document.getElementById('scoringToast');if(!t){t=document.createElement('div');t.id='scoringToast';t.className='scoring-toast';document.body.appendChild(t)}t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000)}
-        function scoringSwitchTab(tid){document.querySelectorAll('.scoring-tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.scoring-panel').forEach(p=>p.classList.remove('active'));document.querySelector(`[data-scoring-tab="${tid}"]`).classList.add('active');document.getElementById('scoring-panel-'+tid).classList.add('active');if(tid==='ranking')scoringRenderRanking();if(tid==='estadisticas')scoringRenderEstadisticas()}
-        function scoringShowPublicView(){document.getElementById('scoringAdminView').classList.add('scoring-hidden');document.getElementById('scoringPublicView').classList.remove('scoring-hidden');scoringRenderPublicRanking()}
-        function scoringShowAdminView(){document.getElementById('scoringPublicView').classList.add('scoring-hidden');document.getElementById('scoringAdminView').classList.remove('scoring-hidden')}
-        function scoringToggleCustomPoints(){document.getElementById('scoringCustomPointsPanel').style.display=document.getElementById('scCfgSistemaPuntos').value==='custom'?'block':'none'}
-        function scoringSaveConfig(){scoringTorneo.nombre=document.getElementById('scCfgNombre').value.trim();scoringTorneo.desempate=document.getElementById('scCfgDesempate').value;scoringTorneo.sistemaPuntos=document.getElementById('scCfgSistemaPuntos').value;scoringTorneo.estado=document.getElementById('scCfgEstado').value;if(scoringTorneo.sistemaPuntos==='custom'){scoringTorneo.customPoints={};document.querySelectorAll('.scoring-custom-point').forEach(i=>{const p=parseInt(i.dataset.pos),v=parseInt(i.value)||0;if(v>0)scoringTorneo.customPoints[p]=v})}if(!scoringTorneo.nombre){scoringShowToast('❌ Ingresa nombre');return}document.getElementById('scoringTorneoNombre').textContent=scoringTorneo.nombre;scoringSaveToStorage();scoringShowToast('✅ Configuración guardada');scoringRenderPublicSection()}
-        function scoringApplyConfig(){document.getElementById('scCfgNombre').value=scoringTorneo.nombre||'';document.getElementById('scCfgDesempate').value=scoringTorneo.desempate||'primeros';document.getElementById('scCfgSistemaPuntos').value=scoringTorneo.sistemaPuntos||'auto';document.getElementById('scCfgEstado').value=scoringTorneo.estado||'activo';document.getElementById('scoringTorneoNombre').textContent=scoringTorneo.nombre||'Configurar Torneo';scoringToggleCustomPoints();if(scoringTorneo.sistemaPuntos==='custom'&&Object.keys(scoringTorneo.customPoints).length>0){document.querySelectorAll('.scoring-custom-point').forEach(i=>{const p=parseInt(i.dataset.pos);if(scoringTorneo.customPoints[p])i.value=scoringTorneo.customPoints[p]})}}
-        function scoringAddPointRow(){const c=document.getElementById('scoringCustomPointsContainer'),r=c.querySelectorAll('.scoring-grid-4'),l=parseInt(r[r.length-1].querySelector('.scoring-custom-point').dataset.pos),n=document.createElement('div');n.className='scoring-grid-4';n.innerHTML=`<div class="scoring-form-group"><label>${l+1}° lugar</label><input type="number" class="scoring-form-control scoring-custom-point" data-pos="${l+1}" value="1" min="0"></div><div class="scoring-form-group"><label>${l+2}° lugar</label><input type="number" class="scoring-form-control scoring-custom-point" data-pos="${l+2}" value="1" min="0"></div><div class="scoring-form-group"><label>${l+3}° lugar</label><input type="number" class="scoring-form-control scoring-custom-point" data-pos="${l+3}" value="1" min="0"></div><div class="scoring-form-group"><label>${l+4}° lugar</label><input type="number" class="scoring-form-control scoring-custom-point" data-pos="${l+4}" value="1" min="0"></div>`;c.appendChild(n)}
-        function scoringSaveAtleta(){const n=document.getElementById('scAtlNombre').value.trim(),p=document.getElementById('scAtlPais').value.trim().toUpperCase(),w=parseFloat(document.getElementById('scAtlPeso').value),s=document.getElementById('scAtlSexo').value;if(!n||!w||!s){scoringShowToast('❌ Completa campos obligatorios');return}if(scoringEditingAtleta!==null){scoringTorneo.atletas[scoringEditingAtleta]={...scoringTorneo.atletas[scoringEditingAtleta],nombre:n,pais:p,peso:w,sexo:s};scoringEditingAtleta=null;document.querySelector('#scoring-panel-atletas .btn-primary').innerHTML='<i class="fas fa-plus"></i> Agregar Atleta'}else{scoringTorneo.atletas.push({id:'atl_'+Date.now(),nombre:n,pais:p,peso:w,sexo:s,resultados:{}})}document.getElementById('scAtlNombre').value='';document.getElementById('scAtlPais').value='';document.getElementById('scAtlPeso').value='';document.getElementById('scAtlSexo').value='';scoringSaveToStorage();scoringRenderAtletas();scoringShowToast('✅ Atleta guardado');scoringRenderPublicSection()}
-        function scoringEditAtleta(i){const a=scoringTorneo.atletas[i];document.getElementById('scAtlNombre').value=a.nombre;document.getElementById('scAtlPais').value=a.pais||'';document.getElementById('scAtlPeso').value=a.peso;document.getElementById('scAtlSexo').value=a.sexo;scoringEditingAtleta=i;document.querySelector('#scoring-panel-atletas .btn-primary').innerHTML='<i class="fas fa-save"></i> Actualizar Atleta'}
-        function scoringDeleteAtleta(i){if(!confirm('¿Eliminar atleta?'))return;scoringTorneo.atletas.splice(i,1);scoringSaveToStorage();scoringRenderAtletas();scoringRenderRanking();scoringRenderPublicSection()}
-        function scoringRenderAtletas(){const b=document.getElementById('scoringAtletasTable');if(!b)return;b.innerHTML=scoringTorneo.atletas.map((a,i)=>{const f=getFlagImg(a.pais);return`<tr><td>${i+1}</td><td><strong>${a.nombre}</strong></td><td>${f}${a.pais||'-'}</td><td>${a.peso} kg</td><td>${a.sexo==='M'?'♂️ Masculino':'♀️ Femenino'}</td><td><button class="btn btn-outline btn-small" onclick="scoringEditAtleta(${i})"><i class="fas fa-edit"></i></button> <button class="btn btn-danger btn-small" onclick="scoringDeleteAtleta(${i})"><i class="fas fa-trash"></i></button></td></tr>`}).join('')}
-        document.addEventListener('DOMContentLoaded',function(){const cb=document.getElementById('scPrbCombinada');if(cb)cb.addEventListener('change',function(){document.getElementById('scPrbCombinadaDesc').style.display=this.checked?'block':'none'})});
-        function scoringSavePrueba(){const n=document.getElementById('scPrbNombre').value.trim(),t=document.getElementById('scPrbTipo').value,imp=document.getElementById('scPrbImplemento').value.trim(),dist=parseFloat(document.getElementById('scPrbDistancia').value)||0,reqDist=document.getElementById('scPrbRequiereDistancia').checked,comb=document.getElementById('scPrbCombinada').checked,sub=document.getElementById('scPrbSubpruebas').value.trim(),pts=parseInt(document.getElementById('scPrbPuntos').value)||5,tiempoLimite=parseInt(document.getElementById('scPrbTiempoLimite').value)||0,modoTiempo=document.getElementById('scPrbModoTiempo').value;if(!n||!t){scoringShowToast('❌ Completa campos obligatorios');return}if(reqDist&&dist<=0&&t==='distancia'){scoringShowToast('❌ Ingresa la distancia mínima a completar');return}if((modoTiempo==='timer_vivo'||modoTiempo==='manual')&&tiempoLimite<=0){scoringShowToast('❌ Ingresa el tiempo límite en segundos');return}if(scoringEditingPrueba!==null){scoringTorneo.pruebas[scoringEditingPrueba]={...scoringTorneo.pruebas[scoringEditingPrueba],nombre:n,tipo:t,implemento:imp,distancia:dist,requiereDistancia:reqDist,combinada:comb,subpruebas:sub,puntos:pts,tiempoLimite:tiempoLimite,modoTiempo:modoTiempo};scoringEditingPrueba=null;document.querySelector('#scoring-panel-pruebas .btn-primary').innerHTML='<i class="fas fa-plus"></i> Agregar Prueba'}else{scoringTorneo.pruebas.push({id:'prb_'+Date.now(),nombre:n,tipo:t,implemento:imp,distancia:dist,requiereDistancia:reqDist,combinada:comb,subpruebas:sub,puntos:pts,tiempoLimite:tiempoLimite,modoTiempo:modoTiempo,orden:scoringTorneo.pruebas.length+1})}document.getElementById('scPrbNombre').value='';document.getElementById('scPrbTipo').value='';document.getElementById('scPrbImplemento').value='';document.getElementById('scPrbDistancia').value='';document.getElementById('scPrbRequiereDistancia').checked=true;document.getElementById('scPrbCombinada').checked=false;document.getElementById('scPrbSubpruebas').value='';document.getElementById('scPrbPuntos').value='5';document.getElementById('scPrbTiempoLimite').value='';document.getElementById('scPrbModoTiempo').value='sin_timer';scoringToggleModoTiempo();document.getElementById('scPrbCombinadaDesc').style.display='none';scoringSaveToStorage();scoringRenderPruebas();scoringUpdateResPruebaSelect();scoringShowToast('✅ Prueba guardada');scoringRenderPublicSection()}
-        function scoringEditPrueba(i){const p=scoringTorneo.pruebas[i];document.getElementById('scPrbNombre').value=p.nombre;document.getElementById('scPrbTipo').value=p.tipo;document.getElementById('scPrbImplemento').value=p.implemento||'';document.getElementById('scPrbDistancia').value=p.distancia||'';document.getElementById('scPrbRequiereDistancia').checked=p.requiereDistancia!==undefined?p.requiereDistancia:true;document.getElementById('scPrbCombinada').checked=p.combinada||false;document.getElementById('scPrbSubpruebas').value=p.subpruebas||'';document.getElementById('scPrbPuntos').value=p.puntos||5;document.getElementById('scPrbTiempoLimite').value=p.tiempoLimite||'';document.getElementById('scPrbModoTiempo').value=p.modoTiempo||'sin_timer';scoringToggleModoTiempo();document.getElementById('scPrbCombinadaDesc').style.display=p.combinada?'block':'none';scoringEditingPrueba=i;document.querySelector('#scoring-panel-pruebas .btn-primary').innerHTML='<i class="fas fa-save"></i> Actualizar Prueba'}
-        function scoringDeletePrueba(i){if(!confirm('¿Eliminar prueba?'))return;const pid=scoringTorneo.pruebas[i].id;delete scoringTorneo.resultados[pid];scoringTorneo.pruebas.splice(i,1);scoringSaveToStorage();scoringRenderPruebas();scoringUpdateResPruebaSelect();scoringRenderRanking();scoringRenderPublicSection()}
-        function scoringRenderPruebas(){const b=document.getElementById('scoringPruebasTable');if(!b)return;b.innerHTML=scoringTorneo.pruebas.map((p,i)=>`<tr><td>${i+1}</td><td><strong>${p.nombre}</strong></td><td>${scoringGetTipoLabel(p.tipo)}</td><td>${p.implemento||'-'}</td><td>${p.distancia>0?p.distancia+' '+scoringGetTipoUnidad(p.tipo):'-'} ${p.requiereDistancia&&p.distancia>0?'<span style="color:var(--danger);font-size:0.8rem"><i class="fas fa-exclamation-circle"></i> Mínimo</span>':''}</td><td>${p.puntos||5}</td><td>${p.combinada?'<span style="color:var(--gold)"><i class="fas fa-layer-group"></i> Sí</span>':'No'}</td><td>${p.tiempoLimite>0?'<span style="color:var(--warning)"><i class="fas fa-stopwatch"></i> '+p.tiempoLimite+'s</span>'+(p.modoTiempo==='timer_vivo'?' <span style="color:var(--success);font-size:0.75rem"><i class="fas fa-eye"></i> Timer</span>':p.modoTiempo==='manual'?' <span style="color:var(--accent);font-size:0.75rem"><i class="fas fa-keyboard"></i> Manual</span>':' <span style="color:var(--text-muted);font-size:0.75rem">Sin control</span>'):'<span style="color:var(--text-muted)">-</span>'}</td><td><button class="btn btn-outline btn-small" onclick="scoringEditPrueba(${i})"><i class="fas fa-edit"></i></button> <button class="btn btn-danger btn-small" onclick="scoringDeletePrueba(${i})"><i class="fas fa-trash"></i></button></td></tr>`).join('')}
-        function scoringGetTipoLabel(t){const l={tiempo:'⏱️ Tiempo',distancia:'📏 Distancia',reps:'🔢 Repeticiones',peso:'🏋️ Peso'};return l[t]||t}
-        function scoringGetTipoUnidad(t){const u={tiempo:'seg',distancia:'m',reps:'reps',peso:'kg'};return u[t]||''}
-        function scoringUpdateResPruebaSelect(){const s=document.getElementById('scResPrueba');if(!s)return;s.innerHTML='<option value="">Seleccionar prueba...</option>'+scoringTorneo.pruebas.map(p=>`<option value="${p.id}">${p.nombre} (${scoringGetTipoLabel(p.tipo)})</option>`).join('')}
-        function scoringLoadResultadosForm(){const pid=document.getElementById('scResPrueba').value,f=document.getElementById('scoringResultadosForm');if(!pid){f.style.display='none';return}const p=scoringTorneo.pruebas.find(x=>x.id===pid);if(!p)return;document.getElementById('scResPruebaNombre').textContent=p.nombre;const tipoBadge=document.getElementById('scResPruebaTipo');tipoBadge.textContent=scoringGetTipoLabel(p.tipo);if(p.distancia>0&&p.requiereDistancia!==false){tipoBadge.innerHTML=scoringGetTipoLabel(p.tipo)+' <span style="color:var(--danger);margin-left:0.5rem"><i class="fas fa-ruler"></i> Meta: '+p.distancia+' '+scoringGetTipoUnidad(p.tipo)+'</span>'}if(p.modoTiempo==='timer_vivo'&&p.tiempoLimite>0){document.getElementById('scoringTimerPanel').style.display='block';document.getElementById('scoringManualTimePanel').style.display='none';scoringTimerSetup(p.tiempoLimite,p.id);}else if(p.modoTiempo==='manual'&&p.tiempoLimite>0){document.getElementById('scoringTimerPanel').style.display='none';document.getElementById('scoringManualTimePanel').style.display='block';scoringManualTimeSetup(p);}else{document.getElementById('scoringTimerPanel').style.display='none';document.getElementById('scoringManualTimePanel').style.display='none';}const b=document.getElementById('scoringResultadosTable'),rp=scoringTorneo.resultados[pid]||{};b.innerHTML=scoringTorneo.atletas.map(a=>{const r=rp[a.id]||{},fg=getFlagImg(a.pais,'scoring-flag-img-small');const noCompleto=p.distancia>0&&p.requiereDistancia!==false&&r.marca!==undefined&&parseFloat(r.marca)<p.distancia;const rowClass=noCompleto?'style="background:rgba(220,53,69,0.1)"':'';return`<tr data-atleta-id="${a.id}" ${rowClass}><td><strong>${a.nombre}</strong></td><td>${fg}${a.pais||'-'}</td><td>${a.peso} kg</td><td>${p.modoTiempo==='manual'&&r.tiempo!==undefined?(()=>{const min=Math.floor(r.tiempo/60);const seg=r.tiempo%60;return(min>0?min+'m ':'')+seg+'s'})():'-'}</td><td><input type="number" class="scoring-form-control sc-res-marca" value="${r.marca||''}" step="0.01" placeholder="0" style="width:120px" onchange="scoringCheckDistancia(this,${p.distancia||0},${p.requiereDistancia!==false})"></td><td>${scoringGetTipoUnidad(p.tipo)}</td><td class="sc-res-puntos" style="color:var(--gold);font-weight:bold">${r.puntos!==undefined?r.puntos:'-'}${noCompleto?' <span style="color:var(--danger);font-size:0.8rem">(0 pts - no completó)</span>':r&&r.nulo&&r.motivo?' <span style="color:var(--danger);font-size:0.8rem">(0 pts - '+r.motivo+')</span>':''}</td></tr>`}).join('');f.style.display='block'}
-        function scoringCheckDistancia(input,distanciaMinima,requiereDistancia){if(!requiereDistancia||distanciaMinima<=0)return;const marca=parseFloat(input.value)||0;if(marca>0&&marca<distanciaMinima){input.style.borderColor='var(--danger)';input.style.background='rgba(220,53,69,0.1)';const row=input.closest('tr');const ptsCell=row.querySelector('.sc-res-puntos');if(ptsCell&&!ptsCell.querySelector('.distancia-warning')){ptsCell.innerHTML=ptsCell.innerHTML+' <span class="distancia-warning" style="color:var(--danger);font-size:0.8rem"><i class="fas fa-exclamation-triangle"></i> No alcanzó '+distanciaMinima+'m → 0 pts</span>'}}else{input.style.borderColor='';input.style.background='';const row=input.closest('tr');const warning=row.querySelector('.distancia-warning');if(warning)warning.remove()}}function scoringSaveResultados(){const pid=document.getElementById('scResPrueba').value;if(!pid)return;const p=scoringTorneo.pruebas.find(x=>x.id===pid);if(!p)return;const m={};document.querySelectorAll('#scoringResultadosTable tr').forEach(r=>{const aid=r.dataset.atletaId,inp=r.querySelector('.sc-res-marca'),v=inp.value.trim();if(v!=='')m[aid]=parseFloat(v)||0});const pts=scoringCalcularPuntos(p,m);scoringTorneo.resultados[pid]={};Object.entries(m).forEach(([aid,mar])=>{scoringTorneo.resultados[pid][aid]={marca:mar,puntos:pts[aid]||0}});document.querySelectorAll('#scoringResultadosTable tr').forEach(r=>{const aid=r.dataset.atletaId,pc=r.querySelector('.sc-res-puntos'),inp=r.querySelector('.sc-res-marca');if(scoringTorneo.resultados[pid][aid]){const res=scoringTorneo.resultados[pid][aid];const noCompleto=p.distancia>0&&p.requiereDistancia!==false&&res.marca<p.distancia;pc.innerHTML=res.puntos+(noCompleto?' <span style="color:var(--danger);font-size:0.8rem">(0 pts - no completó '+p.distancia+'m)</span>':'')}inp.style.borderColor='';inp.style.background='';const warn=r.querySelector('.distancia-warning');if(warn)warn.remove()});scoringSaveToStorage();scoringRenderRanking();scoringRenderPublicSection();scoringShowToast('✅ Resultados guardados')}
-        function scoringCalcularPuntos(pr,marcas){const acm=Object.entries(marcas).map(([id,mar])=>({id,mar}));if(acm.length===0)return{};const pts={},pb=pr.puntos||5;const distanciaMinima=pr.distancia||0;const requiereDistancia=pr.requiereDistancia!==false;const atletasValidos=[];const atletasDescalificados=[];acm.forEach(x=>{const existingResult=scoringTorneo.resultados[pr.id]?.[x.id];if(existingResult&&existingResult.nulo){pts[x.id]=0;atletasDescalificados.push(x)}else if(pr.modoTiempo==='manual'&&pr.tiempoLimite>0&&x.mar>pr.tiempoLimite){pts[x.id]=0;atletasDescalificados.push(x)}else if(requiereDistancia&&distanciaMinima>0&&pr.tipo==='distancia'&&x.mar<distanciaMinima){pts[x.id]=0;atletasDescalificados.push(x)}else{atletasValidos.push(x)}});if(atletasValidos.length===0)return pts;atletasValidos.sort((a,b)=>pr.tipo==='tiempo'?a.mar-b.mar:b.mar-a.mar);if(scoringTorneo.sistemaPuntos==='custom'&&Object.keys(scoringTorneo.customPoints).length>0){let pos=0;while(pos<atletasValidos.length){const g=[atletasValidos[pos]],ma=atletasValidos[pos].mar;let s=pos+1;while(s<atletasValidos.length&&atletasValidos[s].mar===ma){g.push(atletasValidos[s]);s++}const pd=[];for(let i=pos;i<s;i++){const prl=i+1;pd.push(scoringTorneo.customPoints[prl]||0)}const pm=pd.length>0?pd.reduce((a,b)=>a+b,0)/pd.length:0;g.forEach(x=>{pts[x.id]=Math.round(pm*10)/10});pos=s}}else{let pos=0;while(pos<atletasValidos.length){const g=[atletasValidos[pos]],ma=atletasValidos[pos].mar;let s=pos+1;while(s<atletasValidos.length&&atletasValidos[s].mar===ma){g.push(atletasValidos[s]);s++}const pd=[];for(let i=pos;i<s;i++){let pt=pb-i;if(pt<0)pt=0;pd.push(pt)}const pm=pd.length>0?pd.reduce((a,b)=>a+b,0)/pd.length:0;g.forEach(x=>{pts[x.id]=Math.round(pm*10)/10});pos=s}}scoringTorneo.atletas.forEach(a=>{if(pts[a.id]===undefined)pts[a.id]=0});return pts}
-        function scoringClearResultadosPrueba(){const pid=document.getElementById('scResPrueba').value;if(!pid)return;if(!confirm('¿Limpiar resultados?'))return;delete scoringTorneo.resultados[pid];scoringSaveToStorage();scoringLoadResultadosForm();scoringRenderRanking();scoringRenderPublicSection();scoringShowToast('🗑️ Limpiado')}
-        function scoringCalcularRanking(){if(scoringTorneo.atletas.length===0)return[];const ad=scoringTorneo.atletas.map(a=>{let tp=0,pv=0,ds={};scoringTorneo.pruebas.forEach(p=>{const r=scoringTorneo.resultados[p.id]?.[a.id];if(r){tp+=r.puntos||0;ds[p.id]=r.puntos||0;if(r.puntos>=(p.puntos||5))pv++}else ds[p.id]=0});return{...a,totalPuntos:tp,primerosPuestos:pv,desglose:ds}});ad.sort((a,b)=>{if(b.totalPuntos!==a.totalPuntos)return b.totalPuntos-a.totalPuntos;if(scoringTorneo.desempate==='primeros')return b.primerosPuestos-a.primerosPuestos;if(scoringTorneo.desempate==='peso')return a.peso-b.peso;return 0});ad.forEach((a,i)=>{a.posicion=i+1});return ad}
-        function scoringRenderRanking(){const r=scoringCalcularRanking(),b=document.getElementById('scoringRankingTable');if(!b)return;document.getElementById('scoringRankingInfo').innerHTML=`<strong>Torneo:</strong> ${scoringTorneo.nombre||'Sin nombre'} | <strong>Desempate:</strong> ${scoringTorneo.desempate==='primeros'?'Primeros puestos':'Peso corporal'} | <strong>Atletas:</strong> ${scoringTorneo.atletas.length} | <strong>Pruebas:</strong> ${scoringTorneo.pruebas.length}`;b.innerHTML=r.map(a=>{const f=getFlagImg(a.pais,'scoring-flag-img-small');return`<tr><td class="${a.posicion<=3?'scoring-pos-'+a.posicion:''}">${(scoringTorneo.pruebas.some(p=>scoringTorneo.resultados[p.id]&&Object.keys(scoringTorneo.resultados[p.id]).length>0)&&a.posicion<=3?['🥇','🥈','🥉'][a.posicion-1]:a.posicion)}</td><td><strong>${a.nombre}</strong></td><td>${f}${a.pais||'-'}</td><td>${a.peso} kg</td><td style="color:var(--gold);font-weight:bold;font-size:1.1rem">${a.totalPuntos.toFixed(1)}</td><td>${a.primerosPuestos}</td><td><button class="btn btn-outline btn-small" onclick="scoringShowDesglose('${a.id}')"><i class="fas fa-eye"></i> Ver</button></td></tr>`}).join('')}
-        function scoringShowDesglose(aid){const a=scoringTorneo.atletas.find(x=>x.id===aid);if(!a)return;const f=getFlagImg(a.pais);let h='<div style="margin-top:1rem">';scoringTorneo.pruebas.forEach(p=>{const r=scoringTorneo.resultados[p.id]?.[aid];h+=`<div style="display:flex;justify-content:space-between;padding:0.5rem;background:rgba(0,0,0,0.2);border-radius:5px;margin-bottom:0.3rem"><span>${p.nombre}</span><span style="color:var(--gold)">${r?r.puntos+' pts':'0 pts'} ${r?'('+r.marca+' '+scoringGetTipoUnidad(p.tipo)+')':''}</span></div>`});h+='</div>';const m=document.createElement('div');m.className='modal active';m.style.zIndex='5000';m.innerHTML=`<div class="modal-content" style="max-width:500px;margin:auto"><div class="modal-header"><h3 style="margin:0;font-size:1.3rem"><i class="fas fa-chart-bar"></i> Desglose: ${f} ${a.nombre}</h3><button class="close-btn" onclick="this.closest('.modal').remove()" style="background:none;border:none;color:white;font-size:1.5rem;cursor:pointer">&times;</button></div><div class="modal-body">${h}</div></div>`;document.body.appendChild(m)}
-        function scoringPublishToPublic(){scoringRenderPublicRanking();scoringRenderPublicSection();scoringShowToast('📡 Ranking publicado')}
-        function scoringRenderPublicRanking(){const r=scoringCalcularRanking();document.getElementById('scPubNombreTorneo').textContent=scoringTorneo.nombre||'Torneo Strongman';document.getElementById('scPubInfoTorneo').textContent=`${scoringTorneo.atletas.length} atletas | ${scoringTorneo.pruebas.length} pruebas | Desempate: ${scoringTorneo.desempate==='primeros'?'Primeros Puestos':'Peso Corporal'}`;const hayRes=scoringTorneo.pruebas.some(p=>scoringTorneo.resultados[p.id]&&Object.keys(scoringTorneo.resultados[p.id]).length>0);document.getElementById('scoringPublicRanking').innerHTML=r.map(a=>{const f=getFlagImg(a.pais,'scoring-flag-img-inline');return`<div class="scoring-rank-item"><div class="scoring-rank-pos ${a.posicion<=3?'scoring-pos-'+a.posicion:''}">${hayRes&&a.posicion<=3?['🥇','🥈','🥉'][a.posicion-1]:a.posicion}</div><div class="scoring-rank-info"><h3>${a.nombre} ${f}</h3><p>${a.pais||'Uruguay'} | ${a.peso} kg | ${a.sexo==='M'?'♂️':'♀️'}</p></div><div class="scoring-rank-points">${a.totalPuntos.toFixed(1)} <small style="font-size:0.7rem;color:var(--text-muted)">pts</small></div></div>`}).join('')}
-        function scoringRenderEstadisticas(){const c=document.getElementById('scoringEstadisticasContent');if(!c)return;if(scoringTorneo.atletas.length===0||scoringTorneo.pruebas.length===0){c.innerHTML='<p style="color:var(--text-muted)">No hay datos suficientes.</p>';return}let mv=0,amv=null;const sa=scoringTorneo.atletas.map(a=>{let tp=0,v=0,pc=0,nulos=0;scoringTorneo.pruebas.forEach(p=>{const r=scoringTorneo.resultados[p.id]?.[a.id];if(r){tp+=r.puntos||0;pc++;if(r.nulo)nulos++;else if(r.puntos>=(p.puntos||5))v++}});if(v>mv){mv=v;amv=a}return{...a,totalPuntos:tp,victorias:v,pruebasCompletadas:pc,nulos:nulos,promedio:pc>0?(tp/pc).toFixed(1):0}});const rp=scoringTorneo.pruebas.map(p=>{let mm=p.tipo==='tiempo'?Infinity:0,ma=null;Object.entries(scoringTorneo.resultados[p.id]||{}).forEach(([aid,r])=>{if(p.tipo==='tiempo'){if(r.marca<mm){mm=r.marca;ma=aid}}else{if(r.marca>mm){mm=r.marca;ma=aid}}});const at=scoringTorneo.atletas.find(x=>x.id===ma);return{prueba:p,marca:mm!==Infinity&&mm!==0?mm:null,atleta:at}});c.innerHTML=`<div class="scoring-grid-3"><div class="scoring-card" style="text-align:center"><div style="font-size:2rem;margin-bottom:0.5rem">🏆</div><div style="color:var(--gold);font-size:1.2rem;font-weight:bold">${amv?(getFlagImg(amv.pais)+' '+amv.nombre):'-'}</div><div style="color:var(--text-muted)">Más victorias de prueba</div><div style="color:var(--accent-light);font-size:1.5rem;font-weight:bold">${mv}</div></div><div class="scoring-card" style="text-align:center"><div style="font-size:2rem;margin-bottom:0.5rem">👥</div><div style="color:var(--gold);font-size:1.2rem;font-weight:bold">${scoringTorneo.atletas.length}</div><div style="color:var(--text-muted)">Atletas participando</div></div><div class="scoring-card" style="text-align:center"><div style="font-size:2rem;margin-bottom:0.5rem">🎯</div><div style="color:var(--gold);font-size:1.2rem;font-weight:bold">${scoringTorneo.pruebas.length}</div><div style="color:var(--text-muted)">Pruebas en el torneo</div></div></div><div class="scoring-card" style="margin-top:1rem"><div class="scoring-card-title"><i class="fas fa-chart-line"></i> Promedio de Puntos por Atleta</div><div class="scoring-table-container"><table class="scoring-table"><thead><tr><th>Atleta</th><th>Pruebas</th><th>Total Pts</th><th>Promedio</th><th>Victorias</th><th>Nulos</th></tr></thead><tbody>${sa.sort((a,b)=>b.totalPuntos-a.totalPuntos).map(s=>{const f=getFlagImg(s.pais,'scoring-flag-img-small');return`<tr><td><strong>${f}${s.nombre}</strong></td><td>${s.pruebasCompletadas}/${scoringTorneo.pruebas.length}</td><td style="color:var(--gold);font-weight:bold">${s.totalPuntos.toFixed(1)}</td><td>${s.promedio}</td><td>${s.victorias}</td><td>${s.nulos>0?'<span style="color:var(--danger);font-weight:bold">'+s.nulos+'</span>':'0'}</td></tr>`}).join('')}</tbody></table></div></div><div class="scoring-card" style="margin-top:1rem"><div class="scoring-card-title"><i class="fas fa-trophy"></i> Récords por Prueba</div><div class="scoring-table-container"><table class="scoring-table"><thead><tr><th>Prueba</th><th>Récord</th><th>Atleta</th></tr></thead><tbody>${rp.map(r=>{const f=r.atleta?getFlagImg(r.atleta.pais,'scoring-flag-img-small'):'';const p=r.prueba;return`<tr><td><strong>${p.nombre}</strong> <small style="color:var(--text-muted)">(${scoringGetTipoLabel(p.tipo)})</small>${p.distancia>0&&p.requiereDistancia!==false?'<br><small style="color:var(--danger)"><i class="fas fa-ruler"></i> Meta: '+p.distancia+' '+scoringGetTipoUnidad(p.tipo)+'</small>':''}</td><td style="color:var(--gold);font-weight:bold">${r.marca!==null?r.marca+' '+scoringGetTipoUnidad(p.tipo):'-'}</td><td>${r.atleta?(f+r.atleta.nombre):'-'}</td></tr>`}).join('')}</tbody></table></div></div>`}
-
-        // ===== SECCIÓN PÚBLICA DE COMPETENCIAS =====
-        function scoringRenderPublicSection(){const c=document.getElementById('publicCompContainer');if(!c)return;if(!scoringTorneo.nombre||scoringTorneo.atletas.length===0){c.innerHTML=`<div class="empty-state"><i class="fas fa-clipboard-list"></i><p>No hay torneos activos en este momento.</p><p style="color:var(--text-muted);font-size:0.9rem;margin-top:0.5rem">Los resultados aparecerán aquí cuando haya un torneo en curso.</p></div>`;return}const r=scoringCalcularRanking(),f=getFlagImg;c.innerHTML=`<div style="background:var(--secondary);padding:2rem;border-radius:15px;margin-bottom:2rem;border:1px solid rgba(255,255,255,0.1)"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:1rem"><h3 style="color:var(--gold);font-size:2rem;margin:0">${scoringTorneo.nombre}</h3><span class="scoring-live-badge"><i class="fas fa-circle"></i> ${scoringTorneo.estado==='activo'?'EN VIVO':'FINALIZADO'}</span></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;color:var(--text-muted)"><span><i class="fas fa-users" style="color:var(--accent)"></i> ${scoringTorneo.atletas.length} atletas</span><span><i class="fas fa-dumbbell" style="color:var(--accent)"></i> ${scoringTorneo.pruebas.length} pruebas</span><span><i class="fas fa-balance-scale" style="color:var(--accent)"></i> Desempate: ${scoringTorneo.desempate==='primeros'?'Primeros Puestos':'Peso Corporal'}</span></div></div><h3 style="color:var(--accent-light);margin-bottom:1.5rem;border-bottom:2px solid var(--accent);padding-bottom:0.5rem">Ranking General</h3><div style="display:grid;gap:1rem">${r.map(a=>`<div style="display:grid;grid-template-columns:70px 1fr 120px;align-items:center;background:rgba(255,255,255,0.05);border-radius:12px;padding:1rem 1.5rem;border:1px solid rgba(255,255,255,0.1);${a.posicion<=3?'background:rgba(255,215,0,0.05);border-color:rgba(255,215,0,0.3);':''}"><div style="font-size:2rem;font-weight:bold;text-align:center;font-family:'Oswald',sans-serif;color:${a.posicion===1?'var(--gold)':a.posicion===2?'#C0C0C0':a.posicion===3?'#CD7F32':'var(--text)'}">${(scoringTorneo.pruebas.some(p=>scoringTorneo.resultados[p.id]&&Object.keys(scoringTorneo.resultados[p.id]).length>0)&&a.posicion<=3?['🥇','🥈','🥉'][a.posicion-1]:a.posicion)}</div><div><h3 style="color:white;font-family:'Oswald',sans-serif;margin-bottom:0.2rem;display:flex;align-items:center;gap:0.5rem">${f(a.pais)} ${a.nombre}</h3><p style="color:var(--text-muted);font-size:0.9rem">${a.pais||'Uruguay'} | ${a.peso} kg | ${a.sexo==='M'?'♂️ Masculino':'♀️ Femenino'} | ${a.primerosPuestos} victorias</p></div><div style="text-align:right"><div style="font-size:1.8rem;font-weight:bold;color:var(--gold);font-family:'Oswald',sans-serif">${a.totalPuntos.toFixed(1)}</div><small style="color:var(--text-muted)">puntos</small></div></div>`).join('')}</div>${scoringTorneo.pruebas.length>0?`<h3 style="color:var(--accent-light);margin:2rem 0 1rem 0;border-bottom:2px solid var(--accent);padding-bottom:0.5rem">Pruebas del Torneo</h3><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1rem">${scoringTorneo.pruebas.map((p,i)=>`<div style="background:rgba(0,0,0,0.3);padding:1rem;border-radius:10px;border:1px solid rgba(255,255,255,0.1)"><strong style="color:var(--gold)">${i+1}. ${p.nombre}</strong><p style="color:var(--text-muted);margin:0.5rem 0 0 0;font-size:0.9rem">${scoringGetTipoLabel(p.tipo)}<br>${p.implemento?'Implemento: '+p.implemento+'<br>':''}${p.distancia>0&&p.requiereDistancia!==false?'<span style="color:var(--danger)"><i class="fas fa-ruler"></i> Distancia mínima: '+p.distancia+' '+scoringGetTipoUnidad(p.tipo)+'</span><br>':''}${p.combinada?'<span style="color:var(--gold)"><i class="fas fa-layer-group"></i> Prueba Combinada</span><br>':''}${p.tiempoLimite>0?'<span style="color:var(--warning)"><i class="fas fa-stopwatch"></i> Tiempo límite: '+p.tiempoLimite+'s'+(p.modoTiempo==='timer_vivo'?' <span style="color:var(--success)"><i class="fas fa-eye"></i> Timer en vivo</span>':p.modoTiempo==='manual'?' <span style="color:var(--accent)"><i class="fas fa-keyboard"></i> Ingreso manual</span>':'')+'</span><br>':''}Puntos 1°: ${p.puntos||5}</p></div>`).join('')}</div>`:''}`}
-
-        document.addEventListener('DOMContentLoaded',()=>{scoringLoadFromStorage();scoringRenderPublicSection()});
-
-// ===== SISTEMA DE TIMER / CONTADOR DE TIEMPO =====
-let scoringTimerInterval = null;
-let scoringTimerRemaining = 0;
-let scoringTimerTotal = 0;
-let scoringTimerRunning = false;
-let scoringTimerPaused = false;
-let scoringTimerCurrentPruebaId = null;
-let scoringTimerAtletasCompletados = new Set();
-let scoringTimerAtletasNulos = new Set();
-
-function scoringTimerSetup(tiempoTotal, pruebaId) {
-    scoringTimerTotal = tiempoTotal;
-    scoringTimerRemaining = tiempoTotal;
-    scoringTimerCurrentPruebaId = pruebaId;
-    scoringTimerRunning = false;
-    scoringTimerPaused = false;
-    scoringTimerAtletasCompletados = new Set();
-    scoringTimerAtletasNulos = new Set();
-
-    scoringTimerUpdateDisplay();
-    scoringTimerUpdateProgress();
-    scoringTimerUpdateStatus('ready', '<i class="fas fa-play-circle"></i> Listo para iniciar');
-
-    document.getElementById('scoringTimerStart').style.display = 'inline-flex';
-    document.getElementById('scoringTimerPause').style.display = 'none';
-    document.getElementById('scoringTimerStop').style.display = 'none';
-    document.getElementById('scoringTimerNullAlert').classList.remove('show');
-
-    scoringTimerRenderAtletasStatus();
-}
-
-function scoringTimerFormat(seconds) {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
-}
-
-function scoringTimerUpdateDisplay() {
-    const display = document.getElementById('scoringTimerDisplay');
-    display.textContent = scoringTimerFormat(scoringTimerRemaining);
-
-    const pct = (scoringTimerRemaining / scoringTimerTotal) * 100;
-    const progressBar = document.getElementById('scoringTimerProgress');
-    progressBar.style.width = pct + '%';
-
-    display.classList.remove('warning', 'danger');
-    progressBar.classList.remove('warning', 'danger');
-
-    if (pct <= 15) {
-        display.classList.add('danger');
-        progressBar.classList.add('danger');
-    } else if (pct <= 30) {
-        display.classList.add('warning');
-        progressBar.classList.add('warning');
-    }
-}
-
-function scoringTimerUpdateProgress() {
-    const pct = (scoringTimerRemaining / scoringTimerTotal) * 100;
-    document.getElementById('scoringTimerProgress').style.width = pct + '%';
-}
-
-function scoringTimerUpdateStatus(state, html) {
-    const status = document.getElementById('scoringTimerStatus');
-    status.className = 'scoring-timer-status ' + state;
-    status.innerHTML = html;
-}
-
-function scoringTimerStart() {
-    if (scoringTimerRunning) return;
-    scoringTimerRunning = true;
-    scoringTimerPaused = false;
-
-    scoringTimerUpdateStatus('running', '<i class="fas fa-circle" style="animation:pulseLive 1s infinite"></i> EN CURSO');
-    document.getElementById('scoringTimerStart').style.display = 'none';
-    document.getElementById('scoringTimerPause').style.display = 'inline-flex';
-    document.getElementById('scoringTimerStop').style.display = 'inline-flex';
-    document.getElementById('scoringTimerNullAlert').classList.remove('show');
-
-    scoringTimerInterval = setInterval(() => {
-        if (scoringTimerRemaining > 0) {
-            scoringTimerRemaining--;
-            scoringTimerUpdateDisplay();
-        } else {
-            scoringTimerTimeUp();
-        }
-    }, 1000);
-}
-
-function scoringTimerPause() {
-    if (!scoringTimerRunning || scoringTimerPaused) return;
-    scoringTimerPaused = true;
-    clearInterval(scoringTimerInterval);
-    scoringTimerUpdateStatus('paused', '<i class="fas fa-pause-circle"></i> PAUSADO');
-    document.getElementById('scoringTimerStart').style.display = 'inline-flex';
-    document.getElementById('scoringTimerStart').innerHTML = '<i class="fas fa-play"></i> Reanudar';
-    document.getElementById('scoringTimerPause').style.display = 'none';
-}
-
-function scoringTimerStop() {
-    if (!scoringTimerRunning) return;
-    scoringTimerRunning = false;
-    scoringTimerPaused = false;
-    clearInterval(scoringTimerInterval);
-    scoringTimerUpdateStatus('stopped', '<i class="fas fa-stop-circle"></i> DETENIDO');
-    document.getElementById('scoringTimerStart').style.display = 'inline-flex';
-    document.getElementById('scoringTimerStart').innerHTML = '<i class="fas fa-play"></i> Iniciar';
-    document.getElementById('scoringTimerPause').style.display = 'none';
-    document.getElementById('scoringTimerStop').style.display = 'none';
-}
-
-function scoringTimerReset() {
-    scoringTimerStop();
-    scoringTimerRemaining = scoringTimerTotal;
-    scoringTimerAtletasCompletados = new Set();
-    scoringTimerAtletasNulos = new Set();
-    scoringTimerUpdateDisplay();
-    scoringTimerUpdateStatus('ready', '<i class="fas fa-play-circle"></i> Listo para iniciar');
-    document.getElementById('scoringTimerNullAlert').classList.remove('show');
-    scoringTimerRenderAtletasStatus();
-    scoringShowToast('🔄 Timer reiniciado');
-}
-
-function scoringTimerTimeUp() {
-    clearInterval(scoringTimerInterval);
-    scoringTimerRunning = false;
-    scoringTimerPaused = false;
-    scoringTimerRemaining = 0;
-    scoringTimerUpdateDisplay();
-    scoringTimerUpdateStatus('finished', '<i class="fas fa-clock"></i> TIEMPO AGOTADO');
-    document.getElementById('scoringTimerStart').style.display = 'none';
-    document.getElementById('scoringTimerPause').style.display = 'none';
-    document.getElementById('scoringTimerStop').style.display = 'none';
-    document.getElementById('scoringTimerNullAlert').classList.add('show');
-
-    // Marcar todos los atletas que no completaron como NULOS (0 puntos)
-    scoringTimerMarkRemainingAsNull();
-    scoringShowToast('⏰ Tiempo agotado — Atletas sin resultado marcados como NULO');
-}
-
-function scoringTimerMarkRemainingAsNull() {
-    if (!scoringTimerCurrentPruebaId) return;
-    const pid = scoringTimerCurrentPruebaId;
-
-    if (!scoringTorneo.resultados[pid]) scoringTorneo.resultados[pid] = {};
-
-    scoringTorneo.atletas.forEach(a => {
-        if (!scoringTimerAtletasCompletados.has(a.id)) {
-            scoringTimerAtletasNulos.add(a.id);
-            scoringTorneo.resultados[pid][a.id] = {
-                marca: 0,
-                puntos: 0,
-                nulo: true,
-                motivo: 'Tiempo agotado'
-            };
-        }
-    });
-
-    scoringSaveToStorage();
-    scoringTimerRenderAtletasStatus();
-    scoringLoadResultadosForm(); // Recargar la tabla con los valores actualizados
-    scoringRenderRanking();
-    scoringRenderPublicSection();
-}
-
-function scoringTimerMarkAtletaCompleted(atletaId) {
-    if (!scoringTimerRunning) {
-        scoringShowToast('⚠️ El timer no está en curso');
-        return;
-    }
-    scoringTimerAtletasCompletados.add(atletaId);
-    scoringTimerRenderAtletasStatus();
-    scoringShowToast('✅ Atleta marcado como completado');
-}
-
-function scoringTimerMarkAtletaNull(atletaId) {
-    if (!scoringTimerCurrentPruebaId) return;
-    const pid = scoringTimerCurrentPruebaId;
-
-    scoringTimerAtletasNulos.add(atletaId);
-    if (!scoringTorneo.resultados[pid]) scoringTorneo.resultados[pid] = {};
-    scoringTorneo.resultados[pid][atletaId] = {
-        marca: 0,
-        puntos: 0,
-        nulo: true,
-        motivo: 'Abandonó / Descalificado'
-    };
-
-    scoringSaveToStorage();
-    scoringTimerRenderAtletasStatus();
-    scoringLoadResultadosForm();
-    scoringRenderRanking();
-    scoringRenderPublicSection();
-    scoringShowToast('❌ Atleta marcado como NULO');
-}
-
-function scoringTimerRenderAtletasStatus() {
-    const container = document.getElementById('scoringTimerAtletasStatus');
-    if (!container) return;
-
-    const pid = scoringTimerCurrentPruebaId;
-    const prueba = scoringTorneo.pruebas.find(p => p.id === pid);
-
-    container.innerHTML = scoringTorneo.atletas.map((a, idx) => {
-        const fg = getFlagImg(a.pais, 'scoring-flag-img-small');
-        const isCompleted = scoringTimerAtletasCompletados.has(a.id);
-        const isNull = scoringTimerAtletasNulos.has(a.id);
-        const hasResult = scoringTorneo.resultados[pid] && scoringTorneo.resultados[pid][a.id];
-        const result = hasResult ? scoringTorneo.resultados[pid][a.id] : null;
-
-        let rowClass = '';
-        let badge = '';
-        if (isNull || (result && result.nulo)) {
-            rowClass = 'null';
-            badge = '<span class="scoring-timer-null-badge"><i class="fas fa-times-circle"></i> NULO</span>';
-        } else if (isCompleted || (result && result.puntos > 0)) {
-            rowClass = 'completed';
-            badge = '<span class="scoring-timer-completed-badge"><i class="fas fa-check-circle"></i> OK</span>';
-        } else {
-            badge = '<span style="color:var(--text-muted);font-size:0.8rem"><i class="fas fa-hourglass-half"></i> Pendiente</span>';
-        }
-
-        return `
-            <div class="scoring-timer-atleta-row ${rowClass}">
-                <div><strong>${fg} ${a.nombre}</strong> <small style="color:var(--text-muted)">#${idx+1}</small></div>
-                <div>${badge}</div>
-                <div style="display:flex;gap:0.3rem;">
-                    <button class="btn btn-success btn-small" onclick="scoringTimerMarkAtletaCompleted('${a.id}')" title="Marcar como completado">
-                        <i class="fas fa-check"></i>
-                    </button>
-                    <button class="btn btn-danger btn-small" onclick="scoringTimerMarkAtletaNull('${a.id}')" title="Marcar como NULO">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            </div>
-        `;
-    }).join('');
-}
-
-// ===== FIN SISTEMA DE TIMER =====
-
-// ===== MODO MANUAL DE TIEMPO =====
-function scoringToggleModoTiempo() {
-    const modo = document.getElementById('scPrbModoTiempo').value;
-    const tiempoContainer = document.getElementById('scPrbTiempoLimite').parentElement;
-    if (modo === 'sin_timer') {
-        tiempoContainer.style.opacity = '0.5';
-    } else {
-        tiempoContainer.style.opacity = '1';
-    }
-}
-
-function scoringManualTimeSetup(prueba) {
-    const container = document.getElementById('scoringManualTimeContent');
-    if (!container) return;
-
-    scoringTimerCurrentPruebaId = prueba.id;
-    const pid = prueba.id;
-    const resultadosActuales = scoringTorneo.resultados[pid] || {};
-    const tipoUnidad = scoringGetTipoUnidad(prueba.tipo);
-
-    container.innerHTML = '<div class="scoring-manual-time-grid">' + scoringTorneo.atletas.map((a, idx) => {
-        const fg = getFlagImg(a.pais, 'scoring-flag-img-small');
-        const res = resultadosActuales[a.id];
-        const isNull = res && res.nulo;
-
-        // Tiempo (campo separado 'tiempo')
-        let minVal = '', segVal = '';
-        if (res && res.tiempo && !res.nulo) {
-            const totalSeg = parseFloat(res.tiempo) || 0;
-            minVal = Math.floor(totalSeg / 60);
-            segVal = Math.round(totalSeg % 60);
-        }
-
-        // Marca principal (peso/distancia/reps)
-        let marcaVal = '';
-        if (res && res.marca !== undefined && !res.nulo) {
-            marcaVal = res.marca;
-        }
-
-        const rowClass = isNull ? 'null' : (res && res.marca !== undefined) ? 'completed' : '';
-
-        return `
-            <div class="scoring-manual-time-row ${rowClass}" data-atleta-id="${a.id}" id="manual-row-${a.id}">
-                <div class="scoring-manual-time-atleta">
-                    ${fg}
-                    <strong>${a.nombre}</strong>
-                    <small style="color:var(--text-muted)">#${idx+1}</small>
-                </div>
-                <div style="display:flex;gap:0.8rem;align-items:center;flex-wrap:wrap;">
-                    <div class="scoring-manual-time-input-group">
-                        <span style="color:var(--accent-light);font-size:0.75rem;font-weight:600;margin-right:0.3rem;">TIEMPO:</span>
-                        <input type="number" class="scoring-manual-time-input manual-min" 
-                               value="${minVal}" min="0" placeholder="00"
-                               onchange="scoringManualTimeCalcTotal('${a.id}')">
-                        <span class="scoring-manual-time-sep">:</span>
-                        <input type="number" class="scoring-manual-time-input manual-seg" 
-                               value="${segVal}" min="0" max="59" placeholder="00"
-                               onchange="scoringManualTimeCalcTotal('${a.id}')">
-                        <span class="scoring-manual-time-unit">min:seg</span>
-                    </div>
-                    <div class="scoring-manual-time-input-group">
-                        <span style="color:var(--gold);font-size:0.75rem;font-weight:600;margin-right:0.3rem;">MARCA:</span>
-                        <input type="number" class="scoring-manual-time-input manual-marca" 
-                               value="${marcaVal}" min="0" step="0.01" placeholder="0"
-                               style="width:90px;"
-                               onchange="scoringManualTimeCalcTotal('${a.id}')">
-                        <span class="scoring-manual-time-unit">${tipoUnidad}</span>
-                    </div>
-                </div>
-                <div class="scoring-manual-time-actions">
-                    <button class="scoring-manual-time-btn null-btn ${isNull ? 'active' : ''}" 
-                            onclick="scoringManualTimeToggleNull('${a.id}')" title="Marcar como NULO">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <button class="scoring-manual-time-btn undo-btn" 
-                            onclick="scoringManualTimeUndo('${a.id}')" title="Deshacer">
-                        <i class="fas fa-undo"></i>
-                    </button>
-                </div>
-            </div>
-        `;
-    }).join('') + '</div>';
-}function scoringManualTimeCalcTotal(atletaId) {
-    const row = document.getElementById('manual-row-' + atletaId);
-    if (!row || row.classList.contains('null')) return;
-
-    const minInput = row.querySelector('.manual-min');
-    const segInput = row.querySelector('.manual-seg');
-    const marcaInput = row.querySelector('.manual-marca');
-
-    const min = parseInt(minInput.value) || 0;
-    const seg = parseInt(segInput.value) || 0;
-    const totalSeg = (min * 60) + seg;
-    const marca = parseFloat(marcaInput.value) || 0;
-
-    // Verificar si supera el tiempo límite
-    const pid = scoringTimerCurrentPruebaId;
-    const prueba = scoringTorneo.pruebas.find(p => p.id === pid);
-
-    if (prueba && prueba.tiempoLimite > 0 && totalSeg > prueba.tiempoLimite) {
-        scoringShowToast('⚠️ El tiempo supera el límite de ' + prueba.tiempoLimite + 's → se marcará como NULO');
-        scoringManualTimeToggleNull(atletaId);
-        return;
-    }
-
-    if (totalSeg > 0 || marca > 0) {
-        row.classList.add('completed');
-    } else {
-        row.classList.remove('completed');
-    }
-}function scoringManualTimeToggleNull(atletaId) {
-    const row = document.getElementById('manual-row-' + atletaId);
-    if (!row) return;
-
-    const isNull = row.classList.contains('null');
-    const btn = row.querySelector('.null-btn');
-
-    if (isNull) {
-        row.classList.remove('null');
-        btn.classList.remove('active');
-        row.querySelectorAll('.scoring-manual-time-input').forEach(i => i.disabled = false);
-    } else {
-        row.classList.add('null');
-        row.classList.remove('completed');
-        btn.classList.add('active');
-        row.querySelectorAll('.scoring-manual-time-input').forEach(i => {
-            i.value = '';
-            i.disabled = true;
-        });
-    }
-}
-
-function scoringManualTimeUndo(atletaId) {
-    const row = document.getElementById('manual-row-' + atletaId);
-    if (!row) return;
-
-    row.classList.remove('null', 'completed');
-    row.querySelector('.null-btn').classList.remove('active');
-    row.querySelectorAll('.scoring-manual-time-input').forEach(i => {
-        i.value = '';
-        i.disabled = false;
-    });
-}
-
-function scoringSaveManualTimes() {
-    const pid = scoringTimerCurrentPruebaId;
-    if (!pid) return;
-
-    const prueba = scoringTorneo.pruebas.find(p => p.id === pid);
-    if (!prueba) return;
-
-    if (!scoringTorneo.resultados[pid]) scoringTorneo.resultados[pid] = {};
-
-    scoringTorneo.atletas.forEach(a => {
-        const row = document.getElementById('manual-row-' + a.id);
-        if (!row) return;
-
-        if (row.classList.contains('null')) {
-            scoringTorneo.resultados[pid][a.id] = {
-                marca: 0,
-                puntos: 0,
-                nulo: true,
-                motivo: 'Superó tiempo límite o descalificado'
-            };
-        } else {
-            const min = parseInt(row.querySelector('.manual-min').value) || 0;
-            const seg = parseInt(row.querySelector('.manual-seg').value) || 0;
-            const totalSeg = (min * 60) + seg;
-            const marca = parseFloat(row.querySelector('.manual-marca').value) || 0;
-
-            if (totalSeg > 0 || marca > 0) {
-                // Verificar límite de tiempo
-                if (prueba.tiempoLimite > 0 && totalSeg > prueba.tiempoLimite) {
-                    scoringTorneo.resultados[pid][a.id] = {
-                        marca: 0,
-                        puntos: 0,
-                        nulo: true,
-                        motivo: 'Tiempo (' + totalSeg + 's) superó límite de ' + prueba.tiempoLimite + 's'
-                    };
-                } else {
-                    scoringTorneo.resultados[pid][a.id] = {
-                        marca: marca,
-                        puntos: 0
-                    };
-                    // Guardar tiempo en campo separado si existe
-                    if (totalSeg > 0) {
-                        scoringTorneo.resultados[pid][a.id].tiempo = totalSeg;
-                    }
-                }
-            }
-        }
-    });
-
-    // Recalcular puntos basado en la MARCA PRINCIPAL (peso/distancia/reps)
-    const marcas = {};
-    Object.entries(scoringTorneo.resultados[pid] || {}).forEach(([aid, r]) => {
-        if (r && !r.nulo && r.marca > 0) {
-            marcas[aid] = r.marca;
-        }
-    });
-
-    const pts = scoringCalcularPuntos(prueba, marcas);
-    Object.entries(pts).forEach(([aid, p]) => {
-        if (scoringTorneo.resultados[pid][aid] && !scoringTorneo.resultados[pid][aid].nulo) {
-            scoringTorneo.resultados[pid][aid].puntos = p;
-        }
-    });
-
-    scoringSaveToStorage();
-    scoringRenderRanking();
-    scoringRenderPublicSection();
-    scoringShowToast('✅ Tiempos y marcas guardados');
-    scoringLoadResultadosForm();
-}function scoringClearManualTimes() {
-    if (!confirm('¿Limpiar todos los tiempos manuales de esta prueba?')) return;
-
-    const pid = scoringTimerCurrentPruebaId;
-    if (pid) {
-        delete scoringTorneo.resultados[pid];
-        scoringSaveToStorage();
-    }
-
-    scoringManualTimeSetup(scoringTorneo.pruebas.find(p => p.id === pid));
-    scoringRenderRanking();
-    scoringRenderPublicSection();
-    scoringShowToast('🗑️ Tiempos manuales limpiados');
-}
-
-// ===== FIN MODO MANUAL DE TIEMPO =====
-</script>
+    </script>
 </body>
 </html>
