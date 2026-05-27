@@ -1345,9 +1345,81 @@ select.scoring-form-control{cursor:pointer}
         width: 60px;
     }
 }
+
+/* ===== CONTADOR REGRESIVO ===== */
+.countdown-hero-container {
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid var(--accent);
+    border-radius: 20px;
+    padding: 1.5rem 2rem;
+    margin: 2rem auto;
+    max-width: 700px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    display: none;
+}
+.countdown-hero-container.active {
+    display: block;
+    animation: fadeInUp 0.8s ease;
+}
+.countdown-hero-event-name {
+    color: var(--gold);
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.3rem;
+    margin-bottom: 0.3rem;
+}
+.countdown-hero-event-date {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+.countdown-hero-label {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 0.8rem;
+    font-family: 'Oswald', sans-serif;
+}
+.countdown-hero-display {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+.countdown-hero-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 0.8rem 1.2rem;
+    min-width: 80px;
+}
+.countdown-hero-value {
+    font-family: 'Oswald', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--accent-light);
+    text-shadow: 0 0 20px rgba(0, 102, 204, 0.5);
+}
+.countdown-hero-unit {
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+.countdown-hero-live {
+    color: var(--success);
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.5rem;
+    margin-top: 0.5rem;
+}
+@media (max-width: 768px) {
+    .countdown-hero-container { padding: 1rem; margin: 1rem; }
+    .countdown-hero-value { font-size: 1.8rem; }
+    .countdown-hero-item { min-width: 60px; padding: 0.5rem 0.8rem; }
+}
+
 </style>
-<base target="_blank">
-<base target="_blank">
 <base target="_blank">
 <base target="_blank">
 </head>
@@ -1409,6 +1481,32 @@ select.scoring-form-control{cursor:pointer}
                 </div>
             </div>
             
+            <!-- CONTADOR REGRESIVO A EVENTO -->
+            <div id="countdownHero" class="countdown-hero-container">
+                <div class="countdown-hero-event-name" id="cdEventName"></div>
+                <div class="countdown-hero-event-date" id="cdEventDate"></div>
+                <div class="countdown-hero-label"><i class="fas fa-clock"></i> Tiempo restante</div>
+                <div class="countdown-hero-display">
+                    <div class="countdown-hero-item">
+                        <div class="countdown-hero-value" id="cdDays">00</div>
+                        <div class="countdown-hero-unit">Días</div>
+                    </div>
+                    <div class="countdown-hero-item">
+                        <div class="countdown-hero-value" id="cdHours">00</div>
+                        <div class="countdown-hero-unit">Horas</div>
+                    </div>
+                    <div class="countdown-hero-item">
+                        <div class="countdown-hero-value" id="cdMinutes">00</div>
+                        <div class="countdown-hero-unit">Minutos</div>
+                    </div>
+                    <div class="countdown-hero-item">
+                        <div class="countdown-hero-value" id="cdSeconds">00</div>
+                        <div class="countdown-hero-unit">Segundos</div>
+                    </div>
+                </div>
+                <div class="countdown-hero-live" id="cdLiveMsg" style="display:none;"><i class="fas fa-play-circle"></i> ¡EVENTO EN CURSO!</div>
+            </div>
+
             <a onclick="showHomeSections()" class="btn">Ver Secciones</a>
         </div>
     </section>
@@ -1759,7 +1857,13 @@ select.scoring-form-control{cursor:pointer}
                         <button class="admin-tab" onclick="switchTab('contacts')">Contactos</button>
                         <button class="admin-tab" onclick="switchTab('settings')">Apariencia</button>
                         <button class="admin-tab" onclick="openShopModal()">Tienda</button>
-                        <button class="admin-tab" onclick="openCompetenciasModal()">Competencias</button>
+                        
+                        <button class="admin-tab" onclick="openCountdownConfigModal()">
+                            <i class="fas fa-clock"></i> Contador Evento
+                        </button>
+                        <button class="admin-tab" onclick="window.open('score/', '_blank')">
+                            <i class="fas fa-trophy"></i> StrongScore V3
+                        </button>
                         <button class="admin-tab" onclick="openSuscriptoresModal()">
                             <i class="fas fa-users"></i> Suscriptores <span id="contadorSubsBadge" style="background: var(--danger); color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; margin-left: 5px;">0</span>
                         </button>
@@ -2334,6 +2438,46 @@ select.scoring-form-control{cursor:pointer}
                             </div>
                         </div>
                     </div>
+
+                    <!-- PANEL CONTADOR EVENTO -->
+                    <div id="panel-countdown" class="admin-panel">
+                        <h3><i class="fas fa-clock"></i> Configurar Contador de Evento</h3>
+                        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+                            Configurá la fecha y nombre del próximo evento para mostrar un contador regresivo en la página principal.
+                        </p>
+                        <div class="admin-card" style="margin-bottom: 2rem;">
+                            <h4>Datos del Evento</h4>
+                            <div class="form-group">
+                                <label>Nombre del Evento</label>
+                                <input type="text" id="cdCfgNombre" placeholder="Ej: Copa Strongman Uruguay 2026" style="width: 100%; padding: 0.8rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px;">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Fecha y Hora del Evento *</label>
+                                    <input type="datetime-local" id="cdCfgFecha" style="width: 100%; padding: 0.8rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px;">
+                                </div>
+                                <div class="form-group">
+                                    <label>Lugar (opcional)</label>
+                                    <input type="text" id="cdCfgLugar" placeholder="Ej: Montevideo, Uruguay" style="width: 100%; padding: 0.8rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px;">
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                                <button class="btn btn-success" onclick="saveCountdownConfig()">
+                                    <i class="fas fa-save"></i> Guardar Contador
+                                </button>
+                                <button class="btn btn-outline" onclick="clearCountdownConfig()">
+                                    <i class="fas fa-trash"></i> Eliminar Contador
+                                </button>
+                            </div>
+                        </div>
+                        <div class="admin-card">
+                            <h4>Vista Previa</h4>
+                            <div id="cdPreview" style="padding: 1rem; background: rgba(0,0,0,0.2); border-radius: 10px;">
+                                <p style="color: var(--text-muted); margin: 0;">No hay contador configurado</p>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -6168,6 +6312,146 @@ function scoringSaveManualTimes() {
 }
 
 // ===== FIN MODO MANUAL DE TIEMPO =====
+
+
+// ===== CONTADOR REGRESIVO A EVENTO =====
+let countdownInterval = null;
+
+function initCountdown() {
+    const config = getCountdownConfig();
+    const container = document.getElementById('countdownHero');
+    if (!container) return;
+
+    if (!config || !config.fecha) {
+        container.classList.remove('active');
+        return;
+    }
+
+    const eventDate = new Date(config.fecha);
+    const now = new Date();
+
+    if (eventDate <= now) {
+        // Event already passed or in progress
+        container.classList.add('active');
+        document.getElementById('cdEventName').textContent = config.nombre || 'Evento';
+        document.getElementById('cdEventDate').textContent = config.lugar ? '📍 ' + config.lugar : '';
+        document.querySelector('.countdown-hero-label').innerHTML = '<i class="fas fa-play-circle"></i> ¡EVENTO EN CURSO!';
+        document.querySelector('.countdown-hero-display').style.display = 'none';
+        document.getElementById('cdLiveMsg').style.display = 'block';
+        return;
+    }
+
+    container.classList.add('active');
+    document.getElementById('cdEventName').textContent = config.nombre || 'Próximo Evento';
+    document.getElementById('cdEventDate').textContent = formatCountdownDate(eventDate) + (config.lugar ? ' | 📍 ' + config.lugar : '');
+    document.querySelector('.countdown-hero-display').style.display = 'flex';
+    document.getElementById('cdLiveMsg').style.display = 'none';
+
+    updateCountdown(eventDate);
+    if (countdownInterval) clearInterval(countdownInterval);
+    countdownInterval = setInterval(() => updateCountdown(eventDate), 1000);
+}
+
+function updateCountdown(targetDate) {
+    const now = new Date();
+    const diff = targetDate - now;
+
+    if (diff <= 0) {
+        initCountdown(); // Re-init to show "en curso" message
+        return;
+    }
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+    document.getElementById('cdDays').textContent = String(days).padStart(2, '0');
+    document.getElementById('cdHours').textContent = String(hours).padStart(2, '0');
+    document.getElementById('cdMinutes').textContent = String(minutes).padStart(2, '0');
+    document.getElementById('cdSeconds').textContent = String(seconds).padStart(2, '0');
+}
+
+function formatCountdownDate(date) {
+    return date.toLocaleDateString('es-UY', {day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'});
+}
+
+function getCountdownConfig() {
+    const stored = localStorage.getItem('smu_countdown_v2');
+    return stored ? JSON.parse(stored) : null;
+}
+
+function saveCountdownConfig() {
+    const nombre = document.getElementById('cdCfgNombre').value.trim();
+    const fecha = document.getElementById('cdCfgFecha').value;
+    const lugar = document.getElementById('cdCfgLugar').value.trim();
+
+    if (!nombre || !fecha) {
+        alert('Por favor completá el nombre y la fecha del evento.');
+        return;
+    }
+
+    const config = {nombre, fecha, lugar, updated: new Date().toISOString()};
+    localStorage.setItem('smu_countdown_v2', JSON.stringify(config));
+
+    alert('✅ Contador configurado correctamente');
+    loadCountdownPreview();
+    initCountdown();
+}
+
+function clearCountdownConfig() {
+    if (!confirm('¿Eliminar la configuración del contador?')) return;
+    localStorage.removeItem('smu_countdown_v2');
+    document.getElementById('cdCfgNombre').value = '';
+    document.getElementById('cdCfgFecha').value = '';
+    document.getElementById('cdCfgLugar').value = '';
+    loadCountdownPreview();
+    if (countdownInterval) clearInterval(countdownInterval);
+    const container = document.getElementById('countdownHero');
+    if (container) container.classList.remove('active');
+    alert('🗑️ Contador eliminado');
+}
+
+function loadCountdownPreview() {
+    const config = getCountdownConfig();
+    const preview = document.getElementById('cdPreview');
+    if (!preview) return;
+
+    if (config) {
+        document.getElementById('cdCfgNombre').value = config.nombre || '';
+        document.getElementById('cdCfgFecha').value = config.fecha ? config.fecha.slice(0, 16) : '';
+        document.getElementById('cdCfgLugar').value = config.lugar || '';
+        preview.innerHTML = `
+            <p style="color: var(--text); margin: 0;"><strong>${config.nombre}</strong></p>
+            <p style="color: var(--text-muted); margin: 0.3rem 0 0 0;">
+                📅 ${formatCountdownDate(new Date(config.fecha))}<br>
+                ${config.lugar ? '📍 ' + config.lugar : ''}
+            </p>
+        `;
+    } else {
+        preview.innerHTML = '<p style="color: var(--text-muted); margin: 0;">No hay contador configurado</p>';
+    }
+}
+
+function openCountdownConfigModal() {
+    // Switch to countdown tab
+    document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+
+    // Find and activate countdown tab
+    const tabs = document.querySelectorAll('.admin-tab');
+    tabs.forEach(t => {
+        if (t.textContent.includes('Contador')) t.classList.add('active');
+    });
+    document.getElementById('panel-countdown').classList.add('active');
+    loadCountdownPreview();
+}
+
+// Initialize countdown on page load
+document.addEventListener('DOMContentLoaded', function() {
+    initCountdown();
+});
+
 </script>
 </body>
 </html>
