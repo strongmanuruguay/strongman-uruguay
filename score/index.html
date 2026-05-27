@@ -210,6 +210,7 @@ select.fc option{background:#1a1a2e;color:white}
 }
 </style>
 <base target="_blank">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <base target="_blank">
 </head>
 <body>
@@ -4274,11 +4275,162 @@ swTab = function(t) {
     }
 };
 
+
+
+// ===== SUPABASE INTEGRATION =====
+const SUPABASE_URL = 'https://kiojyhfqwjaoppgwoyjt.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_1MUOcELIRMoDlKdpUA7_fw_gYJ2dQHE';
+let supabaseClient = null;
+
+function initSupabase() {
+    if (typeof supabase !== 'undefined' && supabase.createClient) {
+        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        console.log('✅ Supabase conectado');
+        return true;
+    }
+    console.warn('⚠️ Supabase no disponible');
+    return false;
+}
+
+async function saveToSupabase() {
+    if (!supabaseClient) return;
+
+    try {
+        const competenciaData = {
+            nombre: T.nom || 'Sin nombre',
+            fecha: T.fec ? new Date(T.fec).toISOString() : new Date().toISOString(),
+            lugar: T.lug || '',
+            estado: T.est || 'activo',
+            data_json: T
+        };
+
+        const { data: existing } = await supabaseClient
+            .from('competencias')
+            .select('id')
+            .eq('nombre', competenciaData.nombre)
+            .maybeSingle();
+
+        let result;
+        if (existing) {
+            result = await supabaseClient
+                .from('competencias')
+                .update(competenciaData)
+                .eq('id', existing.id);
+        } else {
+            result = await supabaseClient
+                .from('competencias')
+                .insert([competenciaData]);
+        }
+
+        if (result.error) {
+            console.error('Supabase save error:', result.error);
+        } else {
+            console.log('✅ Guardado en Supabase');
+        }
+    } catch (e) {
+        console.error('Error guardando en Supabase:', e);
+    }
+}
+
+async function loadFromSupabase() {
+    if (!supabaseClient) {
+        if (!initSupabase()) return null;
+    }
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('competencias')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(1);
+
+        if (error) {
+            console.error('Supabase load error:', error);
+            return null;
+        }
+
+        if (data && data.length > 0) {
+            return data[0].data_json;
+        }
+        return null;
+    } catch (e) {
+        console.error('Error cargando de Supabase:', e);
+        return null;
+    }
+}
+
+async function listCompetenciasSupabase() {
+    if (!supabaseClient) {
+        if (!initSupabase()) return [];
+    }
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('competencias')
+            .select('id, nombre, fecha, lugar, estado, created_at')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error('Error listando competencias:', error);
+            return [];
+        }
+        return data || [];
+    } catch (e) {
+        console.error('Error:', e);
+        return [];
+    }
+}
+
+async function loadCompetenciaById(id) {
+    if (!supabaseClient) {
+        if (!initSupabase()) return null;
+    }
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('competencias')
+            .select('*')
+            .eq('id', id)
+            .single();
+
+        if (error) {
+            console.error('Error cargando competencia:', error);
+            return null;
+        }
+
+        if (data && data.data_json) {
+            T = data.data_json;
+            if (!T.cat) T.cat = [];
+            T.atl.forEach(a => { if (!a.catId) a.catId = ''; });
+            T.prb.forEach(p => { if (!p.cats) p.cats = []; });
+            applyCfg();
+            renderAll();
+            toast('📂 Competencia cargada de la nube');
+            return true;
+        }
+        return null;
+    } catch (e) {
+        console.error('Error:', e);
+        return null;
+    }
+}
+
+// Initialize Supabase
+document.addEventListener('DOMContentLoaded', function() {
+    initSupabase();
+});
+
 // ===== MODIFICAR saveStg PARA ENVIAR DATOS A BROADCAST =====
 const originalSaveStg = saveStg;
 saveStg = function() {
     originalSaveStg();
     enviarDatosABroadcast();
+
+    // ===== SUPABASE: Guardar en la nube =====
+    if (typeof initSupabase === 'function' || (typeof supabase !== 'undefined' && supabase.createClient)) {
+        if (!supabaseClient && typeof initSupabase === 'function') initSupabase();
+        if (supabaseClient) saveToSupabase();
+    }
 };
 
 // ===== MODIFICAR renderAll PARA INCLUIR BROADCAST =====
@@ -4298,6 +4450,8 @@ window.addEventListener('beforeunload', function() {
 // Init
 loadStg();
 renderAll();
+
+
 </script>
 </body>
 </html>
