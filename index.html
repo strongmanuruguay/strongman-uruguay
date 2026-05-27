@@ -1419,8 +1419,119 @@ select.scoring-form-control{cursor:pointer}
     .countdown-hero-item { min-width: 60px; padding: 0.5rem 0.8rem; }
 }
 
+
+/* ===== RANKING Y COMPETENCIAS ===== */
+.ranking-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+.ranking-card {
+    background: var(--secondary);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: all 0.3s;
+}
+.ranking-card:hover {
+    border-color: rgba(0,102,204,0.3);
+    transform: translateY(-3px);
+}
+.ranking-position {
+    font-family: 'Oswald', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--gold);
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+.ranking-position.top1 { color: var(--gold); text-shadow: 0 0 20px rgba(255,215,0,0.3); }
+.ranking-position.top2 { color: #c0c0c0; }
+.ranking-position.top3 { color: var(--bronze); }
+.ranking-name {
+    color: var(--text);
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 0.3rem;
+}
+.ranking-stats {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    text-align: center;
+}
+.ranking-points {
+    color: var(--accent-light);
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.5rem;
+    text-align: center;
+    margin-top: 0.5rem;
+}
+
+.competencias-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+.competencia-card {
+    background: var(--secondary);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+.competencia-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-3px);
+}
+.competencia-card.en-curso {
+    border-color: var(--success);
+    box-shadow: 0 0 20px rgba(40,167,69,0.2);
+}
+.competencia-status {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.8rem;
+}
+.competencia-status.programado { background: rgba(255,193,7,0.2); color: var(--warning); }
+.competencia-status.en-curso { background: rgba(40,167,69,0.2); color: var(--success); }
+.competencia-status.finalizado { background: rgba(108,117,125,0.2); color: var(--text-muted); }
+.competencia-nombre {
+    color: var(--gold);
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+}
+.competencia-fecha {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+}
+.competencia-lugar {
+    color: var(--accent-light);
+    font-size: 0.85rem;
+}
+.loading-spinner {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted);
+}
+.loading-spinner i {
+    font-size: 2rem;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
 </style>
 <base target="_blank">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <base target="_blank">
 </head>
 <body>
@@ -1661,6 +1772,17 @@ select.scoring-form-control{cursor:pointer}
         <div class="grid" id="eventsContainer"></div>
     </section>
 
+    <!-- COMPETENCIAS PÚBLICO -->
+    <section id="competencias-publico" class="content-section">
+        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-home"></i> Volver al Inicio</button>
+        <h2 class="section-title"><i class="fas fa-clipboard-list"></i> Competencias</h2>
+        <p style="color: var(--text-muted); margin-bottom: 1rem;">Torneos y competencias de Strongman Uruguay</p>
+        <div id="competenciasPublicoContainer">
+            <div class="loading-spinner"><i class="fas fa-circle-notch"></i> Cargando competencias...</div>
+        </div>
+    </section>
+
+
     <!-- SECCIÓN GIMNASIOS -->
     <section id="gimnasios" class="content-section" style="background: rgba(255,255,255,0.02);">
         <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-home"></i> Volver al Inicio</button>
@@ -1703,64 +1825,6 @@ select.scoring-form-control{cursor:pointer}
         <div class="sponsors-grid" id="sponsorsContainer"></div>
     </section>
 
-    <!-- SECCIÓN TIENDA -->
-    <section id="tienda" class="content-section">
-        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-home"></i> Volver al Inicio</button>
-        <h2 class="section-title">Tienda Oficial</h2>
-        <div id="productsContainer"></div>
-    </section>
-
-    <!-- SECCIÓN COMPETENCIAS PÚBLICO -->
-        <!-- SECCIÓN COMPETENCIAS PÚBLICO V2 -->
-    <section id="competencias-publico" class="content-section">
-        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-home"></i> Volver al Inicio</button>
-        <h2 class="section-title">Competencias y Resultados</h2>
-        <div id="publicCompContainer">
-            <div class="empty-state">
-                <i class="fas fa-clipboard-list"></i>
-                <p>Cargando resultados...</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- SECCIÓN SUSCRIPTORES - PÚBLICO (NUEVO) -->
-
-
-        <!-- CARRITO -->
-    <div class="cart-float-btn" onclick="openCart()" id="cartBtn">
-        <i class="fas fa-shopping-cart"></i>
-        <span class="cart-count" id="cartCount">0</span>
-    </div>
-
-    <div id="cartModal" class="modal">
-        <div class="modal-content cart-drawer">
-            <div class="modal-header">
-                <h2><i class="fas fa-shopping-cart"></i> Tu Carrito</h2>
-                <button class="close-btn" onclick="closeCart()">&times;</button>
-            </div>
-            <div class="modal-body" id="cartBody">
-                <div class="empty-state">
-                    <i class="fas fa-shopping-cart"></i>
-                    <p>Tu carrito está vacío</p>
-                </div>
-            </div>
-            <div class="cart-footer" id="cartFooter" style="display: none;">
-                <div class="cart-total">
-                    <strong>Total: $<span id="cartTotal">0</span></strong>
-                </div>
-                <button class="btn btn-success" onclick="sendWhatsAppOrder()" style="width: 100%; margin-bottom: 0.5rem;">
-                    <i class="fab fa-whatsapp"></i> Enviar pedido por WhatsApp
-                </button>
-                <button class="btn btn-outline" onclick="clearCart()" style="width: 100%;">
-                    <i class="fas fa-trash"></i> Vaciar carrito
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <button class="scroll-top-btn" id="scrollTopBtn" onclick="scrollToTop()" title="Volver arriba">
-        <i class="fas fa-arrow-up"></i>
-    </button>
 
     <footer>
         <div class="footer-content">
@@ -3062,6 +3126,7 @@ select.scoring-form-control{cursor:pointer}
                 if (sectionId === 'gimnasios') renderGyms();
                 if (sectionId === 'galeria') renderGallery();
                 if (sectionId === 'reglas') renderRules();
+                if (sectionId === 'competencias-publico') renderCompetenciasPublico();
                 if (sectionId === 'cursos') renderCourses();
                 if (sectionId === 'jueces') renderJudges();
                 if (sectionId === 'sponsors') renderSponsors();
@@ -6451,6 +6516,271 @@ function openCountdownConfigModal() {
 document.addEventListener('DOMContentLoaded', function() {
     initCountdown();
 });
+
+
+
+// ===== SUPABASE INTEGRATION - WEB PRINCIPAL =====
+const SUPABASE_URL = 'https://kiojyhfqwjaoppgwoyjt.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_1MUOcELIRMoDlKdpUA7_fw_gYJ2dQHE';
+let supabaseClient = null;
+
+function initSupabaseMain() {
+    if (typeof supabase !== 'undefined' && supabase.createClient) {
+        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        console.log('✅ Supabase conectado - Web Principal');
+        loadRanking();
+        loadCompetencias();
+        return true;
+    }
+    console.warn('⚠️ Supabase no disponible');
+    return false;
+}
+
+// ===== CARGAR RANKING =====
+async function loadRanking() {
+    const container = document.getElementById('rankingContainer');
+    if (!container) return;
+
+    if (!supabaseClient) {
+        if (!initSupabaseMain()) {
+            container.innerHTML = '<p style="color: var(--text-muted); text-align: center;">No se pudo conectar a la base de datos</p>';
+            return;
+        }
+    }
+
+    try {
+        // For now, show sample data or load from competencias
+        // In production, this would query the ranking table
+        const { data: competencias, error } = await supabaseClient
+            .from('competencias')
+            .select('*')
+            .eq('estado', 'finalizado')
+            .order('created_at', { ascending: false })
+            .limit(5);
+
+        if (error) {
+            console.error('Error cargando ranking:', error);
+            container.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Error al cargar ranking</p>';
+            return;
+        }
+
+        if (!competencias || competencias.length === 0) {
+            container.innerHTML = '<p style="color: var(--text-muted); text-align: center;">No hay datos de ranking disponibles aún</p>';
+            return;
+        }
+
+        // Build ranking from competition data
+        let html = '<div class="ranking-grid">';
+        competencias.forEach((comp, index) => {
+            const data = comp.data_json || {};
+            const atl = data.atl || [];
+            // Sort by points if available
+            const sorted = [...atl].sort((a, b) => (b.pts || 0) - (a.pts || 0));
+
+            if (sorted.length > 0) {
+                const top = sorted[0];
+                const posClass = index === 0 ? 'top1' : index === 1 ? 'top2' : index === 2 ? 'top3' : '';
+                html += `
+                    <div class="ranking-card">
+                        <div class="ranking-position ${posClass}">#${index + 1}</div>
+                        <div class="ranking-name">${top.nom || 'Atleta'}</div>
+                        <div class="ranking-stats">${top.cat || 'Open'} | ${top.peso || '-'} kg</div>
+                        <div class="ranking-points">${top.pts || 0} pts</div>
+                    </div>
+                `;
+            }
+        });
+        html += '</div>';
+        container.innerHTML = html;
+
+    } catch (e) {
+        console.error('Error:', e);
+        container.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Error al cargar datos</p>';
+    }
+}
+
+// ===== CARGAR COMPETENCIAS =====
+async function loadCompetencias() {
+    const container = document.getElementById('competenciasContainer');
+    if (!container) return;
+
+    if (!supabaseClient) {
+        if (!initSupabaseMain()) {
+            container.innerHTML = '<p style="color: var(--text-muted); text-align: center;">No se pudo conectar a la base de datos</p>';
+            return;
+        }
+    }
+
+    try {
+        const { data: competencias, error } = await supabaseClient
+            .from('competencias')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(10);
+
+        if (error) {
+            console.error('Error cargando competencias:', error);
+            container.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Error al cargar competencias</p>';
+            return;
+        }
+
+        if (!competencias || competencias.length === 0) {
+            container.innerHTML = `
+                <div class="competencias-grid">
+                    <div class="competencia-card">
+                        <div class="competencia-status programado">Próximamente</div>
+                        <div class="competencia-nombre">No hay competencias registradas</div>
+                        <div class="competencia-fecha">Las competencias aparecerán aquí cuando se creen en el sistema de puntos</div>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        let html = '<div class="competencias-grid">';
+        competencias.forEach(comp => {
+            const statusClass = comp.estado === 'en_curso' ? 'en-curso' : '';
+            const statusText = comp.estado === 'en_curso' ? 'en-curso' : comp.estado === 'finalizado' ? 'finalizado' : 'programado';
+            const fecha = comp.fecha ? new Date(comp.fecha).toLocaleDateString('es-UY', {day: 'numeric', month: 'long', year: 'numeric'}) : 'Fecha por definir';
+
+            html += `
+                <div class="competencia-card ${statusClass}" onclick="window.open('score/', '_blank')">
+                    <div class="competencia-status ${statusText}">${comp.estado === 'en_curso' ? '🔴 En Vivo' : comp.estado === 'finalizado' ? '✅ Finalizado' : '📅 Programado'}</div>
+                    <div class="competencia-nombre">${comp.nombre || 'Competencia'}</div>
+                    <div class="competencia-fecha"><i class="fas fa-calendar"></i> ${fecha}</div>
+                    ${comp.lugar ? `<div class="competencia-lugar"><i class="fas fa-map-marker-alt"></i> ${comp.lugar}</div>` : ''}
+                </div>
+            `;
+        });
+        html += '</div>';
+        container.innerHTML = html;
+
+    } catch (e) {
+        console.error('Error:', e);
+        container.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Error al cargar datos</p>';
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Small delay to ensure Supabase library is loaded
+    setTimeout(initSupabaseMain, 500);
+});
+
+
+
+// ===== SUPABASE FUNCTIONS FOR MAIN WEB =====
+async function renderCompetenciasPublico() {
+    const container = document.getElementById('competenciasPublicoContainer');
+    if (!container) return;
+
+    container.innerHTML = '<div class="loading-spinner"><i class="fas fa-circle-notch"></i> Cargando competencias...</div>';
+
+    if (!supabaseClient) {
+        if (!initSupabaseMain()) {
+            container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>No se pudo conectar a la base de datos</p></div>';
+            return;
+        }
+    }
+
+    try {
+        const { data: competencias, error } = await supabaseClient
+            .from('competencias')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(20);
+
+        if (error) {
+            console.error('Error:', error);
+            container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>Error al cargar competencias</p></div>';
+            return;
+        }
+
+        if (!competencias || competencias.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-calendar-plus"></i>
+                    <p>No hay competencias registradas aún</p>
+                    <p style="font-size: 0.9rem; margin-top: 0.5rem;">Las competencias aparecerán aquí cuando se creen desde el Panel Admin</p>
+                </div>
+            `;
+            return;
+        }
+
+        let html = '<div class="competencias-grid">';
+        competencias.forEach(comp => {
+            const statusClass = comp.estado === 'en_curso' ? 'en-curso' : '';
+            const statusText = comp.estado || 'programado';
+            const fecha = comp.fecha ? new Date(comp.fecha).toLocaleDateString('es-UY', {day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'}) : 'Fecha por definir';
+
+            html += `
+                <div class="competencia-card ${statusClass}">
+                    <div class="competencia-status ${statusText}">${comp.estado === 'en_curso' ? '🔴 En Vivo' : comp.estado === 'finalizado' ? '✅ Finalizado' : '📅 Programado'}</div>
+                    <div class="competencia-nombre">${comp.nombre || 'Competencia'}</div>
+                    <div class="competencia-fecha"><i class="fas fa-calendar"></i> ${fecha}</div>
+                    ${comp.lugar ? `<div class="competencia-lugar"><i class="fas fa-map-marker-alt"></i> ${comp.lugar}</div>` : ''}
+                </div>
+            `;
+        });
+        html += '</div>';
+        container.innerHTML = html;
+
+    } catch (e) {
+        console.error('Error:', e);
+        container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>Error al cargar datos</p></div>';
+    }
+}
+
+// Override renderRanking to also load from Supabase
+const originalRenderRanking = renderRanking;
+renderRanking = async function() {
+    // First try to load from Supabase
+    if (!supabaseClient) initSupabaseMain();
+
+    if (supabaseClient) {
+        try {
+            const { data: competencias, error } = await supabaseClient
+                .from('competencias')
+                .select('*')
+                .eq('estado', 'finalizado')
+                .order('created_at', { ascending: false })
+                .limit(10);
+
+            if (!error && competencias && competencias.length > 0) {
+                // Build ranking from competition data
+                const container = document.getElementById('rankingContainer');
+                let html = '<div class="ranking-grid">';
+
+                competencias.forEach((comp, index) => {
+                    const data = comp.data_json || {};
+                    const atl = data.atl || [];
+                    const sorted = [...atl].sort((a, b) => (b.pts || 0) - (a.pts || 0));
+
+                    if (sorted.length > 0) {
+                        const top = sorted[0];
+                        const posClass = index === 0 ? 'top1' : index === 1 ? 'top2' : index === 2 ? 'top3' : '';
+                        html += `
+                            <div class="ranking-card">
+                                <div class="ranking-position ${posClass}">#${index + 1}</div>
+                                <div class="ranking-name">${top.nom || 'Atleta'}</div>
+                                <div class="ranking-stats">${top.cat || 'Open'} | ${top.peso || '-'} kg</div>
+                                <div class="ranking-points">${top.pts || 0} pts</div>
+                            </div>
+                        `;
+                    }
+                });
+                html += '</div>';
+                container.innerHTML = html;
+                return;
+            }
+        } catch (e) {
+            console.log('Supabase ranking failed, using local data');
+        }
+    }
+
+    // Fallback to original function
+    originalRenderRanking();
+};
 
 </script>
 </body>
