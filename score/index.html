@@ -212,6 +212,7 @@ select.fc option{background:#1a1a2e;color:white}
 <base target="_blank">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
 <div class="c">
@@ -4279,21 +4280,29 @@ swTab = function(t) {
 
 // ===== SUPABASE INTEGRATION =====
 const SUPABASE_URL = 'https://kiojyhfqwjaoppgwoyjt.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_1MUOcELIRMoDlKdpUA7_fw_gYJ2dQHE';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtpb2p5aGZxd2phb3BwZ3dveWp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NzY3MjgsImV4cCI6MjA5NTQ1MjcyOH0.Nd24E0kQJKjcypjz45MELtPD-eq91URunn6UVL2PL4Y';
 let supabaseClient = null;
 
 function initSupabase() {
-    if (typeof supabase !== 'undefined' && supabase.createClient) {
-        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        console.log('✅ Supabase conectado');
-        return true;
+    try {
+        if (typeof supabase !== 'undefined' && supabase.createClient) {
+            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            console.log('✅ Supabase conectado');
+            return true;
+        }
+        console.warn('⚠️ Librería Supabase no cargada');
+        return false;
+    } catch (e) {
+        console.error('❌ Error inicializando Supabase:', e);
+        return false;
     }
-    console.warn('⚠️ Supabase no disponible');
-    return false;
 }
 
 async function saveToSupabase() {
-    if (!supabaseClient) return;
+    if (!supabaseClient) {
+        console.warn('⚠️ Supabase no inicializado');
+        return;
+    }
 
     try {
         const competenciaData = {
@@ -4304,31 +4313,45 @@ async function saveToSupabase() {
             data_json: T
         };
 
-        const { data: existing } = await supabaseClient
+        console.log('📤 Guardando en Supabase:', competenciaData.nombre);
+
+        // Buscar si ya existe
+        const { data: existing, error: selectError } = await supabaseClient
             .from('competencias')
             .select('id')
             .eq('nombre', competenciaData.nombre)
             .maybeSingle();
 
+        if (selectError) {
+            console.error('❌ Error buscando competencia:', selectError);
+            return;
+        }
+
         let result;
         if (existing) {
-            result = await supabaseClient
+            console.log('📝 Actualizando competencia existente:', existing.id);
+            const { data, error } = await supabaseClient
                 .from('competencias')
                 .update(competenciaData)
-                .eq('id', existing.id);
+                .eq('id', existing.id)
+                .select();
+            result = { data, error };
         } else {
-            result = await supabaseClient
+            console.log('➕ Insertando nueva competencia');
+            const { data, error } = await supabaseClient
                 .from('competencias')
-                .insert([competenciaData]);
+                .insert([competenciaData])
+                .select();
+            result = { data, error };
         }
 
         if (result.error) {
-            console.error('Supabase save error:', result.error);
+            console.error('❌ Error Supabase:', result.error);
         } else {
-            console.log('✅ Guardado en Supabase');
+            console.log('✅ Guardado en Supabase:', result.data);
         }
     } catch (e) {
-        console.error('Error guardando en Supabase:', e);
+        console.error('❌ Error guardando en Supabase:', e);
     }
 }
 
@@ -4338,6 +4361,7 @@ async function loadFromSupabase() {
     }
 
     try {
+        console.log('📥 Cargando desde Supabase...');
         const { data, error } = await supabaseClient
             .from('competencias')
             .select('*')
@@ -4345,16 +4369,18 @@ async function loadFromSupabase() {
             .limit(1);
 
         if (error) {
-            console.error('Supabase load error:', error);
+            console.error('❌ Error cargando de Supabase:', error);
             return null;
         }
 
-        if (data && data.length > 0) {
+        if (data && data.length > 0 && data[0].data_json) {
+            console.log('✅ Datos cargados de Supabase:', data[0].nombre);
             return data[0].data_json;
         }
+        console.log('ℹ️ No hay datos en Supabase');
         return null;
     } catch (e) {
-        console.error('Error cargando de Supabase:', e);
+        console.error('❌ Error cargando de Supabase:', e);
         return null;
     }
 }
@@ -4449,6 +4475,24 @@ window.addEventListener('beforeunload', function() {
 
 // Init
 loadStg();
+
+// Intentar cargar desde Supabase si hay internet
+(async function() {
+    await new Promise(r => setTimeout(r, 1000)); // Esperar que Supabase cargue
+    if (initSupabase()) {
+        const cloudData = await loadFromSupabase();
+        if (cloudData) {
+            T = cloudData;
+            if (!T.cat) T.cat = [];
+            T.atl.forEach(a => { if (!a.catId) a.catId = ''; });
+            T.prb.forEach(p => { if (!p.cats) p.cats = []; });
+            applyCfg();
+            renderAll();
+            toast('📂 Datos cargados de la nube');
+        }
+    }
+})();
+
 renderAll();
 
 
