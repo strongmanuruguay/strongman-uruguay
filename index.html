@@ -1533,6 +1533,7 @@ select.scoring-form-control{cursor:pointer}
 <base target="_blank">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
     <div class="menu-overlay" id="menuOverlay" onclick="closeMenu()"></div>
@@ -1826,7 +1827,15 @@ select.scoring-form-control{cursor:pointer}
     </section>
 
 
-    <footer>
+    
+    <!-- SECCIÓN TIENDA -->
+    <section id="tienda" class="content-section">
+        <button class="btn btn-outline back-btn" onclick="showHome()"><i class="fas fa-home"></i> Volver al Inicio</button>
+        <h2 class="section-title">Tienda Oficial</h2>
+        <div id="productsContainer"></div>
+    </section>
+
+<footer>
         <div class="footer-content">
             <div class="footer-section">
                 <h3>Strongman Uruguay</h3>
@@ -6783,5 +6792,37 @@ renderRanking = async function() {
 };
 
 </script>
+
+    <!-- BOTÓN FLOTANTE CARRITO -->
+    <div class="cart-float-btn" onclick="openCart()" title="Ver carrito">
+        <i class="fas fa-shopping-cart" style="font-size: 1.5rem; color: #000;"></i>
+        <span class="cart-count" id="cartCount">0</span>
+    </div>
+
+    <!-- MODAL CARRITO -->
+    <div id="cartModal" class="modal">
+        <div class="modal-content cart-drawer">
+            <div class="modal-header" style="background: var(--gold); color: #000;">
+                <h2><i class="fas fa-shopping-cart"></i> Tu Carrito</h2>
+                <button class="close-btn" onclick="closeCart()" style="color: #000;">&times;</button>
+            </div>
+            <div class="modal-body" id="cartBody" style="max-height: 60vh; overflow-y: auto;">
+                <div class="empty-state">
+                    <i class="fas fa-shopping-cart"></i>
+                    <p>Tu carrito está vacío</p>
+                </div>
+            </div>
+            <div class="cart-footer" id="cartFooter" style="display: none;">
+                <div class="cart-total">Total: <span>$<span id="cartTotal">0</span></span> UYU</div>
+                <button class="btn btn-success" onclick="sendWhatsAppOrder()" style="width: 100%; margin-bottom: 0.5rem;">
+                    <i class="fab fa-whatsapp"></i> Enviar pedido por WhatsApp
+                </button>
+                <button class="btn btn-outline" onclick="clearCart()" style="width: 100%;">
+                    <i class="fas fa-trash"></i> Vaciar carrito
+                </button>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
