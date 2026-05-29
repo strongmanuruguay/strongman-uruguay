@@ -1534,6 +1534,7 @@ select.scoring-form-control{cursor:pointer}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <base target="_blank">
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
     <div class="menu-overlay" id="menuOverlay" onclick="closeMenu()"></div>
@@ -6528,269 +6529,275 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-// ===== SUPABASE INTEGRATION - WEB PRINCIPAL =====
+// ===== SUPABASE INTEGRATION - WEB PRINCIPAL (CORREGIDO V2) =====
 const SUPABASE_URL = 'https://kiojyhfqwjaoppgwoyjt.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_1MUOcELIRMoDlKdpUA7_fw_gYJ2dQHE';
 let supabaseClient = null;
 
 function initSupabaseMain() {
     if (typeof supabase !== 'undefined' && supabase.createClient) {
-        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        console.log('✅ Supabase conectado - Web Principal');
-        loadRanking();
-        loadCompetencias();
-        return true;
+        try {
+            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            console.log('✅ Supabase conectado - Web Principal');
+            return true;
+        } catch(e) {
+            console.error('❌ Error conectando Supabase:', e);
+            return false;
+        }
     }
-    console.warn('⚠️ Supabase no disponible');
+    console.warn('⚠️ Librería Supabase no cargada');
     return false;
 }
 
-// ===== CARGAR RANKING =====
-async function loadRanking() {
-    const container = document.getElementById('rankingContainer');
-    if (!container) return;
-
-    if (!supabaseClient) {
-        if (!initSupabaseMain()) {
-            container.innerHTML = '<p style="color: var(--text-muted); text-align: center;">No se pudo conectar a la base de datos</p>';
-            return;
-        }
-    }
-
-    try {
-        // For now, show sample data or load from competencias
-        // In production, this would query the ranking table
-        const { data: competencias, error } = await supabaseClient
-            .from('competencias')
-            .select('*')
-            .eq('estado', 'finalizado')
-            .order('created_at', { ascending: false })
-            .limit(5);
-
-        if (error) {
-            console.error('Error cargando ranking:', error);
-            container.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Error al cargar ranking</p>';
-            return;
-        }
-
-        if (!competencias || competencias.length === 0) {
-            container.innerHTML = '<p style="color: var(--text-muted); text-align: center;">No hay datos de ranking disponibles aún</p>';
-            return;
-        }
-
-        // Build ranking from competition data
-        let html = '<div class="ranking-grid">';
-        competencias.forEach((comp, index) => {
-            const data = comp.data_json || {};
-            const atl = data.atl || [];
-            // Sort by points if available
-            const sorted = [...atl].sort((a, b) => (b.pts || 0) - (a.pts || 0));
-
-            if (sorted.length > 0) {
-                const top = sorted[0];
-                const posClass = index === 0 ? 'top1' : index === 1 ? 'top2' : index === 2 ? 'top3' : '';
-                html += `
-                    <div class="ranking-card">
-                        <div class="ranking-position ${posClass}">#${index + 1}</div>
-                        <div class="ranking-name">${top.nom || 'Atleta'}</div>
-                        <div class="ranking-stats">${top.cat || 'Open'} | ${top.peso || '-'} kg</div>
-                        <div class="ranking-points">${top.pts || 0} pts</div>
-                    </div>
-                `;
-            }
-        });
-        html += '</div>';
-        container.innerHTML = html;
-
-    } catch (e) {
-        console.error('Error:', e);
-        container.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Error al cargar datos</p>';
-    }
-}
-
-// ===== CARGAR COMPETENCIAS =====
-async function loadCompetencias() {
-    const container = document.getElementById('competenciasContainer');
-    if (!container) return;
-
-    if (!supabaseClient) {
-        if (!initSupabaseMain()) {
-            container.innerHTML = '<p style="color: var(--text-muted); text-align: center;">No se pudo conectar a la base de datos</p>';
-            return;
-        }
-    }
-
-    try {
-        const { data: competencias, error } = await supabaseClient
-            .from('competencias')
-            .select('*')
-            .order('created_at', { ascending: false })
-            .limit(10);
-
-        if (error) {
-            console.error('Error cargando competencias:', error);
-            container.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Error al cargar competencias</p>';
-            return;
-        }
-
-        if (!competencias || competencias.length === 0) {
-            container.innerHTML = `
-                <div class="competencias-grid">
-                    <div class="competencia-card">
-                        <div class="competencia-status programado">Próximamente</div>
-                        <div class="competencia-nombre">No hay competencias registradas</div>
-                        <div class="competencia-fecha">Las competencias aparecerán aquí cuando se creen en el sistema de puntos</div>
-                    </div>
-                </div>
-            `;
-            return;
-        }
-
-        let html = '<div class="competencias-grid">';
-        competencias.forEach(comp => {
-            const statusClass = comp.estado === 'en_curso' ? 'en-curso' : '';
-            const statusText = comp.estado === 'en_curso' ? 'en-curso' : comp.estado === 'finalizado' ? 'finalizado' : 'programado';
-            const fecha = comp.fecha ? new Date(comp.fecha).toLocaleDateString('es-UY', {day: 'numeric', month: 'long', year: 'numeric'}) : 'Fecha por definir';
-
-            html += `
-                <div class="competencia-card ${statusClass}" onclick="window.open('score/', '_blank')">
-                    <div class="competencia-status ${statusText}">${comp.estado === 'en_curso' ? '🔴 En Vivo' : comp.estado === 'finalizado' ? '✅ Finalizado' : '📅 Programado'}</div>
-                    <div class="competencia-nombre">${comp.nombre || 'Competencia'}</div>
-                    <div class="competencia-fecha"><i class="fas fa-calendar"></i> ${fecha}</div>
-                    ${comp.lugar ? `<div class="competencia-lugar"><i class="fas fa-map-marker-alt"></i> ${comp.lugar}</div>` : ''}
-                </div>
-            `;
-        });
-        html += '</div>';
-        container.innerHTML = html;
-
-    } catch (e) {
-        console.error('Error:', e);
-        container.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Error al cargar datos</p>';
-    }
-}
-
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', function() {
-    // Small delay to ensure Supabase library is loaded
-    setTimeout(initSupabaseMain, 500);
-});
-
-
-
-// ===== SUPABASE FUNCTIONS FOR MAIN WEB =====
+// ===== CARGAR COMPETENCIAS DESDE SUPABASE =====
 async function renderCompetenciasPublico() {
     const container = document.getElementById('competenciasPublicoContainer');
     if (!container) return;
 
-    container.innerHTML = '<div class="loading-spinner"><i class="fas fa-circle-notch"></i> Cargando competencias...</div>';
+    container.innerHTML = '<div class="loading-spinner"><i class="fas fa-circle-notch"></i> Cargando competencias desde la nube...</div>';
 
-    if (!supabaseClient) {
-        if (!initSupabaseMain()) {
-            container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>No se pudo conectar a la base de datos</p></div>';
-            return;
-        }
-    }
-
-    try {
-        const { data: competencias, error } = await supabaseClient
-            .from('competencias')
-            .select('*')
-            .order('created_at', { ascending: false })
-            .limit(20);
-
-        if (error) {
-            console.error('Error:', error);
-            container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>Error al cargar competencias</p></div>';
-            return;
-        }
-
-        if (!competencias || competencias.length === 0) {
-            container.innerHTML = `
-                <div class="empty-state">
-                    <i class="fas fa-calendar-plus"></i>
-                    <p>No hay competencias registradas aún</p>
-                    <p style="font-size: 0.9rem; margin-top: 0.5rem;">Las competencias aparecerán aquí cuando se creen desde el Panel Admin</p>
-                </div>
-            `;
-            return;
-        }
-
-        let html = '<div class="competencias-grid">';
-        competencias.forEach(comp => {
-            const statusClass = comp.estado === 'en_curso' ? 'en-curso' : '';
-            const statusText = comp.estado || 'programado';
-            const fecha = comp.fecha ? new Date(comp.fecha).toLocaleDateString('es-UY', {day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'}) : 'Fecha por definir';
-
-            html += `
-                <div class="competencia-card ${statusClass}">
-                    <div class="competencia-status ${statusText}">${comp.estado === 'en_curso' ? '🔴 En Vivo' : comp.estado === 'finalizado' ? '✅ Finalizado' : '📅 Programado'}</div>
-                    <div class="competencia-nombre">${comp.nombre || 'Competencia'}</div>
-                    <div class="competencia-fecha"><i class="fas fa-calendar"></i> ${fecha}</div>
-                    ${comp.lugar ? `<div class="competencia-lugar"><i class="fas fa-map-marker-alt"></i> ${comp.lugar}</div>` : ''}
-                </div>
-            `;
-        });
-        html += '</div>';
-        container.innerHTML = html;
-
-    } catch (e) {
-        console.error('Error:', e);
-        container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>Error al cargar datos</p></div>';
-    }
-}
-
-// Override renderRanking to also load from Supabase
-const originalRenderRanking = renderRanking;
-renderRanking = async function() {
-    // First try to load from Supabase
+    // Intentar Supabase primero
     if (!supabaseClient) initSupabaseMain();
+
+    let competencias = [];
+    let fromSupabase = false;
 
     if (supabaseClient) {
         try {
-            const { data: competencias, error } = await supabaseClient
+            const { data, error } = await supabaseClient
+                .from('competencias')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(20);
+
+            if (!error && data && data.length > 0) {
+                competencias = data;
+                fromSupabase = true;
+                console.log('✅ Competencias cargadas desde Supabase:', data.length);
+            } else if (error) {
+                console.error('Error Supabase competencias:', error);
+            }
+        } catch (e) {
+            console.error('Error conexión Supabase:', e);
+        }
+    }
+
+    // Fallback a localStorage si Supabase falla o está vacío
+    if (!fromSupabase) {
+        competencias = JSON.parse(localStorage.getItem('acaf_competencias')) || [];
+        console.log('📦 Competencias cargadas desde localStorage:', competencias.length);
+    }
+
+    if (competencias.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-calendar-plus"></i>
+                <p>No hay competencias registradas aún</p>
+                <p style="font-size: 0.9rem; margin-top: 0.5rem; color: var(--text-muted);">
+                    Las competencias aparecerán aquí cuando se creen desde StrongScore Pro V3
+                </p>
+            </div>
+        `;
+        return;
+    }
+
+    let html = '<div class="competencias-grid">';
+    competencias.forEach(comp => {
+        // Extraer datos del JSON (formato StrongScore Pro V3)
+        const dataJson = comp.data_json || {};
+
+        const statusClass = comp.estado === 'en_curso' ? 'en-curso' : '';
+        const statusText = comp.estado || 'programado';
+
+        let fechaStr = 'Fecha por definir';
+        if (comp.fecha) {
+            try {
+                const d = new Date(comp.fecha);
+                fechaStr = d.toLocaleDateString('es-UY', {day: 'numeric', month: 'long', year: 'numeric'});
+            } catch(e) {}
+        }
+
+        // Contar atletas y pruebas desde data_json
+        const numAtletas = dataJson.atl ? dataJson.atl.length : 0;
+        const numPruebas = dataJson.prb ? dataJson.prb.length : 0;
+        const nombre = comp.nombre || dataJson.nom || 'Competencia';
+        const lugar = comp.lugar || dataJson.lug || '';
+
+        html += `
+            <div class="competencia-card ${statusClass}">
+                <div class="competencia-status ${statusText}">
+                    ${comp.estado === 'activo' ? '🔴 En Vivo' : comp.estado === 'finalizado' ? '✅ Finalizado' : '📅 Programado'}
+                </div>
+                <div class="competencia-nombre">${nombre}</div>
+                <div class="competencia-fecha"><i class="fas fa-calendar"></i> ${fechaStr}</div>
+                ${lugar ? `<div class="competencia-lugar"><i class="fas fa-map-marker-alt"></i> ${lugar}</div>` : ''}
+                <div style="margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); font-size: 0.85rem;">
+                    <i class="fas fa-users"></i> ${numAtletas} atletas &nbsp;|&nbsp; 
+                    <i class="fas fa-dumbbell"></i> ${numPruebas} pruebas
+                </div>
+            </div>
+        `;
+    });
+    html += '</div>';
+
+    if (fromSupabase) {
+        html += `<p style="text-align: center; color: var(--success); margin-top: 1rem; font-size: 0.85rem;">
+            <i class="fas fa-cloud"></i> Datos sincronizados desde la nube
+        </p>`;
+    }
+
+    container.innerHTML = html;
+}
+
+// ===== CARGAR RANKING DESDE SUPABASE =====
+async function renderRanking() {
+    const container = document.getElementById('rankingContainer');
+    if (!container) return;
+
+    container.innerHTML = '<div class="loading-spinner"><i class="fas fa-circle-notch"></i> Cargando ranking...</div>';
+
+    if (!supabaseClient) initSupabaseMain();
+
+    let rankingData = [];
+    let fromSupabase = false;
+
+    // Intentar cargar desde Supabase primero
+    if (supabaseClient) {
+        try {
+            const { data, error } = await supabaseClient
                 .from('competencias')
                 .select('*')
                 .eq('estado', 'finalizado')
                 .order('created_at', { ascending: false })
                 .limit(10);
 
-            if (!error && competencias && competencias.length > 0) {
-                // Build ranking from competition data
-                const container = document.getElementById('rankingContainer');
-                let html = '<div class="ranking-grid">';
+            if (!error && data && data.length > 0) {
+                // Construir ranking global de todas las competencias finalizadas
+                const atletaStats = {};
 
-                competencias.forEach((comp, index) => {
-                    const data = comp.data_json || {};
-                    const atl = data.atl || [];
-                    const sorted = [...atl].sort((a, b) => (b.pts || 0) - (a.pts || 0));
+                data.forEach(comp => {
+                    const d = comp.data_json || {};
+                    const atl = d.atl || [];
+                    const res = d.res || {};
+                    const prb = d.prb || [];
 
-                    if (sorted.length > 0) {
-                        const top = sorted[0];
-                        const posClass = index === 0 ? 'top1' : index === 1 ? 'top2' : index === 2 ? 'top3' : '';
-                        html += `
-                            <div class="ranking-card">
-                                <div class="ranking-position ${posClass}">#${index + 1}</div>
-                                <div class="ranking-name">${top.nom || 'Atleta'}</div>
-                                <div class="ranking-stats">${top.cat || 'Open'} | ${top.peso || '-'} kg</div>
-                                <div class="ranking-points">${top.pts || 0} pts</div>
-                            </div>
-                        `;
-                    }
+                    atl.forEach(a => {
+                        const id = a.id || a.nom;
+                        if (!atletaStats[id]) {
+                            atletaStats[id] = {
+                                nombre: a.n || a.nom || 'Atleta',
+                                pais: a.p || a.pais || 'UY',
+                                peso: a.w || a.peso || 0,
+                                sexo: a.s || a.sexo || 'M',
+                                categoria: a.catId || 'Open',
+                                totalPuntos: 0,
+                                competencias: 0,
+                                victorias: 0
+                            };
+                        }
+
+                        // Sumar puntos de todas las pruebas
+                        let ptsComp = 0;
+                        prb.forEach(p => {
+                            const prbRes = res[p.id] || {};
+                            const atletaRes = prbRes[a.id];
+                            if (atletaRes && atletaRes.pt) {
+                                ptsComp += atletaRes.pt;
+                            }
+                        });
+
+                        atletaStats[id].totalPuntos += ptsComp;
+                        atletaStats[id].competencias++;
+                    });
                 });
-                html += '</div>';
-                container.innerHTML = html;
-                return;
+
+                rankingData = Object.values(atletaStats)
+                    .sort((a, b) => b.totalPuntos - a.totalPuntos)
+                    .slice(0, 20);
+
+                fromSupabase = true;
+                console.log('✅ Ranking cargado desde Supabase');
             }
         } catch (e) {
-            console.log('Supabase ranking failed, using local data');
+            console.error('Error cargando ranking Supabase:', e);
         }
     }
 
-    // Fallback to original function
-    originalRenderRanking();
-};
+    // Fallback a localStorage
+    if (!fromSupabase) {
+        if (currentRankingFilter === 'all') {
+            container.innerHTML = `
+                <div class="ranking-category">
+                    <h3><i class="fas fa-mars"></i> Masculino</h3>
+                    ${renderRankingByGender('male')}
+                </div>
+                <div class="ranking-category">
+                    <h3><i class="fas fa-venus"></i> Femenino</h3>
+                    ${renderRankingByGender('female')}
+                </div>
+            `;
+        } else {
+            container.innerHTML = `
+                <div class="ranking-category">
+                    <h3><i class="fas fa-${currentRankingFilter === 'male' ? 'mars' : 'venus'}"></i> 
+                    ${currentRankingFilter === 'male' ? 'Masculino' : 'Femenino'}</h3>
+                    ${renderRankingByGender(currentRankingFilter)}
+                </div>
+            `;
+        }
+        return;
+    }
 
+    // Renderizar ranking desde Supabase
+    if (rankingData.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-trophy"></i>
+                <p>No hay datos de ranking disponibles aún</p>
+                <p style="font-size: 0.9rem; margin-top: 0.5rem; color: var(--text-muted);">
+                    El ranking se generará automáticamente cuando haya competencias finalizadas
+                </p>
+            </div>
+        `;
+        return;
+    }
+
+    let html = `
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+            <span style="color: var(--success); font-size: 0.9rem;">
+                <i class="fas fa-cloud"></i> Ranking global calculado desde ${data.length} competencias finalizadas
+            </span>
+        </div>
+        <div class="ranking-grid">
+    `;
+
+    rankingData.forEach((a, index) => {
+        const posClass = index === 0 ? 'top1' : index === 1 ? 'top2' : index === 2 ? 'top3' : '';
+        const flag = a.pais ? `<img src="https://flagcdn.com/w40/${a.pais.toLowerCase()}.png" style="width: 28px; height: 20px; border-radius: 3px; vertical-align: middle; margin-right: 0.4rem;">` : '';
+
+        html += `
+            <div class="ranking-card">
+                <div class="ranking-position ${posClass}">#${index + 1}</div>
+                <div class="ranking-name">${flag}${a.nombre}</div>
+                <div class="ranking-stats">${a.categoria} | ${a.peso} kg | ${a.competencias} comps</div>
+                <div class="ranking-points">${a.totalPuntos.toFixed(1)} pts</div>
+            </div>
+        `;
+    });
+
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+// ===== INICIALIZACIÓN =====
+document.addEventListener('DOMContentLoaded', function() {
+    initSupabaseMain();
+    initCountdown();
+    loadProducts();
+    updateCartUI();
+    scoringLoadFromStorage();
+    scoringRenderPublicSection();
+});
 </script>
 
     <!-- BOTÓN FLOTANTE CARRITO -->
