@@ -2992,8 +2992,8 @@ select.scoring-form-control{cursor:pointer}
         let currentRankingFilter = 'all';
 
         // ===== INICIALIZACIÓN =====
-        document.addEventListener('DOMContentLoaded', function() {
-            loadAllData();
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadAllData();        
             setupNavbar();
             updateCounters();
             countVisit();
@@ -3066,36 +3066,43 @@ select.scoring-form-control{cursor:pointer}
             localStorage.setItem('acaf_contacts', JSON.stringify(data.contacts));
             localStorage.setItem('acaf_settings', JSON.stringify(data.settings));
             updateCounters();
+            // También guardar en Supabase
+            saveDataToSupabase();
         }
 
-        function loadAllData() {
-            data.events = JSON.parse(localStorage.getItem('acaf_events')) || [];
-            data.athletes = JSON.parse(localStorage.getItem('acaf_athletes')) || [];
-            data.ranking = JSON.parse(localStorage.getItem('acaf_ranking')) || [];
-            data.gyms = JSON.parse(localStorage.getItem('acaf_gyms')) || [];
-            data.records = JSON.parse(localStorage.getItem('acaf_records')) || [];
-            data.gallery = JSON.parse(localStorage.getItem('acaf_gallery')) || [];
-            data.rules = JSON.parse(localStorage.getItem('acaf_rules')) || [];
-            data.courses = JSON.parse(localStorage.getItem('acaf_courses')) || [];
-            data.judges = JSON.parse(localStorage.getItem('acaf_judges')) || [];
-            data.sponsors = JSON.parse(localStorage.getItem('acaf_sponsors')) || [];
-            data.contacts = JSON.parse(localStorage.getItem('acaf_contacts')) || [];
-            data.settings = JSON.parse(localStorage.getItem('acaf_settings')) || { heroBg: null, logo: null, social: {} };
-            
-            renderEvents();
-            renderAthletes();
-            renderGyms();
-            renderRecords();
-            renderGallery();
-            renderRules();
-            renderCourses();
-            renderJudges();
-            renderSponsors();
-            renderContacts();
-            applySettings();
-        }
-
-        // ===== NAVEGACIÓN =====
+      async function loadAllData() {
+    // Intentar cargar desde Supabase primero
+    const fromSupabase = await loadDataFromSupabase();
+    
+    if (!fromSupabase) {
+        // Fallback a localStorage
+        data.events = JSON.parse(localStorage.getItem('acaf_events')) || [];
+        data.athletes = JSON.parse(localStorage.getItem('acaf_athletes')) || [];
+        data.ranking = JSON.parse(localStorage.getItem('acaf_ranking')) || [];
+        data.records = JSON.parse(localStorage.getItem('acaf_records')) || [];
+        console.log('📦 Datos cargados desde localStorage');
+    }
+    
+    data.gyms = JSON.parse(localStorage.getItem('acaf_gyms')) || [];
+    data.gallery = JSON.parse(localStorage.getItem('acaf_gallery')) || [];
+    data.rules = JSON.parse(localStorage.getItem('acaf_rules')) || [];
+    data.courses = JSON.parse(localStorage.getItem('acaf_courses')) || [];
+    data.judges = JSON.parse(localStorage.getItem('acaf_judges')) || [];
+    data.sponsors = JSON.parse(localStorage.getItem('acaf_sponsors')) || [];
+    data.contacts = JSON.parse(localStorage.getItem('acaf_contacts')) || [
+        { type: 'email', value: 'info@strongmanuruguay.com', label: '' },
+        { type: 'phone', value: '+598 99 123 456', label: '' },
+        { type: 'address', value: 'Montevideo, Uruguay', label: '' }
+    ];
+    data.settings = JSON.parse(localStorage.getItem('acaf_settings')) || { 
+        heroBg: null, 
+        logo: null,
+        social: {} 
+    };
+    data.visits = parseInt(localStorage.getItem('acaf_visits')) || 0;
+}
+    
+    // ===== NAVEGACIÓN =====
         function showHome() {
             document.getElementById('inicio').style.display = 'flex';
             document.getElementById('mainMenu').style.display = 'none';
@@ -6830,6 +6837,8 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         </div>
     </div>
+
+<script src="supabase-integration.js"></script>
 
 </body>
 </html>
