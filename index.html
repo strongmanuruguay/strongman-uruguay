@@ -3123,9 +3123,9 @@ select.scoring-form-control{cursor:pointer}
                     .select('*')
                     .order('fecha', { ascending: true });
 
-                if (!eventsError && eventsData) {
+                if (!eventsError && eventsData && eventsData.length > 0) {
                     data.events = eventsData;
-                    console.log('✅ Eventos cargados:', eventsData.length);
+                    console.log('✅ Eventos cargados desde Supabase:', eventsData.length);
                 }
 
                 // Cargar atletas
@@ -3134,20 +3134,20 @@ select.scoring-form-control{cursor:pointer}
                     .select('*')
                     .order('nombre', { ascending: true });
 
-                if (!athletesError && athletesData) {
+                if (!athletesError && athletesData && athletesData.length > 0) {
                     data.athletes = athletesData;
-                    console.log('✅ Atletas cargados:', athletesData.length);
+                    console.log('✅ Atletas cargados desde Supabase:', athletesData.length);
                 }
 
-                // Cargar ranking nacional
+                // Cargar ranking
                 const { data: rankingData, error: rankingError } = await supabaseClient
                     .from('ranking_nacional')
                     .select('*')
                     .order('posicion', { ascending: true });
 
-                if (!rankingError && rankingData) {
+                if (!rankingError && rankingData && rankingData.length > 0) {
                     data.ranking = rankingData;
-                    console.log('✅ Ranking cargado:', rankingData.length);
+                    console.log('✅ Ranking cargado desde Supabase:', rankingData.length);
                 }
 
                 // Cargar records
@@ -3156,11 +3156,24 @@ select.scoring-form-control{cursor:pointer}
                     .select('*')
                     .order('categoria', { ascending: true });
 
-                if (!recordsError && recordsData) {
+                if (!recordsError && recordsData && recordsData.length > 0) {
                     data.records = recordsData;
-                    console.log('✅ Records cargados:', recordsData.length);
+                    console.log('✅ Records cargados desde Supabase:', recordsData.length);
                 }
 
+                // Cargar settings (logo, configuración)
+                const { data: settingsData, error: settingsError } = await supabaseClient
+                    .from('settings')
+                    .select('*')
+                    .eq('id', 1)
+                    .single();
+
+                if (!settingsError && settingsData && settingsData.data_json) {
+                    data.settings = { ...data.settings, ...settingsData.data_json };
+                    console.log('✅ Settings cargados desde Supabase');
+                }
+
+                console.log('✅ Todos los datos cargados desde Supabase');
                 return true;
             } catch (e) {
                 console.error('Error cargando desde Supabase:', e);
@@ -3173,33 +3186,74 @@ select.scoring-form-control{cursor:pointer}
             if (!supabaseClient) initSupabaseMain();
             if (!supabaseClient) return false;
 
+            let guardado = false;
+
             try {
                 // Guardar eventos
                 if (data.events && data.events.length > 0) {
-                    await supabaseClient.from('eventos').delete().neq('id', 0);
-                    await supabaseClient.from('eventos').insert(data.events);
+                    try {
+                        await supabaseClient.from('eventos').delete().neq('id', 0);
+                        await supabaseClient.from('eventos').insert(data.events);
+                        console.log('✅ Eventos guardados en Supabase');
+                        guardado = true;
+                    } catch (e) {
+                        console.warn('Eventos:', e.message);
+                    }
                 }
 
                 // Guardar atletas
                 if (data.athletes && data.athletes.length > 0) {
-                    await supabaseClient.from('atletas').delete().neq('id', 0);
-                    await supabaseClient.from('atletas').insert(data.athletes);
+                    try {
+                        await supabaseClient.from('atletas').delete().neq('id', 0);
+                        await supabaseClient.from('atletas').insert(data.athletes);
+                        console.log('✅ Atletas guardados en Supabase');
+                        guardado = true;
+                    } catch (e) {
+                        console.warn('Atletas:', e.message);
+                    }
                 }
 
                 // Guardar ranking
                 if (data.ranking && data.ranking.length > 0) {
-                    await supabaseClient.from('ranking_nacional').delete().neq('id', 0);
-                    await supabaseClient.from('ranking_nacional').insert(data.ranking);
+                    try {
+                        await supabaseClient.from('ranking_nacional').delete().neq('id', 0);
+                        await supabaseClient.from('ranking_nacional').insert(data.ranking);
+                        console.log('✅ Ranking guardado en Supabase');
+                        guardado = true;
+                    } catch (e) {
+                        console.warn('Ranking:', e.message);
+                    }
                 }
 
                 // Guardar records
                 if (data.records && data.records.length > 0) {
-                    await supabaseClient.from('records').delete().neq('id', 0);
-                    await supabaseClient.from('records').insert(data.records);
+                    try {
+                        await supabaseClient.from('records').delete().neq('id', 0);
+                        await supabaseClient.from('records').insert(data.records);
+                        console.log('✅ Records guardados en Supabase');
+                        guardado = true;
+                    } catch (e) {
+                        console.warn('Records:', e.message);
+                    }
                 }
 
-                console.log('✅ Datos guardados en Supabase');
-                return true;
+                // Guardar settings (logo, configuración)
+                if (data.settings) {
+                    try {
+                        await supabaseClient.from('settings').upsert({
+                            id: 1,
+                            data_json: data.settings,
+                            updated_at: new Date().toISOString()
+                        }, { onConflict: 'id' });
+                        console.log('✅ Settings guardados en Supabase');
+                        guardado = true;
+                    } catch (e) {
+                        console.warn('Settings:', e.message);
+                    }
+                }
+
+                console.log('✅ Sincronización con Supabase completada');
+                return guardado;
             } catch (e) {
                 console.error('Error guardando en Supabase:', e);
                 return false;
