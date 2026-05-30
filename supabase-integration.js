@@ -1,16 +1,15 @@
 // ===== SUPABASE INTEGRATION - STRONGMAN URUGUAY =====
 // Este archivo maneja la conexión con Supabase para las secciones manuales
 // Tablas: eventos, atletas, ranking_nacional, records
+// NOTA: SUPABASE_URL y SUPABASE_KEY ya están definidos en index.html
 
-const SUPABASE_URL = 'https://kiojyhfqwjaoppgwoyjt.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_1MUOcELIRMoDlKdpUA7_fw_gYJ2dQHE';
 let supabaseClient = null;
 
 function initSupabaseMain() {
     if (typeof supabase !== 'undefined' && supabase.createClient) {
         try {
             supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-            console.log('✅ Supabase conectado');
+            console.log('✅ Supabase conectado - Integration');
             return true;
         } catch(e) {
             console.error('❌ Error conectando Supabase:', e);
@@ -55,7 +54,7 @@ async function loadDataFromSupabase() {
             .select('*')
             .order('posicion', { ascending: true });
 
-        if (!athletesError && rankingData) {
+        if (!rankingError && rankingData) {
             data.ranking = rankingData;
             console.log('✅ Ranking cargado:', rankingData.length);
         }
