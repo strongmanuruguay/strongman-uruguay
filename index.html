@@ -3091,6 +3091,9 @@ select.scoring-form-control{cursor:pointer}
         // ===== SUPABASE INTEGRATION - STRONGMAN URUGUAY =====
         // Código migrado desde el archivo de integración existente
 
+        const SUPABASE_URL = 'https://kiojyhfqwjaoppgwoyjt.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_1MUOcELIRMoDlKdpUA7_fw_gYJ2dQHE';
+
         let supabaseClient = null;
 
         function initSupabaseMain() {
@@ -6900,25 +6903,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-// ===== SUPABASE INTEGRATION - WEB PRINCIPAL (CORREGIDO V2) =====
-const SUPABASE_URL = 'https://kiojyhfqwjaoppgwoyjt.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_1MUOcELIRMoDlKdpUA7_fw_gYJ2dQHE';
-let supabaseClient = null;
-
-
-// ===== CARGAR COMPETENCIAS DESDE SUPABASE =====
-
-// ===== CARGAR RANKING DESDE SUPABASE =====
-
-// ===== INICIALIZACIÓN =====
-document.addEventListener('DOMContentLoaded', function() {
-    initSupabaseMain();
-    initCountdown();
-    loadProducts();
-    updateCartUI();
-    scoringLoadFromStorage();
-    scoringRenderPublicSection();
-});
 </script>
 
     <!-- BOTÓN FLOTANTE CARRITO -->
