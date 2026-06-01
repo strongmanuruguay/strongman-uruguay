@@ -1532,6 +1532,7 @@ select.scoring-form-control{cursor:pointer}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
     <div class="menu-overlay" id="menuOverlay" onclick="closeMenu()"></div>
@@ -2967,28 +2968,6 @@ select.scoring-form-control{cursor:pointer}
             visits: parseInt(localStorage.getItem('acaf_visits')) || 0
         };
 
-        // CATEGORÍAS DE PESO
-        const weightCategories = {
-            male: [
-                { value: 'male_lightweight', label: 'Ligero (-80kg)' },
-                { value: 'male_middleweight', label: 'Medio (80-95kg)' },
-                { value: 'male_lightheavy', label: 'Semipesado (95-105kg)' },
-                { value: 'male_heavyweight', label: 'Pesado (105-120kg)' },
-                { value: 'male_superheavy', label: 'Superpesado (+120kg)' }
-            ],
-            female: [
-                { value: 'female_lightweight', label: 'Ligero (-60kg)' },
-                { value: 'female_middleweight', label: 'Medio (60-70kg)' },
-                { value: 'female_heavyweight', label: 'Pesado (70-82kg)' },
-                { value: 'female_superheavy', label: 'Superpesado (+82kg)' }
-            ]
-        };
-
-        let isAdmin = false;
-        let currentAthleteFilter = 'all';
-        let currentRankingFilter = 'all';
-
-        // ===== INICIALIZACIÓN =====
         document.addEventListener('DOMContentLoaded', async function() {
             loadAllData();
 
@@ -3013,7 +2992,42 @@ select.scoring-form-control{cursor:pointer}
             if (window.innerWidth <= 768) {
                 document.querySelector('.menu-toggle').style.display = 'block';
             }
+            const notifAsunto = document.getElementById('notifAsunto');
+            const notifMensaje = document.getElementById('notifMensaje');
+            if (notifAsunto) notifAsunto.addEventListener('input', actualizarPreviewEmail);
+            if (notifMensaje) notifMensaje.addEventListener('input', actualizarPreviewEmail);
+            loadProducts();
+            updateCartUI();
+            const cb=document.getElementById('scPrbCombinada');if(cb)cb.addEventListener('change',function(){document.getElementById('scPrbCombinadaDesc').style.display=this.checked?'block':'none'})
+            scoringLoadFromStorage();scoringRenderPublicSection()
+            initCountdown();
         });
+
+        
+
+        // CATEGORÍAS DE PESO
+        const weightCategories = {
+            male: [
+                { value: 'male_lightweight', label: 'Ligero (-80kg)' },
+                { value: 'male_middleweight', label: 'Medio (80-95kg)' },
+                { value: 'male_lightheavy', label: 'Semipesado (95-105kg)' },
+                { value: 'male_heavyweight', label: 'Pesado (105-120kg)' },
+                { value: 'male_superheavy', label: 'Superpesado (+120kg)' }
+            ],
+            female: [
+                { value: 'female_lightweight', label: 'Ligero (-60kg)' },
+                { value: 'female_middleweight', label: 'Medio (60-70kg)' },
+                { value: 'female_heavyweight', label: 'Pesado (70-82kg)' },
+                { value: 'female_superheavy', label: 'Superpesado (+82kg)' }
+            ]
+        };
+
+        let isAdmin = false;
+        let currentAthleteFilter = 'all';
+        let currentRankingFilter = 'all';
+
+        // ===== INICIALIZACIÓN =====
+        
 
         function setupNavbar() {
             window.addEventListener('scroll', () => {
@@ -3260,7 +3274,20 @@ select.scoring-form-control{cursor:pointer}
             }
         }
 
-        // ===== CARGAR COMPETENCIAS DESDE SUPABASE (STRONGSCORE) =====
+        // ===== WRAPPERS PARA COMPATIBILIDAD =====
+async function loadFromSupabase() {
+    return await loadDataFromSupabase();
+}
+
+async function saveToSupabase() {
+    return await saveDataToSupabase();
+}
+
+async function syncToSupabase() {
+    return await saveDataToSupabase();
+}
+
+// ===== CARGAR COMPETENCIAS DESDE SUPABASE (STRONGSCORE) =====
         async function renderCompetenciasPublico() {
             const container = document.getElementById('competenciasPublicoContainer');
             if (!container) return;
@@ -6228,12 +6255,7 @@ select.scoring-form-control{cursor:pointer}
         }
 
         // Actualizar preview cuando cambian los campos
-        document.addEventListener('DOMContentLoaded', function() {
-            const notifAsunto = document.getElementById('notifAsunto');
-            const notifMensaje = document.getElementById('notifMensaje');
-            if (notifAsunto) notifAsunto.addEventListener('input', actualizarPreviewEmail);
-            if (notifMensaje) notifMensaje.addEventListener('input', actualizarPreviewEmail);
-        });
+        
 
         function enviarNotificacionMasiva() {
             const suscriptores = JSON.parse(localStorage.getItem('acaf_suscriptores')) || [];
@@ -6293,10 +6315,7 @@ select.scoring-form-control{cursor:pointer}
         }
 
         // Inicializar
-        document.addEventListener('DOMContentLoaded', () => {
-            loadProducts();
-            updateCartUI();
-        });
+        
     
 
         // ===== SISTEMA DE PUNTUACIÓN V2 =====
@@ -6321,7 +6340,7 @@ select.scoring-form-control{cursor:pointer}
         function scoringEditAtleta(i){const a=scoringTorneo.atletas[i];document.getElementById('scAtlNombre').value=a.nombre;document.getElementById('scAtlPais').value=a.pais||'';document.getElementById('scAtlPeso').value=a.peso;document.getElementById('scAtlSexo').value=a.sexo;scoringEditingAtleta=i;document.querySelector('#scoring-panel-atletas .btn-primary').innerHTML='<i class="fas fa-save"></i> Actualizar Atleta'}
         function scoringDeleteAtleta(i){if(!confirm('¿Eliminar atleta?'))return;scoringTorneo.atletas.splice(i,1);scoringSaveToStorage();scoringRenderAtletas();scoringRenderRanking();scoringRenderPublicSection()}
         function scoringRenderAtletas(){const b=document.getElementById('scoringAtletasTable');if(!b)return;b.innerHTML=scoringTorneo.atletas.map((a,i)=>{const f=getFlagImg(a.pais);return`<tr><td>${i+1}</td><td><strong>${a.nombre}</strong></td><td>${f}${a.pais||'-'}</td><td>${a.peso} kg</td><td>${a.sexo==='M'?'♂️ Masculino':'♀️ Femenino'}</td><td><button class="btn btn-outline btn-small" onclick="scoringEditAtleta(${i})"><i class="fas fa-edit"></i></button> <button class="btn btn-danger btn-small" onclick="scoringDeleteAtleta(${i})"><i class="fas fa-trash"></i></button></td></tr>`}).join('')}
-        document.addEventListener('DOMContentLoaded',function(){const cb=document.getElementById('scPrbCombinada');if(cb)cb.addEventListener('change',function(){document.getElementById('scPrbCombinadaDesc').style.display=this.checked?'block':'none'})});
+        
         function scoringSavePrueba(){const n=document.getElementById('scPrbNombre').value.trim(),t=document.getElementById('scPrbTipo').value,imp=document.getElementById('scPrbImplemento').value.trim(),dist=parseFloat(document.getElementById('scPrbDistancia').value)||0,reqDist=document.getElementById('scPrbRequiereDistancia').checked,comb=document.getElementById('scPrbCombinada').checked,sub=document.getElementById('scPrbSubpruebas').value.trim(),pts=parseInt(document.getElementById('scPrbPuntos').value)||5,tiempoLimite=parseInt(document.getElementById('scPrbTiempoLimite').value)||0,modoTiempo=document.getElementById('scPrbModoTiempo').value;if(!n||!t){scoringShowToast('❌ Completa campos obligatorios');return}if(reqDist&&dist<=0&&t==='distancia'){scoringShowToast('❌ Ingresa la distancia mínima a completar');return}if((modoTiempo==='timer_vivo'||modoTiempo==='manual')&&tiempoLimite<=0){scoringShowToast('❌ Ingresa el tiempo límite en segundos');return}if(scoringEditingPrueba!==null){scoringTorneo.pruebas[scoringEditingPrueba]={...scoringTorneo.pruebas[scoringEditingPrueba],nombre:n,tipo:t,implemento:imp,distancia:dist,requiereDistancia:reqDist,combinada:comb,subpruebas:sub,puntos:pts,tiempoLimite:tiempoLimite,modoTiempo:modoTiempo};scoringEditingPrueba=null;document.querySelector('#scoring-panel-pruebas .btn-primary').innerHTML='<i class="fas fa-plus"></i> Agregar Prueba'}else{scoringTorneo.pruebas.push({id:'prb_'+Date.now(),nombre:n,tipo:t,implemento:imp,distancia:dist,requiereDistancia:reqDist,combinada:comb,subpruebas:sub,puntos:pts,tiempoLimite:tiempoLimite,modoTiempo:modoTiempo,orden:scoringTorneo.pruebas.length+1})}document.getElementById('scPrbNombre').value='';document.getElementById('scPrbTipo').value='';document.getElementById('scPrbImplemento').value='';document.getElementById('scPrbDistancia').value='';document.getElementById('scPrbRequiereDistancia').checked=true;document.getElementById('scPrbCombinada').checked=false;document.getElementById('scPrbSubpruebas').value='';document.getElementById('scPrbPuntos').value='5';document.getElementById('scPrbTiempoLimite').value='';document.getElementById('scPrbModoTiempo').value='sin_timer';scoringToggleModoTiempo();document.getElementById('scPrbCombinadaDesc').style.display='none';scoringSaveToStorage();scoringRenderPruebas();scoringUpdateResPruebaSelect();scoringShowToast('✅ Prueba guardada');scoringRenderPublicSection()}
         function scoringEditPrueba(i){const p=scoringTorneo.pruebas[i];document.getElementById('scPrbNombre').value=p.nombre;document.getElementById('scPrbTipo').value=p.tipo;document.getElementById('scPrbImplemento').value=p.implemento||'';document.getElementById('scPrbDistancia').value=p.distancia||'';document.getElementById('scPrbRequiereDistancia').checked=p.requiereDistancia!==undefined?p.requiereDistancia:true;document.getElementById('scPrbCombinada').checked=p.combinada||false;document.getElementById('scPrbSubpruebas').value=p.subpruebas||'';document.getElementById('scPrbPuntos').value=p.puntos||5;document.getElementById('scPrbTiempoLimite').value=p.tiempoLimite||'';document.getElementById('scPrbModoTiempo').value=p.modoTiempo||'sin_timer';scoringToggleModoTiempo();document.getElementById('scPrbCombinadaDesc').style.display=p.combinada?'block':'none';scoringEditingPrueba=i;document.querySelector('#scoring-panel-pruebas .btn-primary').innerHTML='<i class="fas fa-save"></i> Actualizar Prueba'}
         function scoringDeletePrueba(i){if(!confirm('¿Eliminar prueba?'))return;const pid=scoringTorneo.pruebas[i].id;delete scoringTorneo.resultados[pid];scoringTorneo.pruebas.splice(i,1);scoringSaveToStorage();scoringRenderPruebas();scoringUpdateResPruebaSelect();scoringRenderRanking();scoringRenderPublicSection()}
@@ -6343,7 +6362,7 @@ select.scoring-form-control{cursor:pointer}
         // ===== SECCIÓN PÚBLICA DE COMPETENCIAS =====
         function scoringRenderPublicSection(){const c=document.getElementById('publicCompContainer');if(!c)return;if(!scoringTorneo.nombre||scoringTorneo.atletas.length===0){c.innerHTML=`<div class="empty-state"><i class="fas fa-clipboard-list"></i><p>No hay torneos activos en este momento.</p><p style="color:var(--text-muted);font-size:0.9rem;margin-top:0.5rem">Los resultados aparecerán aquí cuando haya un torneo en curso.</p></div>`;return}const r=scoringCalcularRanking(),f=getFlagImg;c.innerHTML=`<div style="background:var(--secondary);padding:2rem;border-radius:15px;margin-bottom:2rem;border:1px solid rgba(255,255,255,0.1)"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:1rem"><h3 style="color:var(--gold);font-size:2rem;margin:0">${scoringTorneo.nombre}</h3><span class="scoring-live-badge"><i class="fas fa-circle"></i> ${scoringTorneo.estado==='activo'?'EN VIVO':'FINALIZADO'}</span></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;color:var(--text-muted)"><span><i class="fas fa-users" style="color:var(--accent)"></i> ${scoringTorneo.atletas.length} atletas</span><span><i class="fas fa-dumbbell" style="color:var(--accent)"></i> ${scoringTorneo.pruebas.length} pruebas</span><span><i class="fas fa-balance-scale" style="color:var(--accent)"></i> Desempate: ${scoringTorneo.desempate==='primeros'?'Primeros Puestos':'Peso Corporal'}</span></div></div><h3 style="color:var(--accent-light);margin-bottom:1.5rem;border-bottom:2px solid var(--accent);padding-bottom:0.5rem">Ranking General</h3><div style="display:grid;gap:1rem">${r.map(a=>`<div style="display:grid;grid-template-columns:70px 1fr 120px;align-items:center;background:rgba(255,255,255,0.05);border-radius:12px;padding:1rem 1.5rem;border:1px solid rgba(255,255,255,0.1);${a.posicion<=3?'background:rgba(255,215,0,0.05);border-color:rgba(255,215,0,0.3);':''}"><div style="font-size:2rem;font-weight:bold;text-align:center;font-family:'Oswald',sans-serif;color:${a.posicion===1?'var(--gold)':a.posicion===2?'#C0C0C0':a.posicion===3?'#CD7F32':'var(--text)'}">${a.posicion<=3?['🥇','🥈','🥉'][a.posicion-1]:a.posicion}</div><div><h3 style="color:white;font-family:'Oswald',sans-serif;margin-bottom:0.2rem;display:flex;align-items:center;gap:0.5rem">${f(a.pais)} ${a.nombre}</h3><p style="color:var(--text-muted);font-size:0.9rem">${a.pais||'Uruguay'} | ${a.peso} kg | ${a.sexo==='M'?'♂️ Masculino':'♀️ Femenino'} | ${a.primerosPuestos} victorias</p></div><div style="text-align:right"><div style="font-size:1.8rem;font-weight:bold;color:var(--gold);font-family:'Oswald',sans-serif">${a.totalPuntos.toFixed(1)}</div><small style="color:var(--text-muted)">puntos</small></div></div>`).join('')}</div>${scoringTorneo.pruebas.length>0?`<h3 style="color:var(--accent-light);margin:2rem 0 1rem 0;border-bottom:2px solid var(--accent);padding-bottom:0.5rem">Pruebas del Torneo</h3><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1rem">${scoringTorneo.pruebas.map((p,i)=>`<div style="background:rgba(0,0,0,0.3);padding:1rem;border-radius:10px;border:1px solid rgba(255,255,255,0.1)"><strong style="color:var(--gold)">${i+1}. ${p.nombre}</strong><p style="color:var(--text-muted);margin:0.5rem 0 0 0;font-size:0.9rem">${scoringGetTipoLabel(p.tipo)}<br>${p.implemento?'Implemento: '+p.implemento+'<br>':''}${p.distancia>0&&p.requiereDistancia!==false?'<span style="color:var(--danger)"><i class="fas fa-ruler"></i> Distancia mínima: '+p.distancia+' '+scoringGetTipoUnidad(p.tipo)+'</span><br>':''}${p.combinada?'<span style="color:var(--gold)"><i class="fas fa-layer-group"></i> Prueba Combinada</span><br>':''}${p.tiempoLimite>0?'<span style="color:var(--warning)"><i class="fas fa-stopwatch"></i> Tiempo límite: '+p.tiempoLimite+'s'+(p.modoTiempo==='timer_vivo'?' <span style="color:var(--success)"><i class="fas fa-eye"></i> Timer en vivo</span>':p.modoTiempo==='manual'?' <span style="color:var(--accent)"><i class="fas fa-keyboard"></i> Ingreso manual</span>':'')+'</span><br>':''}Puntos 1°: ${p.puntos||5}</p></div>`).join('')}</div>`:''}`}
 
-        document.addEventListener('DOMContentLoaded',()=>{scoringLoadFromStorage();scoringRenderPublicSection()});
+        
 
 // ===== SISTEMA DE TIMER / CONTADOR DE TIEMPO =====
 let scoringTimerInterval = null;
@@ -6951,9 +6970,7 @@ function openCountdownConfigModal() {
 }
 
 // Initialize countdown on page load
-document.addEventListener('DOMContentLoaded', function() {
-    initCountdown();
-});
+
 
 
 
