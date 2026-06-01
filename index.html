@@ -2989,8 +2989,9 @@ select.scoring-form-control{cursor:pointer}
         let currentRankingFilter = 'all';
 
         // ===== INICIALIZACIÓN =====
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             loadAllData();
+            await loadFromSupabase(); // Cargar desde Supabase
             setupNavbar();
             updateCounters();
             countVisit();
@@ -3049,7 +3050,7 @@ select.scoring-form-control{cursor:pointer}
             saveAllData();
         }
 
-        function saveAllData() {
+        async function saveAllData() {
             localStorage.setItem('acaf_events', JSON.stringify(data.events));
             localStorage.setItem('acaf_athletes', JSON.stringify(data.athletes));
             localStorage.setItem('acaf_ranking', JSON.stringify(data.ranking));
@@ -3062,8 +3063,190 @@ select.scoring-form-control{cursor:pointer}
             localStorage.setItem('acaf_sponsors', JSON.stringify(data.sponsors));
             localStorage.setItem('acaf_contacts', JSON.stringify(data.contacts));
             localStorage.setItem('acaf_settings', JSON.stringify(data.settings));
+
+            // Guardar en Supabase también
+            await saveToSupabase();
+
             updateCounters();
         }
+
+
+        // ===== SUPABASE INTEGRATION =====
+        let supabaseClient = null;
+
+        function initSupabase() {
+            if (typeof supabase !== 'undefined' && supabase.createClient) {
+                try {
+                    supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                    console.log('✅ Supabase conectado');
+                    return true;
+                } catch (e) {
+                    console.error('❌ Error Supabase:', e);
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        async function loadFromSupabase() {
+            if (!supabaseClient) initSupabase();
+            if (!supabaseClient) return;
+
+            try {
+                // Cargar eventos
+                const { data: events } = await supabaseClient.from('eventos').select('*');
+                if (events && events.length > 0) {
+                    data.events = events.map(e => ({
+                        id: e.id,
+                        name: e.nombre,
+                        date: e.fecha,
+                        time: e.hora,
+                        location: e.lugar,
+                        cost: e.costo,
+                        description: e.descripcion,
+                        categories: e.categorias,
+                        image: e.imagen_url
+                    }));
+                }
+
+                // Cargar atletas
+                const { data: athletes } = await supabaseClient.from('atletas').select('*');
+                if (athletes && athletes.length > 0) {
+                    data.athletes = athletes.map(a => ({
+                        id: a.id,
+                        firstName: a.nombre,
+                        lastName: a.apellido,
+                        document: a.documento,
+                        phone: a.telefono,
+                        gender: a.genero,
+                        years: a.anos_compitiendo,
+                        number: a.numero,
+                        hasLicense: a.tiene_carne,
+                        photo: a.foto_url,
+                        marks: a.marcas
+                    }));
+                }
+
+                // Cargar ranking
+                const { data: ranking } = await supabaseClient.from('ranking_nacional').select('*');
+                if (ranking && ranking.length > 0) {
+                    data.ranking = ranking.map(r => ({
+                        id: r.id,
+                        position: r.posicion,
+                        name: r.nombre,
+                        points: r.puntos,
+                        category: r.categoria,
+                        gender: r.genero
+                    }));
+                }
+
+                // Cargar records
+                const { data: records } = await supabaseClient.from('records').select('*');
+                if (records && records.length > 0) {
+                    data.records = records.map(r => ({
+                        id: r.id,
+                        test: r.categoria,
+                        holder: r.atleta,
+                        mark: r.marca,
+                        date: r.fecha,
+                        event: r.evento
+                    }));
+                }
+
+                // Cargar settings
+                const { data: settings } = await supabaseClient.from('settings').select('*').eq('id', 1).single();
+                if (settings && settings.data_json) {
+                    data.settings = { ...data.settings, ...settings.data_json };
+                }
+
+                console.log('✅ Datos cargados desde Supabase');
+            } catch (e) {
+                console.error('Error cargando Supabase:', e);
+            }
+        }
+
+        async function saveToSupabase() {
+            if (!supabaseClient) initSupabase();
+            if (!supabaseClient) return;
+
+            try {
+                // Guardar eventos
+                if (data.events.length > 0) {
+                    const mapped = data.events.map(e => ({
+                        id: e.id,
+                        nombre: e.name,
+                        fecha: e.date,
+                        hora: e.time,
+                        lugar: e.location,
+                        costo: e.cost,
+                        descripcion: e.description,
+                        categorias: e.categories,
+                        imagen_url: e.image
+                    }));
+                    await supabaseClient.from('eventos').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+                    await supabaseClient.from('eventos').insert(mapped);
+                }
+
+                // Guardar atletas
+                if (data.athletes.length > 0) {
+                    const mapped = data.athletes.map(a => ({
+                        id: a.id,
+                        nombre: a.firstName,
+                        apellido: a.lastName,
+                        documento: a.document,
+                        telefono: a.phone,
+                        genero: a.gender,
+                        anos_compitiendo: a.years,
+                        numero: a.number,
+                        tiene_carne: a.hasLicense,
+                        foto_url: a.photo,
+                        marcas: a.marks
+                    }));
+                    await supabaseClient.from('atletas').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+                    await supabaseClient.from('atletas').insert(mapped);
+                }
+
+                // Guardar ranking
+                if (data.ranking.length > 0) {
+                    const mapped = data.ranking.map(r => ({
+                        id: r.id,
+                        posicion: r.position,
+                        nombre: r.name,
+                        puntos: r.points,
+                        categoria: r.category,
+                        genero: r.gender
+                    }));
+                    await supabaseClient.from('ranking_nacional').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+                    await supabaseClient.from('ranking_nacional').insert(mapped);
+                }
+
+                // Guardar records
+                if (data.records.length > 0) {
+                    const mapped = data.records.map(r => ({
+                        id: r.id,
+                        categoria: r.test,
+                        atleta: r.holder,
+                        marca: r.mark,
+                        fecha: r.date,
+                        evento: r.event
+                    }));
+                    await supabaseClient.from('records').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+                    await supabaseClient.from('records').insert(mapped);
+                }
+
+                // Guardar settings
+                await supabaseClient.from('settings').upsert({
+                    id: 1,
+                    data_json: data.settings,
+                    updated_at: new Date().toISOString()
+                });
+
+                console.log('✅ Datos guardados en Supabase');
+            } catch (e) {
+                console.error('Error guardando Supabase:', e);
+            }
+        }
+
 
         function loadAllData() {
             data.events = JSON.parse(localStorage.getItem('acaf_events')) || [];
