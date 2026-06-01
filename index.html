@@ -2969,45 +2969,51 @@ select.scoring-form-control{cursor:pointer}
         };
 
         document.addEventListener('DOMContentLoaded', async function() {
-            // ===== LIMPIAR LOCALSTORAGE (reset completo) =====
-            // Borrar TODOS los datos locales para empezar desde cero con Supabase
-            const keysToClear = [
-                'acaf_events', 'acaf_athletes', 'acaf_ranking', 'acaf_gyms',
-                'acaf_records', 'acaf_gallery', 'acaf_rules', 'acaf_courses',
-                'acaf_judges', 'acaf_sponsors', 'acaf_contacts', 'acaf_settings',
-                'acaf_visits', 'acaf_competencias', 'acaf_suscriptores',
-                'acaf_notificaciones', 'productosTienda', 'cartStrongman',
-                'smu_countdown_v2'
-            ];
-            keysToClear.forEach(k => localStorage.removeItem(k));
-            console.log('🧹 localStorage limpiado - empezando desde cero');
+            // ===== LIMPIAR LOCALSTORAGE SOLO LA PRIMERA VEZ =====
+            // Usamos una flag para limpiar solo una vez (primera vez con esta version)
+            if (!localStorage.getItem('smu_v3_cleaned')) {
+                const keysToClear = [
+                    'acaf_events', 'acaf_athletes', 'acaf_ranking', 'acaf_gyms',
+                    'acaf_records', 'acaf_gallery', 'acaf_rules', 'acaf_courses',
+                    'acaf_judges', 'acaf_sponsors', 'acaf_contacts', 'acaf_settings',
+                    'acaf_visits', 'acaf_competencias', 'acaf_suscriptores',
+                    'acaf_notificaciones', 'productosTienda', 'cartStrongman',
+                    'smu_countdown_v2'
+                ];
+                keysToClear.forEach(k => localStorage.removeItem(k));
+                localStorage.setItem('smu_v3_cleaned', 'true');
+                console.log('🧹 localStorage limpiado - primera vez con v3');
 
-            // Reiniciar data object
-            data = {
-                events: [], athletes: [], ranking: [], gyms: [],
-                records: [], gallery: [], rules: [], courses: [],
-                judges: [], sponsors: [], contacts: [],
-                settings: { heroBg: null, logo: null, social: {} },
-                visits: 0
-            };
+                // Reiniciar data object solo la primera vez
+                data = {
+                    events: [], athletes: [], ranking: [], gyms: [],
+                    records: [], gallery: [], rules: [], courses: [],
+                    judges: [], sponsors: [], contacts: [],
+                    settings: { heroBg: null, logo: null, social: {} },
+                    visits: 0
+                };
+            } else {
+                // Cargar desde localStorage primero
+                loadAllData();
+                console.log('📦 Datos cargados desde localStorage');
+            }
 
             // ===== CONECTAR SUPABASE =====
             if (!supabaseClient) initSupabaseMain();
 
-            // ===== CARGAR DESDE SUPABASE =====
+            // ===== CARGAR DESDE SUPABASE (merge) =====
             if (supabaseClient) {
                 try {
                     await loadFromSupabase();
-                    console.log('✅ Datos cargados desde Supabase');
+                    console.log('✅ Datos sincronizados desde Supabase');
                 } catch (e) {
                     console.error('Error cargando desde Supabase:', e);
                 }
             } else {
-                console.warn('⚠️ Supabase no disponible - usando datos vacios');
+                console.warn('⚠️ Supabase no disponible');
             }
 
             // Renderizar todo
-            loadAllData();
             setupNavbar();
             updateCounters();
             countVisit();
