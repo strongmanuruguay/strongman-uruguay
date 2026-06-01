@@ -2969,37 +2969,73 @@ select.scoring-form-control{cursor:pointer}
         };
 
         document.addEventListener('DOMContentLoaded', async function() {
-            loadAllData();
+            // ===== LIMPIAR LOCALSTORAGE (reset completo) =====
+            // Borrar TODOS los datos locales para empezar desde cero con Supabase
+            const keysToClear = [
+                'acaf_events', 'acaf_athletes', 'acaf_ranking', 'acaf_gyms',
+                'acaf_records', 'acaf_gallery', 'acaf_rules', 'acaf_courses',
+                'acaf_judges', 'acaf_sponsors', 'acaf_contacts', 'acaf_settings',
+                'acaf_visits', 'acaf_competencias', 'acaf_suscriptores',
+                'acaf_notificaciones', 'productosTienda', 'cartStrongman',
+                'smu_countdown_v2'
+            ];
+            keysToClear.forEach(k => localStorage.removeItem(k));
+            console.log('🧹 localStorage limpiado - empezando desde cero');
 
-            // Intentar cargar desde Supabase primero
+            // Reiniciar data object
+            data = {
+                events: [], athletes: [], ranking: [], gyms: [],
+                records: [], gallery: [], rules: [], courses: [],
+                judges: [], sponsors: [], contacts: [],
+                settings: { heroBg: null, logo: null, social: {} },
+                visits: 0
+            };
+
+            // ===== CONECTAR SUPABASE =====
             if (!supabaseClient) initSupabaseMain();
+
+            // ===== CARGAR DESDE SUPABASE =====
             if (supabaseClient) {
                 try {
                     await loadFromSupabase();
+                    console.log('✅ Datos cargados desde Supabase');
                 } catch (e) {
                     console.error('Error cargando desde Supabase:', e);
                 }
+            } else {
+                console.warn('⚠️ Supabase no disponible - usando datos vacios');
             }
 
+            // Renderizar todo
+            loadAllData();
             setupNavbar();
             updateCounters();
             countVisit();
-            if (data.events.length === 0) loadSampleData();
-            
-            // Actualizar contador de suscriptores público
             actualizarContadorPublico();
-            
+
             if (window.innerWidth <= 768) {
                 document.querySelector('.menu-toggle').style.display = 'block';
             }
+
+            // Event listeners
             const notifAsunto = document.getElementById('notifAsunto');
             const notifMensaje = document.getElementById('notifMensaje');
             if (notifAsunto) notifAsunto.addEventListener('input', actualizarPreviewEmail);
             if (notifMensaje) notifMensaje.addEventListener('input', actualizarPreviewEmail);
+
+            // Tienda
             loadProducts();
             updateCartUI();
-            const cb=document.getElementById('scPrbCombinada');if(cb)cb.addEventListener('change',function(){document.getElementById('scPrbCombinadaDesc').style.display=this.checked?'block':'none'})
-            scoringLoadFromStorage();scoringRenderPublicSection()
+
+            // Scoring (StrongScore - NO tocar)
+            const cb = document.getElementById('scPrbCombinada');
+            if (cb) cb.addEventListener('change', function() {
+                document.getElementById('scPrbCombinadaDesc').style.display = this.checked ? 'block' : 'none';
+            });
+            scoringLoadFromStorage();
+            scoringRenderPublicSection();
+
+            // Contador regresivo
             initCountdown();
         });
 
