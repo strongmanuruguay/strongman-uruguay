@@ -6701,6 +6701,221 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 // ===== SUPABASE INTEGRATION - WEB PRINCIPAL (CORREGIDO V2) =====
+    }
+    console.warn('⚠️ Librería Supabase no cargada');
+    return false;
+}
+
+// ===== CARGAR COMPETENCIAS DESDE SUPABASE =====
+        } catch (e) {
+            console.error('Error conexión Supabase:', e);
+        }
+    }
+
+    // Fallback a localStorage si Supabase falla o está vacío
+    if (!fromSupabase) {
+        competencias = JSON.parse(localStorage.getItem('acaf_competencias')) || [];
+        console.log('📦 Competencias cargadas desde localStorage:', competencias.length);
+    }
+
+    if (competencias.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-calendar-plus"></i>
+                <p>No hay competencias registradas aún</p>
+                <p style="font-size: 0.9rem; margin-top: 0.5rem; color: var(--text-muted);">
+                    Las competencias aparecerán aquí cuando se creen desde StrongScore Pro V3
+                </p>
+            </div>
+        `;
+        return;
+    }
+
+    let html = '<div class="competencias-grid">';
+    competencias.forEach(comp => {
+        // Extraer datos del JSON (formato StrongScore Pro V3)
+        const dataJson = comp.data_json || {};
+
+        const statusClass = comp.estado === 'en_curso' ? 'en-curso' : '';
+        const statusText = comp.estado || 'programado';
+
+        let fechaStr = 'Fecha por definir';
+        if (comp.fecha) {
+            try {
+                const d = new Date(comp.fecha);
+                fechaStr = d.toLocaleDateString('es-UY', {day: 'numeric', month: 'long', year: 'numeric'});
+            } catch(e) {}
+        }
+
+        // Contar atletas y pruebas desde data_json
+        const numAtletas = dataJson.atl ? dataJson.atl.length : 0;
+        const numPruebas = dataJson.prb ? dataJson.prb.length : 0;
+        const nombre = comp.nombre || dataJson.nom || 'Competencia';
+        const lugar = comp.lugar || dataJson.lug || '';
+
+        html += `
+            <div class="competencia-card ${statusClass}">
+                <div class="competencia-status ${statusText}">
+                    ${comp.estado === 'activo' ? '🔴 En Vivo' : comp.estado === 'finalizado' ? '✅ Finalizado' : '📅 Programado'}
+                </div>
+                <div class="competencia-nombre">${nombre}</div>
+                <div class="competencia-fecha"><i class="fas fa-calendar"></i> ${fechaStr}</div>
+                ${lugar ? `<div class="competencia-lugar"><i class="fas fa-map-marker-alt"></i> ${lugar}</div>` : ''}
+                <div style="margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); font-size: 0.85rem;">
+                    <i class="fas fa-users"></i> ${numAtletas} atletas &nbsp;|&nbsp; 
+                    <i class="fas fa-dumbbell"></i> ${numPruebas} pruebas
+                </div>
+            </div>
+        `;
+    });
+    html += '</div>';
+
+    if (fromSupabase) {
+        html += `<p style="text-align: center; color: var(--success); margin-top: 1rem; font-size: 0.85rem;">
+            <i class="fas fa-cloud"></i> Datos sincronizados desde la nube
+        </p>`;
+    }
+
+    container.innerHTML = html;
+}
+
+// ===== CARGAR RANKING DESDE SUPABASE =====
+
+                        // Sumar puntos de todas las pruebas
+                        let ptsComp = 0;
+                        prb.forEach(p => {
+                            const prbRes = res[p.id] || {};
+                            const atletaRes = prbRes[a.id];
+                            if (atletaRes && atletaRes.pt) {
+                                ptsComp += atletaRes.pt;
+                            }
+                        });
+
+                        atletaStats[id].totalPuntos += ptsComp;
+                        atletaStats[id].competencias++;
+                    });
+                });
+
+                rankingData = Object.values(atletaStats)
+                    .sort((a, b) => b.totalPuntos - a.totalPuntos)
+                    .slice(0, 20);
+
+                fromSupabase = true;
+                console.log('✅ Ranking cargado desde Supabase');
+            }
+        } catch (e) {
+            console.error('Error cargando ranking Supabase:', e);
+        }
+    }
+
+    // Fallback a localStorage
+    if (!fromSupabase) {
+        if (currentRankingFilter === 'all') {
+            container.innerHTML = `
+                <div class="ranking-category">
+                    <h3><i class="fas fa-mars"></i> Masculino</h3>
+                    ${renderRankingByGender('male')}
+                </div>
+                <div class="ranking-category">
+                    <h3><i class="fas fa-venus"></i> Femenino</h3>
+                    ${renderRankingByGender('female')}
+                </div>
+            `;
+        } else {
+            container.innerHTML = `
+                <div class="ranking-category">
+                    <h3><i class="fas fa-${currentRankingFilter === 'male' ? 'mars' : 'venus'}"></i> 
+                    ${currentRankingFilter === 'male' ? 'Masculino' : 'Femenino'}</h3>
+                    ${renderRankingByGender(currentRankingFilter)}
+                </div>
+            `;
+        }
+        return;
+    }
+
+    // Renderizar ranking desde Supabase
+    if (rankingData.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-trophy"></i>
+                <p>No hay datos de ranking disponibles aún</p>
+                <p style="font-size: 0.9rem; margin-top: 0.5rem; color: var(--text-muted);">
+                    El ranking se generará automáticamente cuando haya competencias finalizadas
+                </p>
+            </div>
+        `;
+        return;
+    }
+
+    let html = `
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+            <span style="color: var(--success); font-size: 0.9rem;">
+                <i class="fas fa-cloud"></i> Ranking global calculado desde ${data.length} competencias finalizadas
+            </span>
+        </div>
+        <div class="ranking-grid">
+    `;
+
+    rankingData.forEach((a, index) => {
+        const posClass = index === 0 ? 'top1' : index === 1 ? 'top2' : index === 2 ? 'top3' : '';
+        const flag = a.pais ? `<img src="https://flagcdn.com/w40/${a.pais.toLowerCase()}.png" style="width: 28px; height: 20px; border-radius: 3px; vertical-align: middle; margin-right: 0.4rem;">` : '';
+
+        html += `
+            <div class="ranking-card">
+                <div class="ranking-position ${posClass}">#${index + 1}</div>
+                <div class="ranking-name">${flag}${a.nombre}</div>
+                <div class="ranking-stats">${a.categoria} | ${a.peso} kg | ${a.competencias} comps</div>
+                <div class="ranking-points">${a.totalPuntos.toFixed(1)} pts</div>
+            </div>
+        `;
+    });
+
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+// ===== INICIALIZACIÓN =====
+document.addEventListener('DOMContentLoaded', function() {
+    initSupabaseMain();
+    initCountdown();
+    loadProducts();
+    updateCartUI();
+    scoringLoadFromStorage();
+    scoringRenderPublicSection();
+});
+</script>
+
+    <!-- BOTÓN FLOTANTE CARRITO -->
+    <div class="cart-float-btn" onclick="openCart()" title="Ver carrito">
+        <i class="fas fa-shopping-cart" style="font-size: 1.5rem; color: #000;"></i>
+        <span class="cart-count" id="cartCount">0</span>
+    </div>
+
+    <!-- MODAL CARRITO -->
+    <div id="cartModal" class="modal">
+        <div class="modal-content cart-drawer">
+            <div class="modal-header" style="background: var(--gold); color: #000;">
+                <h2><i class="fas fa-shopping-cart"></i> Tu Carrito</h2>
+                <button class="close-btn" onclick="closeCart()" style="color: #000;">&times;</button>
+            </div>
+            <div class="modal-body" id="cartBody" style="max-height: 60vh; overflow-y: auto;">
+                <div class="empty-state">
+                    <i class="fas fa-shopping-cart"></i>
+                    <p>Tu carrito está vacío</p>
+                </div>
+            </div>
+            <div class="cart-footer" id="cartFooter" style="display: none;">
+                <div class="cart-total">Total: <span>$<span id="cartTotal">0</span></span> UYU</div>
+                <button class="btn btn-success" onclick="sendWhatsAppOrder()" style="width: 100%; margin-bottom: 0.5rem;">
+                    <i class="fab fa-whatsapp"></i> Enviar pedido por WhatsApp
+                </button>
+                <button class="btn btn-outline" onclick="clearCart()" style="width: 100%;">
+                    <i class="fas fa-trash"></i> Vaciar carrito
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- BOTÓN VOLVER ARRIBA -->
     <button class="scroll-top-btn" id="scrollTopBtn" onclick="scrollToTop()" title="Volver arriba">
         <i class="fas fa-chevron-up"></i>
