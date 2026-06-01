@@ -4163,8 +4163,19 @@ select.scoring-form-control{cursor:pointer}
             });
         }
 
-        function deleteEvents(id) {
+        async function deleteEvents(id) {
             if (!confirm('¿Eliminar este evento?')) return;
+
+            // Borrar de Supabase primero
+            if (supabaseClient) {
+                try {
+                    await supabaseClient.from('eventos').delete().eq('id', id);
+                    console.log('✅ Evento borrado de Supabase');
+                } catch (e) {
+                    console.error('Error borrando evento de Supabase:', e);
+                }
+            }
+
             data.events = data.events.filter(e => e.id !== id);
             saveAllData();
             renderEvents();
@@ -4473,8 +4484,18 @@ select.scoring-form-control{cursor:pointer}
             document.getElementById('recordDate').value = record.date || '';
         }
 
-        function deleteRecords(id) {
+        async function deleteRecords(id) {
             if (!confirm('¿Eliminar este récord?')) return;
+
+            if (supabaseClient) {
+                try {
+                    await supabaseClient.from('records').delete().eq('id', id);
+                    console.log('✅ Record borrado de Supabase');
+                } catch (e) {
+                    console.error('Error borrando record:', e);
+                }
+            }
+
             data.records = data.records.filter(r => r.id !== id);
             saveAllData();
             renderRecords();
