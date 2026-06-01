@@ -3796,7 +3796,7 @@ select.scoring-form-control{cursor:pointer}
                                 </thead>
                                 <tbody>
                                     ${rankingItems.map(item => {
-                                        const athlete = data.athletes.find(a => a.id === parseInt(item.athleteId));
+                                        const athlete = data.athletes.find(a => a.id == item.athleteId);
                                         return `
                                             <tr>
                                                 <td class="rank-position">#${item.position}</td>
@@ -4339,7 +4339,7 @@ select.scoring-form-control{cursor:pointer}
                 reader.readAsDataURL(fileInput.files[0]);
             } else {
                 if (id) {
-                    const existing = data.athletes.find(a => a.id === parseInt(id));
+                    const existing = data.athletes.find(a => a.id == id);
                     if (existing) athleteData.photo = existing.photo;
                 }
                 finishSaveAthlete(athleteData, id);
@@ -4348,7 +4348,7 @@ select.scoring-form-control{cursor:pointer}
 
         function finishSaveAthlete(athleteData, id) {
             if (id) {
-                const index = data.athletes.findIndex(a => a.id === parseInt(id));
+                const index = data.athletes.findIndex(a => a.id == id);
                 if (index !== -1) data.athletes[index] = athleteData;
             } else {
                 data.athletes.push(athleteData);
@@ -4460,7 +4460,7 @@ select.scoring-form-control{cursor:pointer}
             };
             
             if (id) {
-                const index = data.ranking.findIndex(r => r.id === parseInt(id));
+                const index = data.ranking.findIndex(r => r.id == id);
                 if (index !== -1) data.ranking[index] = rankingData;
             } else {
                 data.ranking.push(rankingData);
@@ -4515,7 +4515,7 @@ select.scoring-form-control{cursor:pointer}
                 reader.readAsDataURL(fileInput.files[0]);
             } else {
                 if (id) {
-                    const existing = data.gyms.find(g => g.id === parseInt(id));
+                    const existing = data.gyms.find(g => g.id == id);
                     if (existing) gymData.photo = existing.photo;
                 }
                 finishSaveGym(gymData, id);
@@ -4524,7 +4524,7 @@ select.scoring-form-control{cursor:pointer}
 
         function finishSaveGym(gymData, id) {
             if (id) {
-                const index = data.gyms.findIndex(g => g.id === parseInt(id));
+                const index = data.gyms.findIndex(g => g.id == id);
                 if (index !== -1) data.gyms[index] = gymData;
             } else {
                 data.gyms.push(gymData);
@@ -4570,7 +4570,7 @@ select.scoring-form-control{cursor:pointer}
                 date: document.getElementById('recordDate').value
             };
             if (id) {
-                const index = data.records.findIndex(r => r.id === parseInt(id));
+                const index = data.records.findIndex(r => r.id == id);
                 if (index !== -1) data.records[index] = recordData;
             } else {
                 data.records.push(recordData);
@@ -4672,7 +4672,7 @@ select.scoring-form-control{cursor:pointer}
                 description: document.getElementById('ruleDesc').value
             };
             if (id) {
-                const index = data.rules.findIndex(r => r.id === parseInt(id));
+                const index = data.rules.findIndex(r => r.id == id);
                 if (index !== -1) data.rules[index] = ruleData;
             } else {
                 data.rules.push(ruleData);
@@ -4720,7 +4720,7 @@ select.scoring-form-control{cursor:pointer}
                 description: document.getElementById('courseDesc').value
             };
             if (id) {
-                const index = data.courses.findIndex(c => c.id === parseInt(id));
+                const index = data.courses.findIndex(c => c.id == id);
                 if (index !== -1) data.courses[index] = courseData;
             } else {
                 data.courses.push(courseData);
@@ -4780,7 +4780,7 @@ select.scoring-form-control{cursor:pointer}
                 reader.readAsDataURL(fileInput.files[0]);
             } else {
                 if (id) {
-                    const existing = data.judges.find(j => j.id === parseInt(id));
+                    const existing = data.judges.find(j => j.id == id);
                     if (existing) judgeData.photo = existing.photo;
                 }
                 finishSaveJudge(judgeData, id);
@@ -4789,7 +4789,7 @@ select.scoring-form-control{cursor:pointer}
 
         function finishSaveJudge(judgeData, id) {
             if (id) {
-                const index = data.judges.findIndex(j => j.id === parseInt(id));
+                const index = data.judges.findIndex(j => j.id == id);
                 if (index !== -1) data.judges[index] = judgeData;
             } else {
                 data.judges.push(judgeData);
@@ -4845,7 +4845,7 @@ select.scoring-form-control{cursor:pointer}
                 reader.readAsDataURL(fileInput.files[0]);
             } else {
                 if (id) {
-                    const existing = data.sponsors.find(s => s.id === parseInt(id));
+                    const existing = data.sponsors.find(s => s.id == id);
                     if (existing) sponsorData.logo = existing.logo;
                 }
                 finishSaveSponsor(sponsorData, id);
@@ -4854,7 +4854,7 @@ select.scoring-form-control{cursor:pointer}
 
         function finishSaveSponsor(sponsorData, id) {
             if (id) {
-                const index = data.sponsors.findIndex(s => s.id === parseInt(id));
+                const index = data.sponsors.findIndex(s => s.id == id);
                 if (index !== -1) data.sponsors[index] = sponsorData;
             } else {
                 data.sponsors.push(sponsorData);
@@ -5617,7 +5617,7 @@ select.scoring-form-control{cursor:pointer}
                 alert('Seleccione un atleta');
                 return;
             }
-            const atleta = data.athletes.find(a => a.id === parseInt(atletaId));
+            const atleta = data.athletes.find(a => a.id == atletaId);
             if (!atleta) return;
             if (atletasComp.find(a => a.id === atleta.id)) {
                 alert('Este atleta ya está inscrito');
@@ -5701,7 +5701,7 @@ select.scoring-form-control{cursor:pointer}
             
             const jueces = [];
             document.querySelectorAll('.juez-comp-check:checked').forEach(cb => {
-                const juez = data.judges.find(j => j.id === parseInt(cb.value));
+                const juez = data.judges.find(j => j.id == cb.value);
                 if (juez) jueces.push(`${juez.name} ${juez.lastName}`);
             });
             
