@@ -3116,7 +3116,7 @@ select.scoring-form-control{cursor:pointer}
             saveAllData();
         }
 
-        async async function saveAllData() {
+        async function saveAllData() {
             // Guardar en localStorage PRIMERO (siempre funciona)
             localStorage.setItem('acaf_events', JSON.stringify(data.events));
             localStorage.setItem('acaf_athletes', JSON.stringify(data.athletes));
