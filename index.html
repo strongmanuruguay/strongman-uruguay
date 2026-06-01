@@ -3117,47 +3117,83 @@ select.scoring-form-control{cursor:pointer}
             if (!supabaseClient) return false;
 
             try {
-                // Cargar eventos
+                // Cargar eventos (mapear de vuelta a nombres del código)
                 const { data: eventsData, error: eventsError } = await supabaseClient
                     .from('eventos')
                     .select('*')
                     .order('fecha', { ascending: true });
 
                 if (!eventsError && eventsData && eventsData.length > 0) {
-                    data.events = eventsData;
+                    data.events = eventsData.map(e => ({
+                        id: e.id,
+                        name: e.nombre,
+                        date: e.fecha,
+                        time: e.hora,
+                        location: e.lugar,
+                        cost: e.costo,
+                        description: e.descripcion,
+                        categories: e.categorias,
+                        image: e.imagen_url
+                    }));
                     console.log('✅ Eventos cargados desde Supabase:', eventsData.length);
                 }
 
-                // Cargar atletas
+                // Cargar atletas (mapear de vuelta)
                 const { data: athletesData, error: athletesError } = await supabaseClient
                     .from('atletas')
                     .select('*')
                     .order('nombre', { ascending: true });
 
                 if (!athletesError && athletesData && athletesData.length > 0) {
-                    data.athletes = athletesData;
+                    data.athletes = athletesData.map(a => ({
+                        id: a.id,
+                        firstName: a.nombre,
+                        lastName: a.apellido,
+                        document: a.documento,
+                        phone: a.telefono,
+                        gender: a.genero,
+                        years: a.anos_compitiendo,
+                        number: a.numero,
+                        hasLicense: a.tiene_carne,
+                        photo: a.foto_url,
+                        marks: a.marcas
+                    }));
                     console.log('✅ Atletas cargados desde Supabase:', athletesData.length);
                 }
 
-                // Cargar ranking
+                // Cargar ranking (mapear de vuelta)
                 const { data: rankingData, error: rankingError } = await supabaseClient
                     .from('ranking_nacional')
                     .select('*')
                     .order('posicion', { ascending: true });
 
                 if (!rankingError && rankingData && rankingData.length > 0) {
-                    data.ranking = rankingData;
+                    data.ranking = rankingData.map(r => ({
+                        id: r.id,
+                        position: r.posicion,
+                        name: r.nombre,
+                        points: r.puntos,
+                        category: r.categoria,
+                        gender: r.genero
+                    }));
                     console.log('✅ Ranking cargado desde Supabase:', rankingData.length);
                 }
 
-                // Cargar records
+                // Cargar records (mapear de vuelta)
                 const { data: recordsData, error: recordsError } = await supabaseClient
                     .from('records')
                     .select('*')
                     .order('categoria', { ascending: true });
 
                 if (!recordsError && recordsData && recordsData.length > 0) {
-                    data.records = recordsData;
+                    data.records = recordsData.map(r => ({
+                        id: r.id,
+                        test: r.categoria,
+                        holder: r.atleta,
+                        mark: r.marca,
+                        date: r.fecha,
+                        event: r.evento
+                    }));
                     console.log('✅ Records cargados desde Supabase:', recordsData.length);
                 }
 
@@ -3189,14 +3225,25 @@ select.scoring-form-control{cursor:pointer}
             let guardado = false;
 
             try {
-                // Guardar eventos
+                // Guardar eventos (mapear nombres de campos)
                 if (data.events && data.events.length > 0) {
                     try {
-                        // Limpiar tabla e insertar nuevos datos
+                        const eventosMapped = data.events.map(e => ({
+                            id: e.id,
+                            nombre: e.name,
+                            fecha: e.date,
+                            hora: e.time,
+                            lugar: e.location,
+                            costo: e.cost,
+                            descripcion: e.description,
+                            categorias: e.categories,
+                            imagen_url: e.image
+                        }));
+
                         const { error: delError } = await supabaseClient.from('eventos').delete().neq('id', '00000000-0000-0000-0000-000000000000');
                         if (delError) console.warn('Error borrando eventos:', delError.message);
 
-                        const { error: insError } = await supabaseClient.from('eventos').insert(data.events);
+                        const { error: insError } = await supabaseClient.from('eventos').insert(eventosMapped);
                         if (insError) console.warn('Error insertando eventos:', insError.message);
                         else {
                             console.log('✅ Eventos guardados en Supabase');
@@ -3207,13 +3254,27 @@ select.scoring-form-control{cursor:pointer}
                     }
                 }
 
-                // Guardar atletas
+                // Guardar atletas (mapear nombres de campos)
                 if (data.athletes && data.athletes.length > 0) {
                     try {
+                        const atletasMapped = data.athletes.map(a => ({
+                            id: a.id,
+                            nombre: a.firstName,
+                            apellido: a.lastName,
+                            documento: a.document,
+                            telefono: a.phone,
+                            genero: a.gender,
+                            anos_compitiendo: a.years,
+                            numero: a.number,
+                            tiene_carne: a.hasLicense,
+                            foto_url: a.photo,
+                            marcas: a.marks
+                        }));
+
                         const { error: delError } = await supabaseClient.from('atletas').delete().neq('id', '00000000-0000-0000-0000-000000000000');
                         if (delError) console.warn('Error borrando atletas:', delError.message);
 
-                        const { error: insError } = await supabaseClient.from('atletas').insert(data.athletes);
+                        const { error: insError } = await supabaseClient.from('atletas').insert(atletasMapped);
                         if (insError) console.warn('Error insertando atletas:', insError.message);
                         else {
                             console.log('✅ Atletas guardados en Supabase');
@@ -3224,13 +3285,22 @@ select.scoring-form-control{cursor:pointer}
                     }
                 }
 
-                // Guardar ranking (puede fallar por estructura de columnas)
+                // Guardar ranking (mapear nombres de campos)
                 if (data.ranking && data.ranking.length > 0) {
                     try {
+                        const rankingMapped = data.ranking.map(r => ({
+                            id: r.id,
+                            posicion: r.position,
+                            nombre: r.name,
+                            puntos: r.points,
+                            categoria: r.category,
+                            genero: r.gender
+                        }));
+
                         const { error: delError } = await supabaseClient.from('ranking_nacional').delete().neq('id', '00000000-0000-0000-0000-000000000000');
                         if (delError) console.warn('Error borrando ranking:', delError.message);
 
-                        const { error: insError } = await supabaseClient.from('ranking_nacional').insert(data.ranking);
+                        const { error: insError } = await supabaseClient.from('ranking_nacional').insert(rankingMapped);
                         if (insError) console.warn('Error insertando ranking:', insError.message);
                         else {
                             console.log('✅ Ranking guardado en Supabase');
@@ -3241,13 +3311,22 @@ select.scoring-form-control{cursor:pointer}
                     }
                 }
 
-                // Guardar records
+                // Guardar records (mapear nombres de campos)
                 if (data.records && data.records.length > 0) {
                     try {
+                        const recordsMapped = data.records.map(r => ({
+                            id: r.id,
+                            categoria: r.test,
+                            atleta: r.holder,
+                            marca: r.mark,
+                            fecha: r.date,
+                            evento: r.event
+                        }));
+
                         const { error: delError } = await supabaseClient.from('records').delete().neq('id', '00000000-0000-0000-0000-000000000000');
                         if (delError) console.warn('Error borrando records:', delError.message);
 
-                        const { error: insError } = await supabaseClient.from('records').insert(data.records);
+                        const { error: insError } = await supabaseClient.from('records').insert(recordsMapped);
                         if (insError) console.warn('Error insertando records:', insError.message);
                         else {
                             console.log('✅ Records guardados en Supabase');
