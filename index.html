@@ -3192,10 +3192,16 @@ select.scoring-form-control{cursor:pointer}
                 // Guardar eventos
                 if (data.events && data.events.length > 0) {
                     try {
-                        await supabaseClient.from('eventos').delete().neq('id', 0);
-                        await supabaseClient.from('eventos').insert(data.events);
-                        console.log('✅ Eventos guardados en Supabase');
-                        guardado = true;
+                        // Limpiar tabla e insertar nuevos datos
+                        const { error: delError } = await supabaseClient.from('eventos').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+                        if (delError) console.warn('Error borrando eventos:', delError.message);
+
+                        const { error: insError } = await supabaseClient.from('eventos').insert(data.events);
+                        if (insError) console.warn('Error insertando eventos:', insError.message);
+                        else {
+                            console.log('✅ Eventos guardados en Supabase');
+                            guardado = true;
+                        }
                     } catch (e) {
                         console.warn('Eventos:', e.message);
                     }
@@ -3204,22 +3210,32 @@ select.scoring-form-control{cursor:pointer}
                 // Guardar atletas
                 if (data.athletes && data.athletes.length > 0) {
                     try {
-                        await supabaseClient.from('atletas').delete().neq('id', 0);
-                        await supabaseClient.from('atletas').insert(data.athletes);
-                        console.log('✅ Atletas guardados en Supabase');
-                        guardado = true;
+                        const { error: delError } = await supabaseClient.from('atletas').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+                        if (delError) console.warn('Error borrando atletas:', delError.message);
+
+                        const { error: insError } = await supabaseClient.from('atletas').insert(data.athletes);
+                        if (insError) console.warn('Error insertando atletas:', insError.message);
+                        else {
+                            console.log('✅ Atletas guardados en Supabase');
+                            guardado = true;
+                        }
                     } catch (e) {
                         console.warn('Atletas:', e.message);
                     }
                 }
 
-                // Guardar ranking
+                // Guardar ranking (puede fallar por estructura de columnas)
                 if (data.ranking && data.ranking.length > 0) {
                     try {
-                        await supabaseClient.from('ranking_nacional').delete().neq('id', 0);
-                        await supabaseClient.from('ranking_nacional').insert(data.ranking);
-                        console.log('✅ Ranking guardado en Supabase');
-                        guardado = true;
+                        const { error: delError } = await supabaseClient.from('ranking_nacional').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+                        if (delError) console.warn('Error borrando ranking:', delError.message);
+
+                        const { error: insError } = await supabaseClient.from('ranking_nacional').insert(data.ranking);
+                        if (insError) console.warn('Error insertando ranking:', insError.message);
+                        else {
+                            console.log('✅ Ranking guardado en Supabase');
+                            guardado = true;
+                        }
                     } catch (e) {
                         console.warn('Ranking:', e.message);
                     }
@@ -3228,10 +3244,15 @@ select.scoring-form-control{cursor:pointer}
                 // Guardar records
                 if (data.records && data.records.length > 0) {
                     try {
-                        await supabaseClient.from('records').delete().neq('id', 0);
-                        await supabaseClient.from('records').insert(data.records);
-                        console.log('✅ Records guardados en Supabase');
-                        guardado = true;
+                        const { error: delError } = await supabaseClient.from('records').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+                        if (delError) console.warn('Error borrando records:', delError.message);
+
+                        const { error: insError } = await supabaseClient.from('records').insert(data.records);
+                        if (insError) console.warn('Error insertando records:', insError.message);
+                        else {
+                            console.log('✅ Records guardados en Supabase');
+                            guardado = true;
+                        }
                     } catch (e) {
                         console.warn('Records:', e.message);
                     }
@@ -3240,13 +3261,16 @@ select.scoring-form-control{cursor:pointer}
                 // Guardar settings (logo, configuración)
                 if (data.settings) {
                     try {
-                        await supabaseClient.from('settings').upsert({
+                        const { error } = await supabaseClient.from('settings').upsert({
                             id: 1,
                             data_json: data.settings,
                             updated_at: new Date().toISOString()
                         }, { onConflict: 'id' });
-                        console.log('✅ Settings guardados en Supabase');
-                        guardado = true;
+                        if (error) console.warn('Error guardando settings:', error.message);
+                        else {
+                            console.log('✅ Settings guardados en Supabase');
+                            guardado = true;
+                        }
                     } catch (e) {
                         console.warn('Settings:', e.message);
                     }
