@@ -4213,7 +4213,7 @@ select.scoring-form-control{cursor:pointer}
                 categories.push(cb.value);
             });
             const eventData = {
-                id: id ? parseInt(id) : Date.now(),
+                id: id ? id : generateUUID(),
                 name: document.getElementById('eventName').value,
                 date: document.getElementById('eventDate').value,
                 time: document.getElementById('eventTime').value,
@@ -4233,7 +4233,7 @@ select.scoring-form-control{cursor:pointer}
                 reader.readAsDataURL(fileInput.files[0]);
             } else {
                 if (id) {
-                    const existing = data.events.find(ev => ev.id === parseInt(id));
+                    const existing = data.events.find(ev => ev.id == id);
                     if (existing) {
                         eventData.image = existing.image;
                         if (categories.length === 0 && existing.categories) {
@@ -4247,7 +4247,7 @@ select.scoring-form-control{cursor:pointer}
 
         function finishSaveEvent(eventData, id) {
             if (id) {
-                const index = data.events.findIndex(e => e.id === parseInt(id));
+                const index = data.events.findIndex(e => e.id == id);
                 if (index !== -1) data.events[index] = eventData;
             } else {
                 data.events.push(eventData);
@@ -4310,7 +4310,7 @@ select.scoring-form-control{cursor:pointer}
             e.preventDefault();
             const id = document.getElementById('athleteId').value;
             const athleteData = {
-                id: id ? parseInt(id) : Date.now(),
+                id: id ? id : generateUUID(),
                 name: document.getElementById('athleteName').value,
                 lastName: document.getElementById('athleteLastName').value,
                 doc: document.getElementById('athleteDoc').value,
@@ -4451,7 +4451,7 @@ select.scoring-form-control{cursor:pointer}
             }
             
             const rankingData = {
-                id: id ? parseInt(id) : Date.now(),
+                id: id ? id : generateUUID(),
                 athleteId: athleteId,
                 gender: gender,
                 category: category,
@@ -4499,7 +4499,7 @@ select.scoring-form-control{cursor:pointer}
             e.preventDefault();
             const id = document.getElementById('gymId').value;
             const gymData = {
-                id: id ? parseInt(id) : Date.now(),
+                id: id ? id : generateUUID(),
                 name: document.getElementById('gymName').value,
                 address: document.getElementById('gymAddress').value,
                 phone: document.getElementById('gymPhone').value,
@@ -4563,7 +4563,7 @@ select.scoring-form-control{cursor:pointer}
             e.preventDefault();
             const id = document.getElementById('recordId').value;
             const recordData = {
-                id: id ? parseInt(id) : Date.now(),
+                id: id ? id : generateUUID(),
                 test: document.getElementById('recordTest').value,
                 holder: document.getElementById('recordHolder').value,
                 mark: document.getElementById('recordMark').value,
@@ -4666,7 +4666,7 @@ select.scoring-form-control{cursor:pointer}
             e.preventDefault();
             const id = document.getElementById('ruleId').value;
             const ruleData = {
-                id: id ? parseInt(id) : Date.now(),
+                id: id ? id : generateUUID(),
                 category: document.getElementById('ruleCategory').value,
                 name: document.getElementById('ruleName').value,
                 description: document.getElementById('ruleDesc').value
@@ -4711,7 +4711,7 @@ select.scoring-form-control{cursor:pointer}
             e.preventDefault();
             const id = document.getElementById('courseId').value;
             const courseData = {
-                id: id ? parseInt(id) : Date.now(),
+                id: id ? id : generateUUID(),
                 title: document.getElementById('courseTitle').value,
                 date: document.getElementById('courseDate').value,
                 time: document.getElementById('courseTime').value,
@@ -4762,7 +4762,7 @@ select.scoring-form-control{cursor:pointer}
             e.preventDefault();
             const id = document.getElementById('judgeId').value;
             const judgeData = {
-                id: id ? parseInt(id) : Date.now(),
+                id: id ? id : generateUUID(),
                 name: document.getElementById('judgeName').value,
                 lastName: document.getElementById('judgeLastName').value,
                 doc: document.getElementById('judgeDoc').value,
@@ -4830,7 +4830,7 @@ select.scoring-form-control{cursor:pointer}
             e.preventDefault();
             const id = document.getElementById('sponsorId').value;
             const sponsorData = {
-                id: id ? parseInt(id) : Date.now(),
+                id: id ? id : generateUUID(),
                 name: document.getElementById('sponsorName').value,
                 link: document.getElementById('sponsorLink').value,
                 logo: null
