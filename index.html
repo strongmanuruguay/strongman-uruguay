@@ -3078,7 +3078,7 @@ select.scoring-form-control{cursor:pointer}
             // Guardar en Supabase (persistencia en la nube)
             if (supabaseClient) {
                 try {
-                    await syncToSupabase();
+                    await saveDataToSupabase();
                 } catch (e) {
                     console.error('Error sincronizando con Supabase:', e);
                 }
