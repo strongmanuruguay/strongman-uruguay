@@ -2989,19 +2989,8 @@ select.scoring-form-control{cursor:pointer}
         let currentRankingFilter = 'all';
 
         // ===== INICIALIZACIÓN =====
-        document.addEventListener('DOMContentLoaded', async function() {
+        document.addEventListener('DOMContentLoaded', function() {
             loadAllData();
-
-            // Intentar cargar desde Supabase primero
-            if (!supabaseClient) initSupabaseMain();
-            if (supabaseClient) {
-                try {
-                    await loadFromSupabase();
-                } catch (e) {
-                    console.error('Error cargando desde Supabase:', e);
-                }
-            }
-
             setupNavbar();
             updateCounters();
             countVisit();
@@ -3060,8 +3049,7 @@ select.scoring-form-control{cursor:pointer}
             saveAllData();
         }
 
-        async function saveAllData() {
-            // Guardar en localStorage (backup local)
+        function saveAllData() {
             localStorage.setItem('acaf_events', JSON.stringify(data.events));
             localStorage.setItem('acaf_athletes', JSON.stringify(data.athletes));
             localStorage.setItem('acaf_ranking', JSON.stringify(data.ranking));
@@ -3074,395 +3062,8 @@ select.scoring-form-control{cursor:pointer}
             localStorage.setItem('acaf_sponsors', JSON.stringify(data.sponsors));
             localStorage.setItem('acaf_contacts', JSON.stringify(data.contacts));
             localStorage.setItem('acaf_settings', JSON.stringify(data.settings));
-
-            // Guardar en Supabase (persistencia en la nube)
-            if (supabaseClient) {
-                try {
-                    await saveDataToSupabase();
-                } catch (e) {
-                    console.error('Error sincronizando con Supabase:', e);
-                }
-            }
-
             updateCounters();
         }
-
-
-        // ===== SUPABASE INTEGRATION - STRONGMAN URUGUAY =====
-        // Código migrado desde el archivo de integración existente
-
-        const SUPABASE_URL = 'https://kiojyhfqwjaoppgwoyjt.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_1MUOcELIRMoDlKdpUA7_fw_gYJ2dQHE';
-
-        let supabaseClient = null;
-
-        function initSupabaseMain() {
-            if (typeof supabase !== 'undefined' && supabase.createClient) {
-                try {
-                    supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-                    console.log('✅ Supabase conectado - Integration');
-                    return true;
-                }
-        // Generar UUID simple
-        function generateUUID() {
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-                return v.toString(16);
-            });
-        }
- catch(e) {
-                    console.error('❌ Error conectando Supabase:', e);
-                    return false;
-                }
-            }
-            console.warn('⚠️ Librería Supabase no cargada');
-            return false;
-        }
-
-        // ===== CARGAR DATOS DESDE SUPABASE =====
-        async function loadDataFromSupabase() {
-            if (!supabaseClient) initSupabaseMain();
-            if (!supabaseClient) return false;
-
-            try {
-                // Cargar eventos (mapear de vuelta a nombres del código)
-                const { data: eventsData, error: eventsError } = await supabaseClient
-                    .from('eventos')
-                    .select('*')
-                    .order('fecha', { ascending: true });
-
-                if (!eventsError && eventsData && eventsData.length > 0) {
-                    data.events = eventsData.map(e => ({
-                        id: e.id,
-                        name: e.nombre,
-                        date: e.fecha,
-                        time: e.hora,
-                        location: e.lugar,
-                        cost: e.costo,
-                        description: e.descripcion,
-                        categories: e.categorias,
-                        image: e.imagen_url
-                    }));
-                    console.log('✅ Eventos cargados desde Supabase:', eventsData.length);
-                }
-
-                // Cargar atletas (mapear de vuelta)
-                const { data: athletesData, error: athletesError } = await supabaseClient
-                    .from('atletas')
-                    .select('*')
-                    .order('nombre', { ascending: true });
-
-                if (!athletesError && athletesData && athletesData.length > 0) {
-                    data.athletes = athletesData.map(a => ({
-                        id: a.id,
-                        firstName: a.nombre,
-                        lastName: a.apellido,
-                        document: a.documento,
-                        phone: a.telefono,
-                        gender: a.genero,
-                        years: a.anos_compitiendo,
-                        number: a.numero,
-                        hasLicense: a.tiene_carne,
-                        photo: a.foto_url,
-                        marks: a.marcas
-                    }));
-                    console.log('✅ Atletas cargados desde Supabase:', athletesData.length);
-                }
-
-                // Cargar ranking (mapear de vuelta)
-                const { data: rankingData, error: rankingError } = await supabaseClient
-                    .from('ranking_nacional')
-                    .select('*')
-                    .order('posicion', { ascending: true });
-
-                if (!rankingError && rankingData && rankingData.length > 0) {
-                    data.ranking = rankingData.map(r => ({
-                        id: r.id,
-                        position: r.posicion,
-                        name: r.nombre,
-                        points: r.puntos,
-                        category: r.categoria,
-                        gender: r.genero
-                    }));
-                    console.log('✅ Ranking cargado desde Supabase:', rankingData.length);
-                }
-
-                // Cargar records (mapear de vuelta)
-                const { data: recordsData, error: recordsError } = await supabaseClient
-                    .from('records')
-                    .select('*')
-                    .order('categoria', { ascending: true });
-
-                if (!recordsError && recordsData && recordsData.length > 0) {
-                    data.records = recordsData.map(r => ({
-                        id: r.id,
-                        test: r.categoria,
-                        holder: r.atleta,
-                        mark: r.marca,
-                        date: r.fecha,
-                        event: r.evento
-                    }));
-                    console.log('✅ Records cargados desde Supabase:', recordsData.length);
-                }
-
-                // Cargar settings (logo, configuración)
-                const { data: settingsData, error: settingsError } = await supabaseClient
-                    .from('settings')
-                    .select('*')
-                    .eq('id', 1)
-                    .single();
-
-                if (!settingsError && settingsData && settingsData.data_json) {
-                    data.settings = { ...data.settings, ...settingsData.data_json };
-                    console.log('✅ Settings cargados desde Supabase');
-                }
-
-                console.log('✅ Todos los datos cargados desde Supabase');
-                return true;
-            } catch (e) {
-                console.error('Error cargando desde Supabase:', e);
-                return false;
-            }
-        }
-
-        // ===== GUARDAR DATOS EN SUPABASE =====
-        async function saveDataToSupabase() {
-            if (!supabaseClient) initSupabaseMain();
-            if (!supabaseClient) return false;
-
-            let guardado = false;
-
-            try {
-                // Guardar eventos (mapear nombres de campos)
-                if (data.events && data.events.length > 0) {
-                    try {
-                        const eventosMapped = data.events.map(e => ({
-                            id: typeof e.id === 'number' || (typeof e.id === 'string' && e.id.length < 36) ? generateUUID() : e.id,
-                            nombre: e.name,
-                            fecha: e.date,
-                            hora: e.time,
-                            lugar: e.location,
-                            costo: e.cost,
-                            descripcion: e.description,
-                            categorias: e.categories,
-                            imagen_url: e.image
-                        }));
-
-                        const { error: delError } = await supabaseClient.from('eventos').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-                        if (delError) console.warn('Error borrando eventos:', delError.message);
-
-                        const { error: insError } = await supabaseClient.from('eventos').insert(eventosMapped);
-                        if (insError) console.warn('Error insertando eventos:', insError.message);
-                        else {
-                            console.log('✅ Eventos guardados en Supabase');
-                            guardado = true;
-                        }
-                    } catch (e) {
-                        console.warn('Eventos:', e.message);
-                    }
-                }
-
-                // Guardar atletas (mapear nombres de campos)
-                if (data.athletes && data.athletes.length > 0) {
-                    try {
-                        const atletasMapped = data.athletes.map(a => ({
-                            id: typeof a.id === 'number' || (typeof a.id === 'string' && a.id.length < 36) ? generateUUID() : a.id,
-                            nombre: a.firstName,
-                            apellido: a.lastName,
-                            documento: a.document,
-                            telefono: a.phone,
-                            genero: a.gender,
-                            anos_compitiendo: a.years,
-                            numero: a.number,
-                            tiene_carne: a.hasLicense,
-                            foto_url: a.photo,
-                            marcas: a.marks
-                        }));
-
-                        const { error: delError } = await supabaseClient.from('atletas').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-                        if (delError) console.warn('Error borrando atletas:', delError.message);
-
-                        const { error: insError } = await supabaseClient.from('atletas').insert(atletasMapped);
-                        if (insError) console.warn('Error insertando atletas:', insError.message);
-                        else {
-                            console.log('✅ Atletas guardados en Supabase');
-                            guardado = true;
-                        }
-                    } catch (e) {
-                        console.warn('Atletas:', e.message);
-                    }
-                }
-
-                // Guardar ranking (mapear nombres de campos)
-                if (data.ranking && data.ranking.length > 0) {
-                    try {
-                        const rankingMapped = data.ranking.map(r => ({
-                            id: typeof r.id === 'number' || (typeof r.id === 'string' && r.id.length < 36) ? generateUUID() : r.id,
-                            posicion: r.position,
-                            nombre: r.name,
-                            puntos: r.points,
-                            categoria: r.category,
-                            genero: r.gender
-                        }));
-
-                        const { error: delError } = await supabaseClient.from('ranking_nacional').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-                        if (delError) console.warn('Error borrando ranking:', delError.message);
-
-                        const { error: insError } = await supabaseClient.from('ranking_nacional').insert(rankingMapped);
-                        if (insError) console.warn('Error insertando ranking:', insError.message);
-                        else {
-                            console.log('✅ Ranking guardado en Supabase');
-                            guardado = true;
-                        }
-                    } catch (e) {
-                        console.warn('Ranking:', e.message);
-                    }
-                }
-
-                // Guardar records (mapear nombres de campos)
-                if (data.records && data.records.length > 0) {
-                    try {
-                        const recordsMapped = data.records.map(r => ({
-                            id: typeof r.id === 'number' || (typeof r.id === 'string' && r.id.length < 36) ? generateUUID() : r.id,
-                            categoria: r.test,
-                            atleta: r.holder,
-                            marca: r.mark,
-                            fecha: r.date,
-                            evento: r.event
-                        }));
-
-                        const { error: delError } = await supabaseClient.from('records').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-                        if (delError) console.warn('Error borrando records:', delError.message);
-
-                        const { error: insError } = await supabaseClient.from('records').insert(recordsMapped);
-                        if (insError) console.warn('Error insertando records:', insError.message);
-                        else {
-                            console.log('✅ Records guardados en Supabase');
-                            guardado = true;
-                        }
-                    } catch (e) {
-                        console.warn('Records:', e.message);
-                    }
-                }
-
-                // Guardar settings (logo, configuración)
-                if (data.settings) {
-                    try {
-                        const { error } = await supabaseClient.from('settings').upsert({
-                            id: 1,
-                            data_json: data.settings,
-                            updated_at: new Date().toISOString()
-                        }, { onConflict: 'id' });
-                        if (error) console.warn('Error guardando settings:', error.message);
-                        else {
-                            console.log('✅ Settings guardados en Supabase');
-                            guardado = true;
-                        }
-                    } catch (e) {
-                        console.warn('Settings:', e.message);
-                    }
-                }
-
-                console.log('✅ Sincronización con Supabase completada');
-                return guardado;
-            } catch (e) {
-                console.error('Error guardando en Supabase:', e);
-                return false;
-            }
-        }
-
-        // ===== CARGAR COMPETENCIAS DESDE SUPABASE (STRONGSCORE) =====
-        async function renderCompetenciasPublico() {
-            const container = document.getElementById('competenciasPublicoContainer');
-            if (!container) return;
-
-            container.innerHTML = '<div class="loading-spinner"><i class="fas fa-circle-notch"></i> Cargando competencias desde la nube...</div>';
-
-            if (!supabaseClient) initSupabaseMain();
-
-            let competencias = [];
-            let fromSupabase = false;
-
-            if (supabaseClient) {
-                try {
-                    const { data: compData, error } = await supabaseClient
-                        .from('competencias')
-                        .select('*')
-                        .order('created_at', { ascending: false })
-                        .limit(20);
-
-                    if (!error && compData && compData.length > 0) {
-                        competencias = compData;
-                        fromSupabase = true;
-                        console.log('✅ Competencias cargadas:', compData.length);
-                    }
-                } catch (e) {
-                    console.error('Error:', e);
-                }
-            }
-
-            if (competencias.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-calendar-plus"></i>
-                        <p>No hay competencias registradas aún</p>
-                        <p style="font-size: 0.9rem; margin-top: 0.5rem; color: var(--text-muted);">
-                            Las competencias aparecerán aquí cuando se creen desde StrongScore Pro V3
-                        </p>
-                    </div>
-                `;
-                return;
-            }
-
-            let html = '<div class="competencias-grid">';
-            competencias.forEach(comp => {
-                const dataJson = comp.data_json || {};
-                const statusClass = comp.estado === 'activo' ? 'en-curso' : '';
-                const statusText = comp.estado || 'programado';
-
-                let fechaStr = 'Fecha por definir';
-                if (comp.fecha || dataJson.fec) {
-                    try {
-                        const d = new Date(comp.fecha || dataJson.fec);
-                        fechaStr = d.toLocaleDateString('es-UY', {day: 'numeric', month: 'long', year: 'numeric'});
-                    } catch(e) {}
-                }
-
-                const numAtletas = dataJson.atl ? dataJson.atl.length : 0;
-                const numPruebas = dataJson.prb ? dataJson.prb.length : 0;
-                const nombre = comp.nombre || dataJson.nom || 'Competencia';
-                const lugar = comp.lugar || dataJson.lug || '';
-
-                html += `
-                    <div class="competencia-card ${statusClass}">
-                        <div class="competencia-status ${statusText}">
-                            ${comp.estado === 'activo' ? '🔴 En Vivo' : comp.estado === 'finalizado' ? '✅ Finalizado' : '📅 Programado'}
-                        </div>
-                        <div class="competencia-nombre">${nombre}</div>
-                        <div class="competencia-fecha"><i class="fas fa-calendar"></i> ${fechaStr}</div>
-                        ${lugar ? `<div class="competencia-lugar"><i class="fas fa-map-marker-alt"></i> ${lugar}</div>` : ''}
-                        <div style="margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); font-size: 0.85rem;">
-                            <i class="fas fa-users"></i> ${numAtletas} atletas &nbsp;|&nbsp; 
-                            <i class="fas fa-dumbbell"></i> ${numPruebas} pruebas
-                        </div>
-                    </div>
-                `;
-            });
-            html += '</div>';
-
-            if (fromSupabase) {
-                html += `<p style="text-align: center; color: var(--success); margin-top: 1rem; font-size: 0.85rem;">
-                    <i class="fas fa-cloud"></i> Datos sincronizados desde la nube
-                </p>`;
-            }
-
-            container.innerHTML = html;
-        }
-
-
-        // Función para sincronizar datos con Supabase
-
-        // Función para cargar datos desde Supabase
 
         function loadAllData() {
             data.events = JSON.parse(localStorage.getItem('acaf_events')) || [];
@@ -3550,36 +3151,8 @@ select.scoring-form-control{cursor:pointer}
             return date.toLocaleDateString('es-UY', { day: 'numeric', month: 'long', year: 'numeric' });
         }
 
-        async function renderEvents() {
+        function renderEvents() {
             const container = document.getElementById('eventsContainer');
-            if (!container) return;
-
-            // Intentar cargar desde Supabase primero
-            if (supabaseClient && data.events.length === 0) {
-                try {
-                    const { data: eventosData, error } = await supabaseClient
-                        .from('eventos')
-                        .select('*')
-                        .order('fecha', { ascending: true });
-
-                    if (!error && eventosData && eventosData.length > 0) {
-                        data.events = eventosData.map(e => ({
-                            id: e.id,
-                            name: e.nombre,
-                            date: e.fecha,
-                            time: e.hora,
-                            location: e.lugar,
-                            cost: e.costo,
-                            description: e.descripcion,
-                            categories: e.categorias || [],
-                            image: e.imagen_url
-                        }));
-                    }
-                } catch (e) {
-                    console.error('Error cargando eventos:', e);
-                }
-            }
-
             if (data.events.length === 0) {
                 container.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;"><i class="fas fa-calendar-times"></i><p>No hay eventos programados</p></div>';
                 return;
@@ -3639,143 +3212,28 @@ select.scoring-form-control{cursor:pointer}
             renderAthletes();
         }
 
-        async function renderRanking() {
+        function renderRanking() {
             const container = document.getElementById('rankingContainer');
-            if (!container) return;
-
-            container.innerHTML = '<div class="loading-spinner"><i class="fas fa-circle-notch"></i> Cargando ranking...</div>';
-
-            if (!supabaseClient) initSupabaseMain();
-
-            let rankingData = [];
-            let fromSupabase = false;
-            let numCompetencias = 0;
-
-            // Intentar cargar desde Supabase primero
-            if (supabaseClient) {
-                try {
-                    const { data, error } = await supabaseClient
-                        .from('competencias')
-                        .select('*')
-                        .eq('estado', 'finalizado')
-                        .order('created_at', { ascending: false })
-                        .limit(10);
-
-                    if (!error && data && data.length > 0) {
-                        numCompetencias = data.length;
-                        const atletaStats = {};
-
-                        data.forEach(comp => {
-                            const d = comp.data_json || {};
-                            const atl = d.atl || [];
-                            const res = d.res || {};
-                            const prb = d.prb || [];
-
-                            atl.forEach(a => {
-                                const id = a.id || a.nom;
-                                if (!atletaStats[id]) {
-                                    atletaStats[id] = {
-                                        nombre: a.n || a.nom || 'Atleta',
-                                        pais: a.p || a.pais || 'UY',
-                                        peso: a.w || a.peso || 0,
-                                        sexo: a.s || a.sexo || 'M',
-                                        categoria: a.catId || 'Open',
-                                        totalPuntos: 0,
-                                        competencias: 0,
-                                        victorias: 0
-                                    };
-                                }
-
-                                let ptsComp = 0;
-                                prb.forEach(p => {
-                                    const prbRes = res[p.id] || {};
-                                    const atletaRes = prbRes[a.id];
-                                    if (atletaRes && atletaRes.pt) {
-                                        ptsComp += atletaRes.pt;
-                                    }
-                                });
-
-                                atletaStats[id].totalPuntos += ptsComp;
-                                atletaStats[id].competencias++;
-                            });
-                        });
-
-                        rankingData = Object.values(atletaStats)
-                            .sort((a, b) => b.totalPuntos - a.totalPuntos)
-                            .slice(0, 20);
-
-                        fromSupabase = true;
-                        console.log('✅ Ranking cargado desde Supabase');
-                    }
-                } catch (e) {
-                    console.error('Error cargando ranking Supabase:', e);
-                }
-            }
-
-            // Fallback a localStorage
-            if (!fromSupabase) {
-                if (currentRankingFilter === 'all') {
-                    container.innerHTML = `
-                        <div class="ranking-category">
-                            <h3><i class="fas fa-mars"></i> Masculino</h3>
-                            ${renderRankingByGender('male')}
-                        </div>
-                        <div class="ranking-category">
-                            <h3><i class="fas fa-venus"></i> Femenino</h3>
-                            ${renderRankingByGender('female')}
-                        </div>
-                    `;
-                } else {
-                    container.innerHTML = `
-                        <div class="ranking-category">
-                            <h3><i class="fas fa-${currentRankingFilter === 'male' ? 'mars' : 'venus'}"></i> 
-                            ${currentRankingFilter === 'male' ? 'Masculino' : 'Femenino'}</h3>
-                            ${renderRankingByGender(currentRankingFilter)}
-                        </div>
-                    `;
-                }
-                return;
-            }
-
-            // Renderizar ranking desde Supabase
-            if (rankingData.length === 0) {
+            if (currentRankingFilter === 'all') {
                 container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-trophy"></i>
-                        <p>No hay datos de ranking disponibles aún</p>
-                        <p style="font-size: 0.9rem; margin-top: 0.5rem; color: var(--text-muted);">
-                            El ranking se generará automáticamente cuando haya competencias finalizadas
-                        </p>
+                    <div class="ranking-category">
+                        <h3><i class="fas fa-mars"></i> Masculino</h3>
+                        ${renderRankingByGender('male')}
+                    </div>
+                    <div class="ranking-category">
+                        <h3><i class="fas fa-venus"></i> Femenino</h3>
+                        ${renderRankingByGender('female')}
                     </div>
                 `;
-                return;
+            } else {
+                container.innerHTML = `
+                    <div class="ranking-category">
+                        <h3><i class="fas fa-${currentRankingFilter === 'male' ? 'mars' : 'venus'}"></i> 
+                        ${currentRankingFilter === 'male' ? 'Masculino' : 'Femenino'}</h3>
+                        ${renderRankingByGender(currentRankingFilter)}
+                    </div>
+                `;
             }
-
-            let html = `
-                <div style="text-align: center; margin-bottom: 1.5rem;">
-                    <span style="color: var(--success); font-size: 0.9rem;">
-                        <i class="fas fa-cloud"></i> Ranking global calculado desde ${numCompetencias} competencias finalizadas
-                    </span>
-                </div>
-                <div class="ranking-grid">
-            `;
-
-            rankingData.forEach((a, index) => {
-                const posClass = index === 0 ? 'top1' : index === 1 ? 'top2' : index === 2 ? 'top3' : '';
-                const flag = a.pais ? `<img src="https://flagcdn.com/w40/${a.pais.toLowerCase()}.png" style="width: 28px; height: 20px; border-radius: 3px; vertical-align: middle; margin-right: 0.4rem; box-shadow: 0 1px 3px rgba(0,0,0,0.3);">` : '';
-
-                html += `
-                    <div class="ranking-card">
-                        <div class="ranking-position ${posClass}">#${index + 1}</div>
-                        <div class="ranking-name">${flag}${a.nombre}</div>
-                        <div class="ranking-stats">${a.categoria} | ${a.peso} kg | ${a.competencias} comps</div>
-                        <div class="ranking-points">${a.totalPuntos.toFixed(1)} pts</div>
-                    </div>
-                `;
-            });
-
-            html += '</div>';
-            container.innerHTML = html;
         }
 
         function renderRankingByGender(gender) {
@@ -3796,7 +3254,7 @@ select.scoring-form-control{cursor:pointer}
                                 </thead>
                                 <tbody>
                                     ${rankingItems.map(item => {
-                                        const athlete = data.athletes.find(a => a.id == item.athleteId);
+                                        const athlete = data.athletes.find(a => a.id === parseInt(item.athleteId));
                                         return `
                                             <tr>
                                                 <td class="rank-position">#${item.position}</td>
@@ -4213,7 +3671,7 @@ select.scoring-form-control{cursor:pointer}
                 categories.push(cb.value);
             });
             const eventData = {
-                id: id ? id : generateUUID(),
+                id: id ? parseInt(id) : Date.now(),
                 name: document.getElementById('eventName').value,
                 date: document.getElementById('eventDate').value,
                 time: document.getElementById('eventTime').value,
@@ -4233,7 +3691,7 @@ select.scoring-form-control{cursor:pointer}
                 reader.readAsDataURL(fileInput.files[0]);
             } else {
                 if (id) {
-                    const existing = data.events.find(ev => ev.id == id);
+                    const existing = data.events.find(ev => ev.id === parseInt(id));
                     if (existing) {
                         eventData.image = existing.image;
                         if (categories.length === 0 && existing.categories) {
@@ -4247,7 +3705,7 @@ select.scoring-form-control{cursor:pointer}
 
         function finishSaveEvent(eventData, id) {
             if (id) {
-                const index = data.events.findIndex(e => e.id == id);
+                const index = data.events.findIndex(e => e.id === parseInt(id));
                 if (index !== -1) data.events[index] = eventData;
             } else {
                 data.events.push(eventData);
@@ -4276,28 +3734,10 @@ select.scoring-form-control{cursor:pointer}
 
         function deleteEvents(id) {
             if (!confirm('¿Eliminar este evento?')) return;
-
-            // Intentar borrar de Supabase primero (async)
-            if (!supabaseClient) initSupabaseMain();
-            if (supabaseClient) {
-                supabaseClient.from('eventos').delete().eq('id', id).then(() => {
-                    console.log('✅ Evento borrado de Supabase');
-                }).catch(e => {
-                    console.error('Error borrando de Supabase:', e);
-                }).finally(() => {
-                    // Siempre borrar del localStorage también
-                    data.events = data.events.filter(e => e.id !== id);
-                    saveAllData();
-                    renderEvents();
-                    loadAdminList('events');
-                });
-            } else {
-                // Si no hay Supabase, solo borrar local
-                data.events = data.events.filter(e => e.id !== id);
-                saveAllData();
-                renderEvents();
-                loadAdminList('events');
-            }
+            data.events = data.events.filter(e => e.id !== id);
+            saveAllData();
+            renderEvents();
+            loadAdminList('events');
         }
 
         function resetEventForm() {
@@ -4310,7 +3750,7 @@ select.scoring-form-control{cursor:pointer}
             e.preventDefault();
             const id = document.getElementById('athleteId').value;
             const athleteData = {
-                id: id ? id : generateUUID(),
+                id: id ? parseInt(id) : Date.now(),
                 name: document.getElementById('athleteName').value,
                 lastName: document.getElementById('athleteLastName').value,
                 doc: document.getElementById('athleteDoc').value,
@@ -4339,7 +3779,7 @@ select.scoring-form-control{cursor:pointer}
                 reader.readAsDataURL(fileInput.files[0]);
             } else {
                 if (id) {
-                    const existing = data.athletes.find(a => a.id == id);
+                    const existing = data.athletes.find(a => a.id === parseInt(id));
                     if (existing) athleteData.photo = existing.photo;
                 }
                 finishSaveAthlete(athleteData, id);
@@ -4348,7 +3788,7 @@ select.scoring-form-control{cursor:pointer}
 
         function finishSaveAthlete(athleteData, id) {
             if (id) {
-                const index = data.athletes.findIndex(a => a.id == id);
+                const index = data.athletes.findIndex(a => a.id === parseInt(id));
                 if (index !== -1) data.athletes[index] = athleteData;
             } else {
                 data.athletes.push(athleteData);
@@ -4451,7 +3891,7 @@ select.scoring-form-control{cursor:pointer}
             }
             
             const rankingData = {
-                id: id ? id : generateUUID(),
+                id: id ? parseInt(id) : Date.now(),
                 athleteId: athleteId,
                 gender: gender,
                 category: category,
@@ -4460,7 +3900,7 @@ select.scoring-form-control{cursor:pointer}
             };
             
             if (id) {
-                const index = data.ranking.findIndex(r => r.id == id);
+                const index = data.ranking.findIndex(r => r.id === parseInt(id));
                 if (index !== -1) data.ranking[index] = rankingData;
             } else {
                 data.ranking.push(rankingData);
@@ -4499,7 +3939,7 @@ select.scoring-form-control{cursor:pointer}
             e.preventDefault();
             const id = document.getElementById('gymId').value;
             const gymData = {
-                id: id ? id : generateUUID(),
+                id: id ? parseInt(id) : Date.now(),
                 name: document.getElementById('gymName').value,
                 address: document.getElementById('gymAddress').value,
                 phone: document.getElementById('gymPhone').value,
@@ -4515,7 +3955,7 @@ select.scoring-form-control{cursor:pointer}
                 reader.readAsDataURL(fileInput.files[0]);
             } else {
                 if (id) {
-                    const existing = data.gyms.find(g => g.id == id);
+                    const existing = data.gyms.find(g => g.id === parseInt(id));
                     if (existing) gymData.photo = existing.photo;
                 }
                 finishSaveGym(gymData, id);
@@ -4524,7 +3964,7 @@ select.scoring-form-control{cursor:pointer}
 
         function finishSaveGym(gymData, id) {
             if (id) {
-                const index = data.gyms.findIndex(g => g.id == id);
+                const index = data.gyms.findIndex(g => g.id === parseInt(id));
                 if (index !== -1) data.gyms[index] = gymData;
             } else {
                 data.gyms.push(gymData);
@@ -4563,14 +4003,14 @@ select.scoring-form-control{cursor:pointer}
             e.preventDefault();
             const id = document.getElementById('recordId').value;
             const recordData = {
-                id: id ? id : generateUUID(),
+                id: id ? parseInt(id) : Date.now(),
                 test: document.getElementById('recordTest').value,
                 holder: document.getElementById('recordHolder').value,
                 mark: document.getElementById('recordMark').value,
                 date: document.getElementById('recordDate').value
             };
             if (id) {
-                const index = data.records.findIndex(r => r.id == id);
+                const index = data.records.findIndex(r => r.id === parseInt(id));
                 if (index !== -1) data.records[index] = recordData;
             } else {
                 data.records.push(recordData);
@@ -4604,25 +4044,10 @@ select.scoring-form-control{cursor:pointer}
 
         function deleteRecords(id) {
             if (!confirm('¿Eliminar este récord?')) return;
-
-            if (!supabaseClient) initSupabaseMain();
-            if (supabaseClient) {
-                supabaseClient.from('records').delete().eq('id', id).then(() => {
-                    console.log('✅ Record borrado de Supabase');
-                }).catch(e => {
-                    console.error('Error borrando de Supabase:', e);
-                }).finally(() => {
-                    data.records = data.records.filter(r => r.id !== id);
-                    saveAllData();
-                    renderRecords();
-                    loadAdminList('records');
-                });
-            } else {
-                data.records = data.records.filter(r => r.id !== id);
-                saveAllData();
-                renderRecords();
-                loadAdminList('records');
-            }
+            data.records = data.records.filter(r => r.id !== id);
+            saveAllData();
+            renderRecords();
+            loadAdminList('records');
         }
 
         function resetRecordForm() {
@@ -4666,13 +4091,13 @@ select.scoring-form-control{cursor:pointer}
             e.preventDefault();
             const id = document.getElementById('ruleId').value;
             const ruleData = {
-                id: id ? id : generateUUID(),
+                id: id ? parseInt(id) : Date.now(),
                 category: document.getElementById('ruleCategory').value,
                 name: document.getElementById('ruleName').value,
                 description: document.getElementById('ruleDesc').value
             };
             if (id) {
-                const index = data.rules.findIndex(r => r.id == id);
+                const index = data.rules.findIndex(r => r.id === parseInt(id));
                 if (index !== -1) data.rules[index] = ruleData;
             } else {
                 data.rules.push(ruleData);
@@ -4711,7 +4136,7 @@ select.scoring-form-control{cursor:pointer}
             e.preventDefault();
             const id = document.getElementById('courseId').value;
             const courseData = {
-                id: id ? id : generateUUID(),
+                id: id ? parseInt(id) : Date.now(),
                 title: document.getElementById('courseTitle').value,
                 date: document.getElementById('courseDate').value,
                 time: document.getElementById('courseTime').value,
@@ -4720,7 +4145,7 @@ select.scoring-form-control{cursor:pointer}
                 description: document.getElementById('courseDesc').value
             };
             if (id) {
-                const index = data.courses.findIndex(c => c.id == id);
+                const index = data.courses.findIndex(c => c.id === parseInt(id));
                 if (index !== -1) data.courses[index] = courseData;
             } else {
                 data.courses.push(courseData);
@@ -4762,7 +4187,7 @@ select.scoring-form-control{cursor:pointer}
             e.preventDefault();
             const id = document.getElementById('judgeId').value;
             const judgeData = {
-                id: id ? id : generateUUID(),
+                id: id ? parseInt(id) : Date.now(),
                 name: document.getElementById('judgeName').value,
                 lastName: document.getElementById('judgeLastName').value,
                 doc: document.getElementById('judgeDoc').value,
@@ -4780,7 +4205,7 @@ select.scoring-form-control{cursor:pointer}
                 reader.readAsDataURL(fileInput.files[0]);
             } else {
                 if (id) {
-                    const existing = data.judges.find(j => j.id == id);
+                    const existing = data.judges.find(j => j.id === parseInt(id));
                     if (existing) judgeData.photo = existing.photo;
                 }
                 finishSaveJudge(judgeData, id);
@@ -4789,7 +4214,7 @@ select.scoring-form-control{cursor:pointer}
 
         function finishSaveJudge(judgeData, id) {
             if (id) {
-                const index = data.judges.findIndex(j => j.id == id);
+                const index = data.judges.findIndex(j => j.id === parseInt(id));
                 if (index !== -1) data.judges[index] = judgeData;
             } else {
                 data.judges.push(judgeData);
@@ -4830,7 +4255,7 @@ select.scoring-form-control{cursor:pointer}
             e.preventDefault();
             const id = document.getElementById('sponsorId').value;
             const sponsorData = {
-                id: id ? id : generateUUID(),
+                id: id ? parseInt(id) : Date.now(),
                 name: document.getElementById('sponsorName').value,
                 link: document.getElementById('sponsorLink').value,
                 logo: null
@@ -4845,7 +4270,7 @@ select.scoring-form-control{cursor:pointer}
                 reader.readAsDataURL(fileInput.files[0]);
             } else {
                 if (id) {
-                    const existing = data.sponsors.find(s => s.id == id);
+                    const existing = data.sponsors.find(s => s.id === parseInt(id));
                     if (existing) sponsorData.logo = existing.logo;
                 }
                 finishSaveSponsor(sponsorData, id);
@@ -4854,7 +4279,7 @@ select.scoring-form-control{cursor:pointer}
 
         function finishSaveSponsor(sponsorData, id) {
             if (id) {
-                const index = data.sponsors.findIndex(s => s.id == id);
+                const index = data.sponsors.findIndex(s => s.id === parseInt(id));
                 if (index !== -1) data.sponsors[index] = sponsorData;
             } else {
                 data.sponsors.push(sponsorData);
@@ -5617,7 +5042,7 @@ select.scoring-form-control{cursor:pointer}
                 alert('Seleccione un atleta');
                 return;
             }
-            const atleta = data.athletes.find(a => a.id == atletaId);
+            const atleta = data.athletes.find(a => a.id === parseInt(atletaId));
             if (!atleta) return;
             if (atletasComp.find(a => a.id === atleta.id)) {
                 alert('Este atleta ya está inscrito');
@@ -5701,7 +5126,7 @@ select.scoring-form-control{cursor:pointer}
             
             const jueces = [];
             document.querySelectorAll('.juez-comp-check:checked').forEach(cb => {
-                const juez = data.judges.find(j => j.id == cb.value);
+                const juez = data.judges.find(j => j.id === parseInt(cb.value));
                 if (juez) jueces.push(`${juez.name} ${juez.lastName}`);
             });
             
@@ -7101,6 +6526,275 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
+// ===== SUPABASE INTEGRATION - WEB PRINCIPAL (CORREGIDO V2) =====
+const SUPABASE_URL = 'https://kiojyhfqwjaoppgwoyjt.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_1MUOcELIRMoDlKdpUA7_fw_gYJ2dQHE';
+let supabaseClient = null;
+
+function initSupabaseMain() {
+    if (typeof supabase !== 'undefined' && supabase.createClient) {
+        try {
+            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            console.log('✅ Supabase conectado - Web Principal');
+            return true;
+        } catch(e) {
+            console.error('❌ Error conectando Supabase:', e);
+            return false;
+        }
+    }
+    console.warn('⚠️ Librería Supabase no cargada');
+    return false;
+}
+
+// ===== CARGAR COMPETENCIAS DESDE SUPABASE =====
+async function renderCompetenciasPublico() {
+    const container = document.getElementById('competenciasPublicoContainer');
+    if (!container) return;
+
+    container.innerHTML = '<div class="loading-spinner"><i class="fas fa-circle-notch"></i> Cargando competencias desde la nube...</div>';
+
+    // Intentar Supabase primero
+    if (!supabaseClient) initSupabaseMain();
+
+    let competencias = [];
+    let fromSupabase = false;
+
+    if (supabaseClient) {
+        try {
+            const { data, error } = await supabaseClient
+                .from('competencias')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(20);
+
+            if (!error && data && data.length > 0) {
+                competencias = data;
+                fromSupabase = true;
+                console.log('✅ Competencias cargadas desde Supabase:', data.length);
+            } else if (error) {
+                console.error('Error Supabase competencias:', error);
+            }
+        } catch (e) {
+            console.error('Error conexión Supabase:', e);
+        }
+    }
+
+    // Fallback a localStorage si Supabase falla o está vacío
+    if (!fromSupabase) {
+        competencias = JSON.parse(localStorage.getItem('acaf_competencias')) || [];
+        console.log('📦 Competencias cargadas desde localStorage:', competencias.length);
+    }
+
+    if (competencias.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-calendar-plus"></i>
+                <p>No hay competencias registradas aún</p>
+                <p style="font-size: 0.9rem; margin-top: 0.5rem; color: var(--text-muted);">
+                    Las competencias aparecerán aquí cuando se creen desde StrongScore Pro V3
+                </p>
+            </div>
+        `;
+        return;
+    }
+
+    let html = '<div class="competencias-grid">';
+    competencias.forEach(comp => {
+        // Extraer datos del JSON (formato StrongScore Pro V3)
+        const dataJson = comp.data_json || {};
+
+        const statusClass = comp.estado === 'en_curso' ? 'en-curso' : '';
+        const statusText = comp.estado || 'programado';
+
+        let fechaStr = 'Fecha por definir';
+        if (comp.fecha) {
+            try {
+                const d = new Date(comp.fecha);
+                fechaStr = d.toLocaleDateString('es-UY', {day: 'numeric', month: 'long', year: 'numeric'});
+            } catch(e) {}
+        }
+
+        // Contar atletas y pruebas desde data_json
+        const numAtletas = dataJson.atl ? dataJson.atl.length : 0;
+        const numPruebas = dataJson.prb ? dataJson.prb.length : 0;
+        const nombre = comp.nombre || dataJson.nom || 'Competencia';
+        const lugar = comp.lugar || dataJson.lug || '';
+
+        html += `
+            <div class="competencia-card ${statusClass}">
+                <div class="competencia-status ${statusText}">
+                    ${comp.estado === 'activo' ? '🔴 En Vivo' : comp.estado === 'finalizado' ? '✅ Finalizado' : '📅 Programado'}
+                </div>
+                <div class="competencia-nombre">${nombre}</div>
+                <div class="competencia-fecha"><i class="fas fa-calendar"></i> ${fechaStr}</div>
+                ${lugar ? `<div class="competencia-lugar"><i class="fas fa-map-marker-alt"></i> ${lugar}</div>` : ''}
+                <div style="margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); font-size: 0.85rem;">
+                    <i class="fas fa-users"></i> ${numAtletas} atletas &nbsp;|&nbsp; 
+                    <i class="fas fa-dumbbell"></i> ${numPruebas} pruebas
+                </div>
+            </div>
+        `;
+    });
+    html += '</div>';
+
+    if (fromSupabase) {
+        html += `<p style="text-align: center; color: var(--success); margin-top: 1rem; font-size: 0.85rem;">
+            <i class="fas fa-cloud"></i> Datos sincronizados desde la nube
+        </p>`;
+    }
+
+    container.innerHTML = html;
+}
+
+// ===== CARGAR RANKING DESDE SUPABASE =====
+async function renderRanking() {
+    const container = document.getElementById('rankingContainer');
+    if (!container) return;
+
+    container.innerHTML = '<div class="loading-spinner"><i class="fas fa-circle-notch"></i> Cargando ranking...</div>';
+
+    if (!supabaseClient) initSupabaseMain();
+
+    let rankingData = [];
+    let fromSupabase = false;
+
+    // Intentar cargar desde Supabase primero
+    if (supabaseClient) {
+        try {
+            const { data, error } = await supabaseClient
+                .from('competencias')
+                .select('*')
+                .eq('estado', 'finalizado')
+                .order('created_at', { ascending: false })
+                .limit(10);
+
+            if (!error && data && data.length > 0) {
+                // Construir ranking global de todas las competencias finalizadas
+                const atletaStats = {};
+
+                data.forEach(comp => {
+                    const d = comp.data_json || {};
+                    const atl = d.atl || [];
+                    const res = d.res || {};
+                    const prb = d.prb || [];
+
+                    atl.forEach(a => {
+                        const id = a.id || a.nom;
+                        if (!atletaStats[id]) {
+                            atletaStats[id] = {
+                                nombre: a.n || a.nom || 'Atleta',
+                                pais: a.p || a.pais || 'UY',
+                                peso: a.w || a.peso || 0,
+                                sexo: a.s || a.sexo || 'M',
+                                categoria: a.catId || 'Open',
+                                totalPuntos: 0,
+                                competencias: 0,
+                                victorias: 0
+                            };
+                        }
+
+                        // Sumar puntos de todas las pruebas
+                        let ptsComp = 0;
+                        prb.forEach(p => {
+                            const prbRes = res[p.id] || {};
+                            const atletaRes = prbRes[a.id];
+                            if (atletaRes && atletaRes.pt) {
+                                ptsComp += atletaRes.pt;
+                            }
+                        });
+
+                        atletaStats[id].totalPuntos += ptsComp;
+                        atletaStats[id].competencias++;
+                    });
+                });
+
+                rankingData = Object.values(atletaStats)
+                    .sort((a, b) => b.totalPuntos - a.totalPuntos)
+                    .slice(0, 20);
+
+                fromSupabase = true;
+                console.log('✅ Ranking cargado desde Supabase');
+            }
+        } catch (e) {
+            console.error('Error cargando ranking Supabase:', e);
+        }
+    }
+
+    // Fallback a localStorage
+    if (!fromSupabase) {
+        if (currentRankingFilter === 'all') {
+            container.innerHTML = `
+                <div class="ranking-category">
+                    <h3><i class="fas fa-mars"></i> Masculino</h3>
+                    ${renderRankingByGender('male')}
+                </div>
+                <div class="ranking-category">
+                    <h3><i class="fas fa-venus"></i> Femenino</h3>
+                    ${renderRankingByGender('female')}
+                </div>
+            `;
+        } else {
+            container.innerHTML = `
+                <div class="ranking-category">
+                    <h3><i class="fas fa-${currentRankingFilter === 'male' ? 'mars' : 'venus'}"></i> 
+                    ${currentRankingFilter === 'male' ? 'Masculino' : 'Femenino'}</h3>
+                    ${renderRankingByGender(currentRankingFilter)}
+                </div>
+            `;
+        }
+        return;
+    }
+
+    // Renderizar ranking desde Supabase
+    if (rankingData.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-trophy"></i>
+                <p>No hay datos de ranking disponibles aún</p>
+                <p style="font-size: 0.9rem; margin-top: 0.5rem; color: var(--text-muted);">
+                    El ranking se generará automáticamente cuando haya competencias finalizadas
+                </p>
+            </div>
+        `;
+        return;
+    }
+
+    let html = `
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+            <span style="color: var(--success); font-size: 0.9rem;">
+                <i class="fas fa-cloud"></i> Ranking global calculado desde ${data.length} competencias finalizadas
+            </span>
+        </div>
+        <div class="ranking-grid">
+    `;
+
+    rankingData.forEach((a, index) => {
+        const posClass = index === 0 ? 'top1' : index === 1 ? 'top2' : index === 2 ? 'top3' : '';
+        const flag = a.pais ? `<img src="https://flagcdn.com/w40/${a.pais.toLowerCase()}.png" style="width: 28px; height: 20px; border-radius: 3px; vertical-align: middle; margin-right: 0.4rem;">` : '';
+
+        html += `
+            <div class="ranking-card">
+                <div class="ranking-position ${posClass}">#${index + 1}</div>
+                <div class="ranking-name">${flag}${a.nombre}</div>
+                <div class="ranking-stats">${a.categoria} | ${a.peso} kg | ${a.competencias} comps</div>
+                <div class="ranking-points">${a.totalPuntos.toFixed(1)} pts</div>
+            </div>
+        `;
+    });
+
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+// ===== INICIALIZACIÓN =====
+document.addEventListener('DOMContentLoaded', function() {
+    initSupabaseMain();
+    initCountdown();
+    loadProducts();
+    updateCartUI();
+    scoringLoadFromStorage();
+    scoringRenderPublicSection();
+});
 </script>
 
     <!-- BOTÓN FLOTANTE CARRITO -->
