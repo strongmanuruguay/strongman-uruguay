@@ -4163,23 +4163,30 @@ select.scoring-form-control{cursor:pointer}
             });
         }
 
-        async function deleteEvents(id) {
+        function deleteEvents(id) {
             if (!confirm('¿Eliminar este evento?')) return;
 
-            // Borrar de Supabase primero
+            // Intentar borrar de Supabase primero (async)
+            if (!supabaseClient) initSupabaseMain();
             if (supabaseClient) {
-                try {
-                    await supabaseClient.from('eventos').delete().eq('id', id);
+                supabaseClient.from('eventos').delete().eq('id', id).then(() => {
                     console.log('✅ Evento borrado de Supabase');
-                } catch (e) {
-                    console.error('Error borrando evento de Supabase:', e);
-                }
+                }).catch(e => {
+                    console.error('Error borrando de Supabase:', e);
+                }).finally(() => {
+                    // Siempre borrar del localStorage también
+                    data.events = data.events.filter(e => e.id !== id);
+                    saveAllData();
+                    renderEvents();
+                    loadAdminList('events');
+                });
+            } else {
+                // Si no hay Supabase, solo borrar local
+                data.events = data.events.filter(e => e.id !== id);
+                saveAllData();
+                renderEvents();
+                loadAdminList('events');
             }
-
-            data.events = data.events.filter(e => e.id !== id);
-            saveAllData();
-            renderEvents();
-            loadAdminList('events');
         }
 
         function resetEventForm() {
@@ -4484,22 +4491,27 @@ select.scoring-form-control{cursor:pointer}
             document.getElementById('recordDate').value = record.date || '';
         }
 
-        async function deleteRecords(id) {
+        function deleteRecords(id) {
             if (!confirm('¿Eliminar este récord?')) return;
 
+            if (!supabaseClient) initSupabaseMain();
             if (supabaseClient) {
-                try {
-                    await supabaseClient.from('records').delete().eq('id', id);
+                supabaseClient.from('records').delete().eq('id', id).then(() => {
                     console.log('✅ Record borrado de Supabase');
-                } catch (e) {
-                    console.error('Error borrando record:', e);
-                }
+                }).catch(e => {
+                    console.error('Error borrando de Supabase:', e);
+                }).finally(() => {
+                    data.records = data.records.filter(r => r.id !== id);
+                    saveAllData();
+                    renderRecords();
+                    loadAdminList('records');
+                });
+            } else {
+                data.records = data.records.filter(r => r.id !== id);
+                saveAllData();
+                renderRecords();
+                loadAdminList('records');
             }
-
-            data.records = data.records.filter(r => r.id !== id);
-            saveAllData();
-            renderRecords();
-            loadAdminList('records');
         }
 
         function resetRecordForm() {
