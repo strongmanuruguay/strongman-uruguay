@@ -3116,8 +3116,8 @@ select.scoring-form-control{cursor:pointer}
             saveAllData();
         }
 
-        async function saveAllData() {
-            // Guardar en localStorage (backup local)
+        async async function saveAllData() {
+            // Guardar en localStorage PRIMERO (siempre funciona)
             localStorage.setItem('acaf_events', JSON.stringify(data.events));
             localStorage.setItem('acaf_athletes', JSON.stringify(data.athletes));
             localStorage.setItem('acaf_ranking', JSON.stringify(data.ranking));
@@ -3130,11 +3130,15 @@ select.scoring-form-control{cursor:pointer}
             localStorage.setItem('acaf_sponsors', JSON.stringify(data.sponsors));
             localStorage.setItem('acaf_contacts', JSON.stringify(data.contacts));
             localStorage.setItem('acaf_settings', JSON.stringify(data.settings));
+            console.log('💾 Datos guardados en localStorage');
 
-            // Guardar en Supabase (persistencia en la nube)
+            // Guardar en Supabase en segundo plano
             if (supabaseClient) {
                 try {
-                    await syncToSupabase();
+                    const result = await syncToSupabase();
+                    if (result) {
+                        console.log('☁️ Datos sincronizados con Supabase');
+                    }
                 } catch (e) {
                     console.error('Error sincronizando con Supabase:', e);
                 }
@@ -4169,7 +4173,7 @@ async function syncToSupabase() {
             }
         }
 
-        function finishSaveEvent(eventData, id) {
+        async function finishSaveEvent(eventData, id) {
             if (id) {
                 const index = data.events.findIndex(e => e.id === parseInt(id));
                 if (index !== -1) data.events[index] = eventData;
@@ -4252,7 +4256,7 @@ async function syncToSupabase() {
             }
         }
 
-        function finishSaveAthlete(athleteData, id) {
+        async function finishSaveAthlete(athleteData, id) {
             if (id) {
                 const index = data.athletes.findIndex(a => a.id === parseInt(id));
                 if (index !== -1) data.athletes[index] = athleteData;
@@ -4428,7 +4432,7 @@ async function syncToSupabase() {
             }
         }
 
-        function finishSaveGym(gymData, id) {
+        async function finishSaveGym(gymData, id) {
             if (id) {
                 const index = data.gyms.findIndex(g => g.id === parseInt(id));
                 if (index !== -1) data.gyms[index] = gymData;
@@ -4678,7 +4682,7 @@ async function syncToSupabase() {
             }
         }
 
-        function finishSaveJudge(judgeData, id) {
+        async function finishSaveJudge(judgeData, id) {
             if (id) {
                 const index = data.judges.findIndex(j => j.id === parseInt(id));
                 if (index !== -1) data.judges[index] = judgeData;
@@ -4743,7 +4747,7 @@ async function syncToSupabase() {
             }
         }
 
-        function finishSaveSponsor(sponsorData, id) {
+        async function finishSaveSponsor(sponsorData, id) {
             if (id) {
                 const index = data.sponsors.findIndex(s => s.id === parseInt(id));
                 if (index !== -1) data.sponsors[index] = sponsorData;
