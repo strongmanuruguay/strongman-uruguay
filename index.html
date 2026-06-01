@@ -3102,7 +3102,15 @@ select.scoring-form-control{cursor:pointer}
                     supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
                     console.log('✅ Supabase conectado - Integration');
                     return true;
-                } catch(e) {
+                }
+        // Generar UUID simple
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+ catch(e) {
                     console.error('❌ Error conectando Supabase:', e);
                     return false;
                 }
@@ -3229,7 +3237,7 @@ select.scoring-form-control{cursor:pointer}
                 if (data.events && data.events.length > 0) {
                     try {
                         const eventosMapped = data.events.map(e => ({
-                            id: e.id,
+                            id: typeof e.id === 'number' || (typeof e.id === 'string' && e.id.length < 36) ? generateUUID() : e.id,
                             nombre: e.name,
                             fecha: e.date,
                             hora: e.time,
@@ -3258,7 +3266,7 @@ select.scoring-form-control{cursor:pointer}
                 if (data.athletes && data.athletes.length > 0) {
                     try {
                         const atletasMapped = data.athletes.map(a => ({
-                            id: a.id,
+                            id: typeof a.id === 'number' || (typeof a.id === 'string' && a.id.length < 36) ? generateUUID() : a.id,
                             nombre: a.firstName,
                             apellido: a.lastName,
                             documento: a.document,
@@ -3289,7 +3297,7 @@ select.scoring-form-control{cursor:pointer}
                 if (data.ranking && data.ranking.length > 0) {
                     try {
                         const rankingMapped = data.ranking.map(r => ({
-                            id: r.id,
+                            id: typeof r.id === 'number' || (typeof r.id === 'string' && r.id.length < 36) ? generateUUID() : r.id,
                             posicion: r.position,
                             nombre: r.name,
                             puntos: r.points,
@@ -3315,7 +3323,7 @@ select.scoring-form-control{cursor:pointer}
                 if (data.records && data.records.length > 0) {
                     try {
                         const recordsMapped = data.records.map(r => ({
-                            id: r.id,
+                            id: typeof r.id === 'number' || (typeof r.id === 'string' && r.id.length < 36) ? generateUUID() : r.id,
                             categoria: r.test,
                             atleta: r.holder,
                             marca: r.mark,
