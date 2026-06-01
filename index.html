@@ -2991,7 +2991,17 @@ select.scoring-form-control{cursor:pointer}
         // ===== INICIALIZACIÓN =====
         document.addEventListener('DOMContentLoaded', async function() {
             loadAllData();
-            await loadFromSupabase();
+
+            // Intentar cargar desde Supabase primero
+            if (!supabaseClient) initSupabaseMain();
+            if (supabaseClient) {
+                try {
+                    await loadFromSupabase();
+                } catch (e) {
+                    console.error('Error cargando desde Supabase:', e);
+                }
+            }
+
             setupNavbar();
             updateCounters();
             countVisit();
@@ -3051,6 +3061,7 @@ select.scoring-form-control{cursor:pointer}
         }
 
         async function saveAllData() {
+            // Guardar en localStorage (backup local)
             localStorage.setItem('acaf_events', JSON.stringify(data.events));
             localStorage.setItem('acaf_athletes', JSON.stringify(data.athletes));
             localStorage.setItem('acaf_ranking', JSON.stringify(data.ranking));
@@ -3064,180 +3075,283 @@ select.scoring-form-control{cursor:pointer}
             localStorage.setItem('acaf_contacts', JSON.stringify(data.contacts));
             localStorage.setItem('acaf_settings', JSON.stringify(data.settings));
 
-            await saveToSupabase();
+            // Guardar en Supabase (persistencia en la nube)
+            if (supabaseClient) {
+                try {
+                    await syncToSupabase();
+                } catch (e) {
+                    console.error('Error sincronizando con Supabase:', e);
+                }
+            }
 
             updateCounters();
         }
 
 
-        // ===== SUPABASE INTEGRATION =====
+        // ===== SUPABASE INTEGRATION - STRONGMAN URUGUAY =====
+        // Código migrado desde el archivo de integración existente
+
         const SUPABASE_URL = 'https://kiojyhfqwjaoppgwoyjt.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_1MUOcELIRMoDlKdpUA7_fw_gYJ2dQHE';
+
         let supabaseClient = null;
 
-        function initSupabase() {
+        function initSupabaseMain() {
             if (typeof supabase !== 'undefined' && supabase.createClient) {
                 try {
                     supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-                    console.log('✅ Supabase conectado');
+                    console.log('✅ Supabase conectado - Integration');
                     return true;
-                } catch (e) {
-                    console.error('❌ Error Supabase:', e);
+                } catch(e) {
+                    console.error('❌ Error conectando Supabase:', e);
                     return false;
                 }
             }
+            console.warn('⚠️ Librería Supabase no cargada');
             return false;
         }
 
-        async function loadFromSupabase() {
-            if (!supabaseClient) initSupabase();
-            if (!supabaseClient) return;
+        // ===== CARGAR DATOS DESDE SUPABASE =====
+        async function loadDataFromSupabase() {
+            if (!supabaseClient) initSupabaseMain();
+            if (!supabaseClient) return false;
 
             try {
-                const { data: events } = await supabaseClient.from('eventos').select('*');
-                if (events && events.length > 0) {
-                    data.events = events.map(e => ({
-                        id: e.id,
-                        name: e.nombre,
-                        date: e.fecha,
-                        time: e.hora,
-                        location: e.lugar,
-                        cost: e.costo,
-                        description: e.descripcion,
-                        categories: e.categorias,
-                        image: e.imagen_url
-                    }));
+                // Cargar eventos
+                const { data: eventsData, error: eventsError } = await supabaseClient
+                    .from('eventos')
+                    .select('*')
+                    .order('fecha', { ascending: true });
+
+                if (!eventsError && eventsData && eventsData.length > 0) {
+                    data.events = eventsData;
+                    console.log('✅ Eventos cargados desde Supabase:', eventsData.length);
                 }
 
-                const { data: athletes } = await supabaseClient.from('atletas').select('*');
-                if (athletes && athletes.length > 0) {
-                    data.athletes = athletes.map(a => ({
-                        id: a.id,
-                        firstName: a.nombre,
-                        lastName: a.apellido,
-                        document: a.documento,
-                        phone: a.telefono,
-                        gender: a.genero,
-                        years: a.anos_compitiendo,
-                        number: a.numero,
-                        hasLicense: a.tiene_carne,
-                        photo: a.foto_url,
-                        marks: a.marcas
-                    }));
+                // Cargar atletas
+                const { data: athletesData, error: athletesError } = await supabaseClient
+                    .from('atletas')
+                    .select('*')
+                    .order('nombre', { ascending: true });
+
+                if (!athletesError && athletesData && athletesData.length > 0) {
+                    data.athletes = athletesData;
+                    console.log('✅ Atletas cargados desde Supabase:', athletesData.length);
                 }
 
-                const { data: ranking } = await supabaseClient.from('ranking_nacional').select('*');
-                if (ranking && ranking.length > 0) {
-                    data.ranking = ranking.map(r => ({
-                        id: r.id,
-                        position: r.posicion,
-                        name: r.nombre,
-                        points: r.puntos,
-                        category: r.categoria,
-                        gender: r.genero
-                    }));
+                // Cargar ranking
+                const { data: rankingData, error: rankingError } = await supabaseClient
+                    .from('ranking_nacional')
+                    .select('*')
+                    .order('posicion', { ascending: true });
+
+                if (!rankingError && rankingData && rankingData.length > 0) {
+                    data.ranking = rankingData;
+                    console.log('✅ Ranking cargado desde Supabase:', rankingData.length);
                 }
 
-                const { data: records } = await supabaseClient.from('records').select('*');
-                if (records && records.length > 0) {
-                    data.records = records.map(r => ({
-                        id: r.id,
-                        test: r.categoria,
-                        holder: r.atleta,
-                        mark: r.marca,
-                        date: r.fecha,
-                        event: r.evento
-                    }));
+                // Cargar records
+                const { data: recordsData, error: recordsError } = await supabaseClient
+                    .from('records')
+                    .select('*')
+                    .order('categoria', { ascending: true });
+
+                if (!recordsError && recordsData && recordsData.length > 0) {
+                    data.records = recordsData;
+                    console.log('✅ Records cargados desde Supabase:', recordsData.length);
                 }
 
-                const { data: settings } = await supabaseClient.from('settings').select('*').eq('id', 1).single();
-                if (settings && settings.data_json) {
-                    data.settings = { ...data.settings, ...settings.data_json };
+                // Cargar settings (logo, configuración)
+                const { data: settingsData, error: settingsError } = await supabaseClient
+                    .from('settings')
+                    .select('*')
+                    .eq('id', 1)
+                    .single();
+
+                if (!settingsError && settingsData && settingsData.data_json) {
+                    data.settings = { ...data.settings, ...settingsData.data_json };
+                    console.log('✅ Settings cargados desde Supabase');
                 }
 
-                console.log('✅ Datos cargados desde Supabase');
+                console.log('✅ Todos los datos cargados desde Supabase');
+                return true;
             } catch (e) {
-                console.error('Error cargando Supabase:', e);
+                console.error('Error cargando desde Supabase:', e);
+                return false;
             }
         }
 
-        async function saveToSupabase() {
-            if (!supabaseClient) initSupabase();
-            if (!supabaseClient) return;
+        // ===== GUARDAR DATOS EN SUPABASE =====
+        async function saveDataToSupabase() {
+            if (!supabaseClient) initSupabaseMain();
+            if (!supabaseClient) return false;
+
+            let guardado = false;
 
             try {
-                if (data.events.length > 0) {
-                    const mapped = data.events.map(e => ({
-                        id: e.id,
-                        nombre: e.name,
-                        fecha: e.date,
-                        hora: e.time,
-                        lugar: e.location,
-                        costo: e.cost,
-                        descripcion: e.description,
-                        categorias: e.categories,
-                        imagen_url: e.image
-                    }));
-                    await supabaseClient.from('eventos').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-                    await supabaseClient.from('eventos').insert(mapped);
+                // Guardar eventos
+                if (data.events && data.events.length > 0) {
+                    try {
+                        await supabaseClient.from('eventos').delete().neq('id', 0);
+                        await supabaseClient.from('eventos').insert(data.events);
+                        console.log('✅ Eventos guardados en Supabase');
+                        guardado = true;
+                    } catch (e) {
+                        console.warn('Eventos:', e.message);
+                    }
                 }
 
-                if (data.athletes.length > 0) {
-                    const mapped = data.athletes.map(a => ({
-                        id: a.id,
-                        nombre: a.firstName,
-                        apellido: a.lastName,
-                        documento: a.document,
-                        telefono: a.phone,
-                        genero: a.gender,
-                        anos_compitiendo: a.years,
-                        numero: a.number,
-                        tiene_carne: a.hasLicense,
-                        foto_url: a.photo,
-                        marcas: a.marks
-                    }));
-                    await supabaseClient.from('atletas').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-                    await supabaseClient.from('atletas').insert(mapped);
+                // Guardar atletas
+                if (data.athletes && data.athletes.length > 0) {
+                    try {
+                        await supabaseClient.from('atletas').delete().neq('id', 0);
+                        await supabaseClient.from('atletas').insert(data.athletes);
+                        console.log('✅ Atletas guardados en Supabase');
+                        guardado = true;
+                    } catch (e) {
+                        console.warn('Atletas:', e.message);
+                    }
                 }
 
-                if (data.ranking.length > 0) {
-                    const mapped = data.ranking.map(r => ({
-                        id: r.id,
-                        posicion: r.position,
-                        nombre: r.name,
-                        puntos: r.points,
-                        categoria: r.category,
-                        genero: r.gender
-                    }));
-                    await supabaseClient.from('ranking_nacional').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-                    await supabaseClient.from('ranking_nacional').insert(mapped);
+                // Guardar ranking
+                if (data.ranking && data.ranking.length > 0) {
+                    try {
+                        await supabaseClient.from('ranking_nacional').delete().neq('id', 0);
+                        await supabaseClient.from('ranking_nacional').insert(data.ranking);
+                        console.log('✅ Ranking guardado en Supabase');
+                        guardado = true;
+                    } catch (e) {
+                        console.warn('Ranking:', e.message);
+                    }
                 }
 
-                if (data.records.length > 0) {
-                    const mapped = data.records.map(r => ({
-                        id: r.id,
-                        categoria: r.test,
-                        atleta: r.holder,
-                        marca: r.mark,
-                        fecha: r.date,
-                        evento: r.event
-                    }));
-                    await supabaseClient.from('records').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-                    await supabaseClient.from('records').insert(mapped);
+                // Guardar records
+                if (data.records && data.records.length > 0) {
+                    try {
+                        await supabaseClient.from('records').delete().neq('id', 0);
+                        await supabaseClient.from('records').insert(data.records);
+                        console.log('✅ Records guardados en Supabase');
+                        guardado = true;
+                    } catch (e) {
+                        console.warn('Records:', e.message);
+                    }
                 }
 
-                await supabaseClient.from('settings').upsert({
-                    id: 1,
-                    data_json: data.settings,
-                    updated_at: new Date().toISOString()
-                });
+                // Guardar settings (logo, configuración)
+                if (data.settings) {
+                    try {
+                        await supabaseClient.from('settings').upsert({
+                            id: 1,
+                            data_json: data.settings,
+                            updated_at: new Date().toISOString()
+                        }, { onConflict: 'id' });
+                        console.log('✅ Settings guardados en Supabase');
+                        guardado = true;
+                    } catch (e) {
+                        console.warn('Settings:', e.message);
+                    }
+                }
 
-                console.log('✅ Datos guardados en Supabase');
+                console.log('✅ Sincronización con Supabase completada');
+                return guardado;
             } catch (e) {
-                console.error('Error guardando Supabase:', e);
+                console.error('Error guardando en Supabase:', e);
+                return false;
             }
         }
 
+        // ===== CARGAR COMPETENCIAS DESDE SUPABASE (STRONGSCORE) =====
+        async function renderCompetenciasPublico() {
+            const container = document.getElementById('competenciasPublicoContainer');
+            if (!container) return;
+
+            container.innerHTML = '<div class="loading-spinner"><i class="fas fa-circle-notch"></i> Cargando competencias desde la nube...</div>';
+
+            if (!supabaseClient) initSupabaseMain();
+
+            let competencias = [];
+            let fromSupabase = false;
+
+            if (supabaseClient) {
+                try {
+                    const { data: compData, error } = await supabaseClient
+                        .from('competencias')
+                        .select('*')
+                        .order('created_at', { ascending: false })
+                        .limit(20);
+
+                    if (!error && compData && compData.length > 0) {
+                        competencias = compData;
+                        fromSupabase = true;
+                        console.log('✅ Competencias cargadas:', compData.length);
+                    }
+                } catch (e) {
+                    console.error('Error:', e);
+                }
+            }
+
+            if (competencias.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-calendar-plus"></i>
+                        <p>No hay competencias registradas aún</p>
+                        <p style="font-size: 0.9rem; margin-top: 0.5rem; color: var(--text-muted);">
+                            Las competencias aparecerán aquí cuando se creen desde StrongScore Pro V3
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '<div class="competencias-grid">';
+            competencias.forEach(comp => {
+                const dataJson = comp.data_json || {};
+                const statusClass = comp.estado === 'activo' ? 'en-curso' : '';
+                const statusText = comp.estado || 'programado';
+
+                let fechaStr = 'Fecha por definir';
+                if (comp.fecha || dataJson.fec) {
+                    try {
+                        const d = new Date(comp.fecha || dataJson.fec);
+                        fechaStr = d.toLocaleDateString('es-UY', {day: 'numeric', month: 'long', year: 'numeric'});
+                    } catch(e) {}
+                }
+
+                const numAtletas = dataJson.atl ? dataJson.atl.length : 0;
+                const numPruebas = dataJson.prb ? dataJson.prb.length : 0;
+                const nombre = comp.nombre || dataJson.nom || 'Competencia';
+                const lugar = comp.lugar || dataJson.lug || '';
+
+                html += `
+                    <div class="competencia-card ${statusClass}">
+                        <div class="competencia-status ${statusText}">
+                            ${comp.estado === 'activo' ? '🔴 En Vivo' : comp.estado === 'finalizado' ? '✅ Finalizado' : '📅 Programado'}
+                        </div>
+                        <div class="competencia-nombre">${nombre}</div>
+                        <div class="competencia-fecha"><i class="fas fa-calendar"></i> ${fechaStr}</div>
+                        ${lugar ? `<div class="competencia-lugar"><i class="fas fa-map-marker-alt"></i> ${lugar}</div>` : ''}
+                        <div style="margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); font-size: 0.85rem;">
+                            <i class="fas fa-users"></i> ${numAtletas} atletas &nbsp;|&nbsp; 
+                            <i class="fas fa-dumbbell"></i> ${numPruebas} pruebas
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+
+            if (fromSupabase) {
+                html += `<p style="text-align: center; color: var(--success); margin-top: 1rem; font-size: 0.85rem;">
+                    <i class="fas fa-cloud"></i> Datos sincronizados desde la nube
+                </p>`;
+            }
+
+            container.innerHTML = html;
+        }
+
+
+        // Función para sincronizar datos con Supabase
+
+        // Función para cargar datos desde Supabase
 
         function loadAllData() {
             data.events = JSON.parse(localStorage.getItem('acaf_events')) || [];
@@ -3325,8 +3439,36 @@ select.scoring-form-control{cursor:pointer}
             return date.toLocaleDateString('es-UY', { day: 'numeric', month: 'long', year: 'numeric' });
         }
 
-        function renderEvents() {
+        async function renderEvents() {
             const container = document.getElementById('eventsContainer');
+            if (!container) return;
+
+            // Intentar cargar desde Supabase primero
+            if (supabaseClient && data.events.length === 0) {
+                try {
+                    const { data: eventosData, error } = await supabaseClient
+                        .from('eventos')
+                        .select('*')
+                        .order('fecha', { ascending: true });
+
+                    if (!error && eventosData && eventosData.length > 0) {
+                        data.events = eventosData.map(e => ({
+                            id: e.id,
+                            name: e.nombre,
+                            date: e.fecha,
+                            time: e.hora,
+                            location: e.lugar,
+                            cost: e.costo,
+                            description: e.descripcion,
+                            categories: e.categorias || [],
+                            image: e.imagen_url
+                        }));
+                    }
+                } catch (e) {
+                    console.error('Error cargando eventos:', e);
+                }
+            }
+
             if (data.events.length === 0) {
                 container.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;"><i class="fas fa-calendar-times"></i><p>No hay eventos programados</p></div>';
                 return;
@@ -3386,28 +3528,143 @@ select.scoring-form-control{cursor:pointer}
             renderAthletes();
         }
 
-        function renderRanking() {
+        async function renderRanking() {
             const container = document.getElementById('rankingContainer');
-            if (currentRankingFilter === 'all') {
-                container.innerHTML = `
-                    <div class="ranking-category">
-                        <h3><i class="fas fa-mars"></i> Masculino</h3>
-                        ${renderRankingByGender('male')}
-                    </div>
-                    <div class="ranking-category">
-                        <h3><i class="fas fa-venus"></i> Femenino</h3>
-                        ${renderRankingByGender('female')}
-                    </div>
-                `;
-            } else {
-                container.innerHTML = `
-                    <div class="ranking-category">
-                        <h3><i class="fas fa-${currentRankingFilter === 'male' ? 'mars' : 'venus'}"></i> 
-                        ${currentRankingFilter === 'male' ? 'Masculino' : 'Femenino'}</h3>
-                        ${renderRankingByGender(currentRankingFilter)}
-                    </div>
-                `;
+            if (!container) return;
+
+            container.innerHTML = '<div class="loading-spinner"><i class="fas fa-circle-notch"></i> Cargando ranking...</div>';
+
+            if (!supabaseClient) initSupabaseMain();
+
+            let rankingData = [];
+            let fromSupabase = false;
+            let numCompetencias = 0;
+
+            // Intentar cargar desde Supabase primero
+            if (supabaseClient) {
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('competencias')
+                        .select('*')
+                        .eq('estado', 'finalizado')
+                        .order('created_at', { ascending: false })
+                        .limit(10);
+
+                    if (!error && data && data.length > 0) {
+                        numCompetencias = data.length;
+                        const atletaStats = {};
+
+                        data.forEach(comp => {
+                            const d = comp.data_json || {};
+                            const atl = d.atl || [];
+                            const res = d.res || {};
+                            const prb = d.prb || [];
+
+                            atl.forEach(a => {
+                                const id = a.id || a.nom;
+                                if (!atletaStats[id]) {
+                                    atletaStats[id] = {
+                                        nombre: a.n || a.nom || 'Atleta',
+                                        pais: a.p || a.pais || 'UY',
+                                        peso: a.w || a.peso || 0,
+                                        sexo: a.s || a.sexo || 'M',
+                                        categoria: a.catId || 'Open',
+                                        totalPuntos: 0,
+                                        competencias: 0,
+                                        victorias: 0
+                                    };
+                                }
+
+                                let ptsComp = 0;
+                                prb.forEach(p => {
+                                    const prbRes = res[p.id] || {};
+                                    const atletaRes = prbRes[a.id];
+                                    if (atletaRes && atletaRes.pt) {
+                                        ptsComp += atletaRes.pt;
+                                    }
+                                });
+
+                                atletaStats[id].totalPuntos += ptsComp;
+                                atletaStats[id].competencias++;
+                            });
+                        });
+
+                        rankingData = Object.values(atletaStats)
+                            .sort((a, b) => b.totalPuntos - a.totalPuntos)
+                            .slice(0, 20);
+
+                        fromSupabase = true;
+                        console.log('✅ Ranking cargado desde Supabase');
+                    }
+                } catch (e) {
+                    console.error('Error cargando ranking Supabase:', e);
+                }
             }
+
+            // Fallback a localStorage
+            if (!fromSupabase) {
+                if (currentRankingFilter === 'all') {
+                    container.innerHTML = `
+                        <div class="ranking-category">
+                            <h3><i class="fas fa-mars"></i> Masculino</h3>
+                            ${renderRankingByGender('male')}
+                        </div>
+                        <div class="ranking-category">
+                            <h3><i class="fas fa-venus"></i> Femenino</h3>
+                            ${renderRankingByGender('female')}
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <div class="ranking-category">
+                            <h3><i class="fas fa-${currentRankingFilter === 'male' ? 'mars' : 'venus'}"></i> 
+                            ${currentRankingFilter === 'male' ? 'Masculino' : 'Femenino'}</h3>
+                            ${renderRankingByGender(currentRankingFilter)}
+                        </div>
+                    `;
+                }
+                return;
+            }
+
+            // Renderizar ranking desde Supabase
+            if (rankingData.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-trophy"></i>
+                        <p>No hay datos de ranking disponibles aún</p>
+                        <p style="font-size: 0.9rem; margin-top: 0.5rem; color: var(--text-muted);">
+                            El ranking se generará automáticamente cuando haya competencias finalizadas
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <span style="color: var(--success); font-size: 0.9rem;">
+                        <i class="fas fa-cloud"></i> Ranking global calculado desde ${numCompetencias} competencias finalizadas
+                    </span>
+                </div>
+                <div class="ranking-grid">
+            `;
+
+            rankingData.forEach((a, index) => {
+                const posClass = index === 0 ? 'top1' : index === 1 ? 'top2' : index === 2 ? 'top3' : '';
+                const flag = a.pais ? `<img src="https://flagcdn.com/w40/${a.pais.toLowerCase()}.png" style="width: 28px; height: 20px; border-radius: 3px; vertical-align: middle; margin-right: 0.4rem; box-shadow: 0 1px 3px rgba(0,0,0,0.3);">` : '';
+
+                html += `
+                    <div class="ranking-card">
+                        <div class="ranking-position ${posClass}">#${index + 1}</div>
+                        <div class="ranking-name">${flag}${a.nombre}</div>
+                        <div class="ranking-stats">${a.categoria} | ${a.peso} kg | ${a.competencias} comps</div>
+                        <div class="ranking-points">${a.totalPuntos.toFixed(1)} pts</div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            container.innerHTML = html;
         }
 
         function renderRankingByGender(gender) {
@@ -6700,189 +6957,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-// ===== SUPABASE INTEGRATION - WEB PRINCIPAL (CORREGIDO V2) =====
-    }
-    console.warn('⚠️ Librería Supabase no cargada');
-    return false;
-}
-
-// ===== CARGAR COMPETENCIAS DESDE SUPABASE =====
-        } catch (e) {
-            console.error('Error conexión Supabase:', e);
-        }
-    }
-
-    // Fallback a localStorage si Supabase falla o está vacío
-    if (!fromSupabase) {
-        competencias = JSON.parse(localStorage.getItem('acaf_competencias')) || [];
-        console.log('📦 Competencias cargadas desde localStorage:', competencias.length);
-    }
-
-    if (competencias.length === 0) {
-        container.innerHTML = `
-            <div class="empty-state">
-                <i class="fas fa-calendar-plus"></i>
-                <p>No hay competencias registradas aún</p>
-                <p style="font-size: 0.9rem; margin-top: 0.5rem; color: var(--text-muted);">
-                    Las competencias aparecerán aquí cuando se creen desde StrongScore Pro V3
-                </p>
-            </div>
-        `;
-        return;
-    }
-
-    let html = '<div class="competencias-grid">';
-    competencias.forEach(comp => {
-        // Extraer datos del JSON (formato StrongScore Pro V3)
-        const dataJson = comp.data_json || {};
-
-        const statusClass = comp.estado === 'en_curso' ? 'en-curso' : '';
-        const statusText = comp.estado || 'programado';
-
-        let fechaStr = 'Fecha por definir';
-        if (comp.fecha) {
-            try {
-                const d = new Date(comp.fecha);
-                fechaStr = d.toLocaleDateString('es-UY', {day: 'numeric', month: 'long', year: 'numeric'});
-            } catch(e) {}
-        }
-
-        // Contar atletas y pruebas desde data_json
-        const numAtletas = dataJson.atl ? dataJson.atl.length : 0;
-        const numPruebas = dataJson.prb ? dataJson.prb.length : 0;
-        const nombre = comp.nombre || dataJson.nom || 'Competencia';
-        const lugar = comp.lugar || dataJson.lug || '';
-
-        html += `
-            <div class="competencia-card ${statusClass}">
-                <div class="competencia-status ${statusText}">
-                    ${comp.estado === 'activo' ? '🔴 En Vivo' : comp.estado === 'finalizado' ? '✅ Finalizado' : '📅 Programado'}
-                </div>
-                <div class="competencia-nombre">${nombre}</div>
-                <div class="competencia-fecha"><i class="fas fa-calendar"></i> ${fechaStr}</div>
-                ${lugar ? `<div class="competencia-lugar"><i class="fas fa-map-marker-alt"></i> ${lugar}</div>` : ''}
-                <div style="margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); font-size: 0.85rem;">
-                    <i class="fas fa-users"></i> ${numAtletas} atletas &nbsp;|&nbsp; 
-                    <i class="fas fa-dumbbell"></i> ${numPruebas} pruebas
-                </div>
-            </div>
-        `;
-    });
-    html += '</div>';
-
-    if (fromSupabase) {
-        html += `<p style="text-align: center; color: var(--success); margin-top: 1rem; font-size: 0.85rem;">
-            <i class="fas fa-cloud"></i> Datos sincronizados desde la nube
-        </p>`;
-    }
-
-    container.innerHTML = html;
-}
-
-// ===== CARGAR RANKING DESDE SUPABASE =====
-
-                        // Sumar puntos de todas las pruebas
-                        let ptsComp = 0;
-                        prb.forEach(p => {
-                            const prbRes = res[p.id] || {};
-                            const atletaRes = prbRes[a.id];
-                            if (atletaRes && atletaRes.pt) {
-                                ptsComp += atletaRes.pt;
-                            }
-                        });
-
-                        atletaStats[id].totalPuntos += ptsComp;
-                        atletaStats[id].competencias++;
-                    });
-                });
-
-                rankingData = Object.values(atletaStats)
-                    .sort((a, b) => b.totalPuntos - a.totalPuntos)
-                    .slice(0, 20);
-
-                fromSupabase = true;
-                console.log('✅ Ranking cargado desde Supabase');
-            }
-        } catch (e) {
-            console.error('Error cargando ranking Supabase:', e);
-        }
-    }
-
-    // Fallback a localStorage
-    if (!fromSupabase) {
-        if (currentRankingFilter === 'all') {
-            container.innerHTML = `
-                <div class="ranking-category">
-                    <h3><i class="fas fa-mars"></i> Masculino</h3>
-                    ${renderRankingByGender('male')}
-                </div>
-                <div class="ranking-category">
-                    <h3><i class="fas fa-venus"></i> Femenino</h3>
-                    ${renderRankingByGender('female')}
-                </div>
-            `;
-        } else {
-            container.innerHTML = `
-                <div class="ranking-category">
-                    <h3><i class="fas fa-${currentRankingFilter === 'male' ? 'mars' : 'venus'}"></i> 
-                    ${currentRankingFilter === 'male' ? 'Masculino' : 'Femenino'}</h3>
-                    ${renderRankingByGender(currentRankingFilter)}
-                </div>
-            `;
-        }
-        return;
-    }
-
-    // Renderizar ranking desde Supabase
-    if (rankingData.length === 0) {
-        container.innerHTML = `
-            <div class="empty-state">
-                <i class="fas fa-trophy"></i>
-                <p>No hay datos de ranking disponibles aún</p>
-                <p style="font-size: 0.9rem; margin-top: 0.5rem; color: var(--text-muted);">
-                    El ranking se generará automáticamente cuando haya competencias finalizadas
-                </p>
-            </div>
-        `;
-        return;
-    }
-
-    let html = `
-        <div style="text-align: center; margin-bottom: 1.5rem;">
-            <span style="color: var(--success); font-size: 0.9rem;">
-                <i class="fas fa-cloud"></i> Ranking global calculado desde ${data.length} competencias finalizadas
-            </span>
-        </div>
-        <div class="ranking-grid">
-    `;
-
-    rankingData.forEach((a, index) => {
-        const posClass = index === 0 ? 'top1' : index === 1 ? 'top2' : index === 2 ? 'top3' : '';
-        const flag = a.pais ? `<img src="https://flagcdn.com/w40/${a.pais.toLowerCase()}.png" style="width: 28px; height: 20px; border-radius: 3px; vertical-align: middle; margin-right: 0.4rem;">` : '';
-
-        html += `
-            <div class="ranking-card">
-                <div class="ranking-position ${posClass}">#${index + 1}</div>
-                <div class="ranking-name">${flag}${a.nombre}</div>
-                <div class="ranking-stats">${a.categoria} | ${a.peso} kg | ${a.competencias} comps</div>
-                <div class="ranking-points">${a.totalPuntos.toFixed(1)} pts</div>
-            </div>
-        `;
-    });
-
-    html += '</div>';
-    container.innerHTML = html;
-}
-
-// ===== INICIALIZACIÓN =====
-document.addEventListener('DOMContentLoaded', function() {
-    initSupabaseMain();
-    initCountdown();
-    loadProducts();
-    updateCartUI();
-    scoringLoadFromStorage();
-    scoringRenderPublicSection();
-});
 </script>
 
     <!-- BOTÓN FLOTANTE CARRITO -->
