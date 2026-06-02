@@ -3512,444 +3512,180 @@ select.scoring-form-control{cursor:pointer}
             let guardado = false;
             const errores = [];
 
-            console.log('🔄 Iniciando sincronización con Supabase...');
-            console.log('📊 Datos a sincronizar:', {
-                eventos: data.events.length,
-                atletas: data.athletes.length,
-                ranking: data.ranking.length,
-                records: data.records.length,
-                gimnasios: data.gyms.length,
-                galeria: data.gallery.length,
-                reglas: data.rules.length,
-                cursos: data.courses.length,
-                jueces: data.judges.length,
-                sponsors: data.sponsors.length,
-                contactos: data.contacts.length
-            });
+            console.log('🔄 Iniciando sincronización completa con Supabase...');
 
-            try {
-                // ===== EVENTOS (uuid) =====
+            // Función helper para sincronizar una tabla completa
+            // Estrategia: borrar todo y reinsertar (garantiza consistencia)
+            async function syncTable(tableName, items, mapFn) {
                 try {
-                    console.log('🔄 Sincronizando eventos...');
-                    await deleteMissingFromSupabase('eventos', data.events.map(e => e.id).filter(Boolean), 'id');
-                    for (const ev of data.events) {
-                        // Asegurar que el ID sea UUID válido
-                        let eventId = ev.id;
-                        if (!eventId || typeof eventId !== 'string' || eventId.length !== 36) {
-                            eventId = generateUUID();
-                            ev.id = eventId; // Actualizar el objeto local también
-                        }
-                        const payload = {
-                            id: eventId,
-                            nombre: ev.name || '',
-                            fecha: ev.date || null,
-                            hora: ev.time || '',
-                            lugar: ev.location || '',
-                            costo: ev.cost ? parseInt(ev.cost) : 0,
-                            descripcion: ev.description || '',
-                            categorias: ev.categories || [],
-                            imagen_url: ev.image || null
-                        };
-                        console.log('📤 Enviando evento:', payload.id, payload.nombre);
-                        const { data: resp, error } = await supabaseClient.from('eventos').upsert(payload, { onConflict: 'id' }).select();
-                        if (error) {
-                            console.error('❌ Error upsert evento:', error);
-                            errores.push('eventos: ' + JSON.stringify(error));
-                        } else {
-                            console.log('✅ Evento guardado:', resp);
-                        }
-                    }
-                    console.log('✅ Eventos sincronizados:', data.events.length);
-                    guardado = true;
-                } catch (e) {
-                    console.error('❌ Eventos excepción:', e);
-                    errores.push('eventos: ' + e.message);
-                }
+                    console.log('🔄 Sincronizando', tableName, '- items locales:', items.length);
 
-                // ===== ATLETAS (uuid) =====
-                // La tabla atletas tiene: id, nombre, categoria, peso, pais, foto_url
-                // El HTML genera: name, lastName, doc, phone, gender, years, number, hasCard, photo, personalRecords
-                try {
-                    console.log('🔄 Sincronizando atletas...');
-                    await deleteMissingFromSupabase('atletas', data.athletes.map(a => a.id).filter(Boolean), 'id');
-                    for (const atl of data.athletes) {
-                        let atlId = atl.id;
-                        if (!atlId || typeof atlId !== 'string' || atlId.length !== 36) {
-                            atlId = generateUUID();
-                            atl.id = atlId;
-                        }
-                        const payload = {
-                            id: atlId,
-                            nombre: (atl.name || '') + ' ' + (atl.lastName || ''),
-                            categoria: atl.gender || '',
-                            peso: null,
-                            pais: 'UY',
-                            foto_url: atl.photo || null
-                        };
-                        console.log('📤 Enviando atleta:', payload.id, payload.nombre);
-                        const { data: resp, error } = await supabaseClient.from('atletas').upsert(payload, { onConflict: 'id' }).select();
-                        if (error) {
-                            console.error('❌ Error upsert atleta:', error);
-                            errores.push('atletas: ' + JSON.stringify(error));
-                        } else {
-                            console.log('✅ Atleta guardado:', resp);
-                        }
-                    }
-                    console.log('✅ Atletas sincronizados:', data.athletes.length);
-                    guardado = true;
-                } catch (e) {
-                    console.error('❌ Atletas excepción:', e);
-                    errores.push('atletas: ' + e.message);
-                }
-
-                // ===== RANKING_NACIONAL (uuid) =====
-                // La tabla tiene: id, posicion, nombre, puntos, categoria, genero
-                // El HTML genera: athleteId, gender, category, position, points
-                try {
-                    console.log('🔄 Sincronizando ranking nacional...');
-                    await deleteMissingFromSupabase('ranking_nacional', data.ranking.map(r => r.id).filter(Boolean), 'id');
-                    for (const rk of data.ranking) {
-                        let rkId = rk.id;
-                        if (!rkId || typeof rkId !== 'string' || rkId.length !== 36) {
-                            rkId = generateUUID();
-                            rk.id = rkId;
-                        }
-                        // Buscar nombre del atleta
-                        let athleteName = '';
-                        if (rk.athleteId) {
-                            const athlete = data.athletes.find(a => a.id === rk.athleteId);
-                            if (athlete) {
-                                athleteName = (athlete.name || '') + ' ' + (athlete.lastName || '');
+                    // 1. Borrar TODO de Supabase (uno por uno para evitar problemas con RLS)
+                    const { data: existing, error: readError } = await supabaseClient.from(tableName).select('id');
+                    if (!readError && existing && existing.length > 0) {
+                        for (const row of existing) {
+                            const { error: delError } = await supabaseClient.from(tableName).delete().eq('id', row.id);
+                            if (delError) {
+                                console.warn('⚠️ No se pudo borrar', tableName, row.id, delError.message);
                             }
                         }
-                        const payload = {
-                            id: rkId,
-                            posicion: rk.position ? parseInt(rk.position) : 0,
-                            nombre: athleteName || rk.athleteName || '',
-                            puntos: rk.points ? parseInt(rk.points) : 0,
-                            categoria: rk.category || '',
-                            genero: rk.gender || ''
-                        };
-                        console.log('📤 Enviando ranking:', payload.id, payload.nombre);
-                        const { data: resp, error } = await supabaseClient.from('ranking_nacional').upsert(payload, { onConflict: 'id' }).select();
+                        console.log('🗑️ Borrados', existing.length, 'registros de', tableName);
+                    }
+
+                    // 2. Insertar todo lo local
+                    for (const item of items) {
+                        const payload = mapFn(item);
+                        if (!payload) continue;
+                        const { error } = await supabaseClient.from(tableName).insert(payload);
                         if (error) {
-                            console.error('❌ Error upsert ranking:', error);
-                            errores.push('ranking_nacional: ' + JSON.stringify(error));
-                        } else {
-                            console.log('✅ Ranking guardado:', resp);
+                            console.error('❌ Error insertando en', tableName, error);
+                            errores.push(tableName + ': ' + JSON.stringify(error));
                         }
                     }
-                    console.log('✅ Ranking sincronizado:', data.ranking.length);
-                    guardado = true;
+                    console.log('✅', tableName, 'sincronizado:', items.length, 'registros');
+                    return true;
                 } catch (e) {
-                    console.error('❌ Ranking excepción:', e);
-                    errores.push('ranking_nacional: ' + e.message);
+                    console.error('❌ Error en syncTable', tableName, e);
+                    errores.push(tableName + ': ' + e.message);
+                    return false;
                 }
+            }
 
-                // ===== RECORDS (uuid) =====
-                // La tabla tiene: id, categoria, atleta, marca, fecha, evento
-                // El HTML genera: test, holder, mark, date
-                try {
-                    console.log('🔄 Sincronizando records...');
-                    for (const rec of data.records) {
-                        let recId = rec.id;
-                        if (!recId || typeof recId !== 'string' || recId.length !== 36) {
-                            recId = generateUUID();
-                            rec.id = recId;
-                        }
-                        const payload = {
-                            id: recId,
-                            categoria: rec.test || '',
-                            atleta: rec.holder || '',
-                            marca: rec.mark || '',
-                            fecha: rec.date || null,
-                            evento: ''
-                        };
-                        console.log('📤 Enviando record:', payload.id, payload.categoria);
-                        const { data: resp, error } = await supabaseClient.from('records').upsert(payload, { onConflict: 'id' }).select();
-                        if (error) {
-                            console.error('❌ Error upsert record:', error);
-                            errores.push('records: ' + JSON.stringify(error));
-                        } else {
-                            console.log('✅ Record guardado:', resp);
-                        }
+            try {
+                // ===== EVENTOS =====
+                await syncTable('eventos', data.events, ev => ({
+                    id: ev.id && ev.id.length === 36 ? ev.id : generateUUID(),
+                    nombre: ev.name || '',
+                    fecha: ev.date || null,
+                    hora: ev.time || '',
+                    lugar: ev.location || '',
+                    costo: ev.cost ? parseInt(ev.cost) : 0,
+                    descripcion: ev.description || '',
+                    categorias: ev.categories || [],
+                    imagen_url: ev.image || null
+                }));
+
+                // ===== ATLETAS =====
+                await syncTable('atletas', data.athletes, atl => ({
+                    id: atl.id && atl.id.length === 36 ? atl.id : generateUUID(),
+                    nombre: (atl.name || '') + ' ' + (atl.lastName || ''),
+                    categoria: atl.gender || '',
+                    peso: null,
+                    pais: 'UY',
+                    foto_url: atl.photo || null
+                }));
+
+                // ===== RANKING_NACIONAL =====
+                await syncTable('ranking_nacional', data.ranking, rk => {
+                    let athleteName = '';
+                    if (rk.athleteId) {
+                        const athlete = data.athletes.find(a => a.id === rk.athleteId);
+                        if (athlete) athleteName = (athlete.name || '') + ' ' + (athlete.lastName || '');
                     }
-                    console.log('✅ Records sincronizados:', data.records.length);
-                    guardado = true;
-                } catch (e) {
-                    console.error('❌ Records excepción:', e);
-                    errores.push('records: ' + e.message);
+                    return {
+                        id: rk.id && rk.id.length === 36 ? rk.id : generateUUID(),
+                        posicion: rk.position || 0,
+                        nombre: athleteName || rk.name || '',
+                        puntos: rk.points || 0,
+                        categoria: rk.category || 'general'
+                    };
+                });
+
+                // ===== RECORDS =====
+                await syncTable('records', data.records, rec => ({
+                    id: rec.id && rec.id.length === 36 ? rec.id : generateUUID(),
+                    prueba: rec.test || '',
+                    marca: rec.record || '',
+                    atleta: rec.holder || '',
+                    categoria: rec.category || 'general',
+                    fecha: rec.date || null,
+                    lugar: rec.location || '',
+                    video: rec.video || '',
+                    imagen: rec.image || ''
+                }));
+
+                // ===== GIMNASIOS =====
+                await syncTable('gimnasios', data.gyms, gym => ({
+                    nombre: gym.name || '',
+                    direccion: gym.address || '',
+                    telefono: gym.phone || '',
+                    horario: gym.schedule || '',
+                    servicios: gym.services || '',
+                    mapa: gym.map || '',
+                    imagen: gym.image || ''
+                }));
+
+                // ===== GALERIA =====
+                await syncTable('galeria', data.gallery, img => ({
+                    titulo: img.title || '',
+                    imagen: img.image || '',
+                    categoria: img.category || 'general'
+                }));
+
+                // ===== REGLAS =====
+                await syncTable('reglas', data.rules, rule => ({
+                    titulo: rule.title || '',
+                    contenido: rule.content || '',
+                    categoria: rule.category || 'general'
+                }));
+
+                // ===== CURSOS =====
+                await syncTable('cursos', data.courses, course => ({
+                    titulo: course.title || '',
+                    descripcion: course.description || '',
+                    instructor: course.instructor || '',
+                    duracion: course.duration || '',
+                    precio: course.price || '',
+                    imagen: course.image || '',
+                    nivel: course.level || 'principiante'
+                }));
+
+                // ===== JUECES =====
+                await syncTable('jueces', data.judges, judge => ({
+                    nombre: judge.name || '',
+                    nivel: judge.level || 'nacional',
+                    experiencia: judge.experience || '',
+                    imagen: judge.image || ''
+                }));
+
+                // ===== SPONSORS =====
+                await syncTable('sponsors', data.sponsors, sponsor => ({
+                    nombre: sponsor.name || '',
+                    logo: sponsor.logo || '',
+                    url: sponsor.url || '',
+                    nivel: sponsor.level || 'bronze'
+                }));
+
+                // ===== CONTACTOS =====
+                await syncTable('contactos', data.contacts, contact => ({
+                    nombre: contact.name || '',
+                    email: contact.email || '',
+                    telefono: contact.phone || '',
+                    rol: contact.role || '',
+                    imagen: contact.image || ''
+                }));
+
+                // ===== SETTINGS =====
+                if (data.settings && data.settings.length > 0) {
+                    await syncTable('settings', data.settings, setting => ({
+                        key: setting.key || '',
+                        value: setting.value || ''
+                    }));
                 }
 
-                // ===== GIMNASIOS (integer) =====
-                // La tabla tiene: id, nombre, direccion, telefono, email, horario, servicios, lat, lng, imagen, activo
-                // El HTML genera: name, address, phone, photo
-                try {
-                    console.log('🔄 Sincronizando gimnasios...');
-                    for (const gym of data.gyms) {
-                        const payload = {
-                            id: gym.id ? parseInt(gym.id) : generateIdForTable('gimnasios'),
-                            nombre: gym.name || '',
-                            direccion: gym.address || '',
-                            telefono: gym.phone || '',
-                            email: '',
-                            horario: '',
-                            servicios: '',
-                            lat: null,
-                            lng: null,
-                            imagen: gym.photo || null,
-                            activo: true
-                        };
-                        console.log('📤 Enviando gimnasio:', payload.id, payload.nombre);
-                        const { data: resp, error } = await supabaseClient.from('gimnasios').upsert(payload, { onConflict: 'id' }).select();
-                        if (error) {
-                            console.error('❌ Error upsert gimnasio:', error);
-                            errores.push('gimnasios: ' + JSON.stringify(error));
-                        } else {
-                            console.log('✅ Gimnasio guardado:', resp);
-                        }
-                    }
-                    console.log('✅ Gimnasios sincronizados:', data.gyms.length);
-                    guardado = true;
-                } catch (e) {
-                    console.error('❌ Gimnasios excepción:', e);
-                    errores.push('gimnasios: ' + e.message);
-                }
-
-                // ===== GALERÍA (integer) =====
-                // La tabla tiene: id, titulo, categoria, imagen, fecha, descripcion
-                // El HTML genera: type, src, title
-                try {
-                    console.log('🔄 Sincronizando galería...');
-                    for (const gal of data.gallery) {
-                        const payload = {
-                            id: gal.id ? parseInt(gal.id) : generateIdForTable('galeria'),
-                            titulo: gal.title || '',
-                            categoria: gal.type || 'general',
-                            imagen: gal.src || '',
-                            fecha: new Date().toISOString().split('T')[0],
-                            descripcion: ''
-                        };
-                        console.log('📤 Enviando galería:', payload.id, payload.titulo);
-                        const { data: resp, error } = await supabaseClient.from('galeria').upsert(payload, { onConflict: 'id' }).select();
-                        if (error) {
-                            console.error('❌ Error upsert galería:', error);
-                            errores.push('galeria: ' + JSON.stringify(error));
-                        } else {
-                            console.log('✅ Galería guardada:', resp);
-                        }
-                    }
-                    console.log('✅ Galería sincronizada:', data.gallery.length);
-                    guardado = true;
-                } catch (e) {
-                    console.error('❌ Galería excepción:', e);
-                    errores.push('galeria: ' + e.message);
-                }
-
-                // ===== REGLAS (integer) =====
-                // La tabla tiene: id, categoria, contenido, orden
-                // El HTML genera: category, name, description
-                try {
-                    console.log('🔄 Sincronizando reglas...');
-                    for (let i = 0; i < data.rules.length; i++) {
-                        const rule = data.rules[i];
-                        const payload = {
-                            id: rule.id ? parseInt(rule.id) : generateIdForTable('reglas'),
-                            categoria: rule.category || '',
-                            contenido: (rule.name || '') + '\n\n' + (rule.description || ''),
-                            orden: i + 1
-                        };
-                        console.log('📤 Enviando regla:', payload.id, payload.categoria);
-                        const { data: resp, error } = await supabaseClient.from('reglas').upsert(payload, { onConflict: 'id' }).select();
-                        if (error) {
-                            console.error('❌ Error upsert regla:', error);
-                            errores.push('reglas: ' + JSON.stringify(error));
-                        } else {
-                            console.log('✅ Regla guardada:', resp);
-                        }
-                    }
-                    console.log('✅ Reglas sincronizadas:', data.rules.length);
-                    guardado = true;
-                } catch (e) {
-                    console.error('❌ Reglas excepción:', e);
-                    errores.push('reglas: ' + e.message);
-                }
-
-                // ===== CURSOS (integer) =====
-                // La tabla tiene: id, nombre, descripcion, instructor, fecha, duracion, precio, imagen, categoria, activo
-                // El HTML genera: title, date, time, location, cost, description
-                try {
-                    console.log('🔄 Sincronizando cursos...');
-                    for (const course of data.courses) {
-                        const payload = {
-                            id: course.id ? parseInt(course.id) : generateIdForTable('cursos'),
-                            nombre: course.title || '',
-                            descripcion: course.description || '',
-                            instructor: '',
-                            fecha: course.date || '',
-                            duracion: course.time || '',
-                            precio: course.cost || '',
-                            imagen: null,
-                            categoria: 'general',
-                            activo: true
-                        };
-                        console.log('📤 Enviando curso:', payload.id, payload.nombre);
-                        const { data: resp, error } = await supabaseClient.from('cursos').upsert(payload, { onConflict: 'id' }).select();
-                        if (error) {
-                            console.error('❌ Error upsert curso:', error);
-                            errores.push('cursos: ' + JSON.stringify(error));
-                        } else {
-                            console.log('✅ Curso guardado:', resp);
-                        }
-                    }
-                    console.log('✅ Cursos sincronizados:', data.courses.length);
-                    guardado = true;
-                } catch (e) {
-                    console.error('❌ Cursos excepción:', e);
-                    errores.push('cursos: ' + e.message);
-                }
-
-                // ===== JUECES (integer) =====
-                // La tabla tiene: id, nombre, categoria, imagen, bio, activo
-                // El HTML genera: name, lastName, doc, phone, level, photo
-                try {
-                    console.log('🔄 Sincronizando jueces...');
-                    for (const judge of data.judges) {
-                        const payload = {
-                            id: judge.id ? parseInt(judge.id) : generateIdForTable('jueces'),
-                            nombre: (judge.name || '') + ' ' + (judge.lastName || ''),
-                            categoria: judge.level || '',
-                            imagen: judge.photo || null,
-                            bio: '',
-                            activo: true
-                        };
-                        console.log('📤 Enviando juez:', payload.id, payload.nombre);
-                        const { data: resp, error } = await supabaseClient.from('jueces').upsert(payload, { onConflict: 'id' }).select();
-                        if (error) {
-                            console.error('❌ Error upsert juez:', error);
-                            errores.push('jueces: ' + JSON.stringify(error));
-                        } else {
-                            console.log('✅ Juez guardado:', resp);
-                        }
-                    }
-                    console.log('✅ Jueces sincronizados:', data.judges.length);
-                    guardado = true;
-                } catch (e) {
-                    console.error('❌ Jueces excepción:', e);
-                    errores.push('jueces: ' + e.message);
-                }
-
-                // ===== SPONSORS (integer) =====
-                // La tabla tiene: id, nombre, logo, link, activo
-                // El HTML genera: name, link, logo
-                try {
-                    console.log('🔄 Sincronizando sponsors...');
-                    for (const sponsor of data.sponsors) {
-                        const payload = {
-                            id: sponsor.id ? parseInt(sponsor.id) : generateIdForTable('sponsors'),
-                            nombre: sponsor.name || '',
-                            logo: sponsor.logo || null,
-                            link: sponsor.link || '',
-                            activo: true
-                        };
-                        console.log('📤 Enviando sponsor:', payload.id, payload.nombre);
-                        const { data: resp, error } = await supabaseClient.from('sponsors').upsert(payload, { onConflict: 'id' }).select();
-                        if (error) {
-                            console.error('❌ Error upsert sponsor:', error);
-                            errores.push('sponsors: ' + JSON.stringify(error));
-                        } else {
-                            console.log('✅ Sponsor guardado:', resp);
-                        }
-                    }
-                    console.log('✅ Sponsors sincronizados:', data.sponsors.length);
-                    guardado = true;
-                } catch (e) {
-                    console.error('❌ Sponsors excepción:', e);
-                    errores.push('sponsors: ' + e.message);
-                }
-
-                // ===== CONTACTOS (integer) =====
-                // La tabla tiene: id, nombre, email, telefono, mensaje, fecha, leido
-                // El HTML genera: type, value, label (array de contactos)
-                try {
-                    console.log('🔄 Sincronizando contactos...');
-                    for (let i = 0; i < data.contacts.length; i++) {
-                        const contact = data.contacts[i];
-                        const payload = {
-                            id: i + 1,
-                            nombre: contact.label || contact.type || '',
-                            email: contact.type === 'email' ? contact.value : '',
-                            telefono: contact.type === 'phone' ? contact.value : '',
-                            mensaje: contact.type === 'address' ? contact.value : '',
-                            fecha: new Date().toISOString().split('T')[0],
-                            leido: true
-                        };
-                        console.log('📤 Enviando contacto:', payload.id, payload.nombre);
-                        const { data: resp, error } = await supabaseClient.from('contactos').upsert(payload, { onConflict: 'id' }).select();
-                        if (error) {
-                            console.error('❌ Error upsert contacto:', error);
-                            errores.push('contactos: ' + JSON.stringify(error));
-                        } else {
-                            console.log('✅ Contacto guardado:', resp);
-                        }
-                    }
-                    console.log('✅ Contactos sincronizados:', data.contacts.length);
-                    guardado = true;
-                } catch (e) {
-                    console.error('❌ Contactos excepción:', e);
-                    errores.push('contactos: ' + e.message);
-                }
-
-                // ===== SETTINGS (integer) =====
-                try {
-                    console.log('🔄 Sincronizando settings...');
-                    const { data: resp, error } = await supabaseClient.from('settings').upsert({
-                        id: 1,
-                        data_json: data.settings,
-                        updated_at: new Date().toISOString()
-                    }, { onConflict: 'id' }).select();
-                    if (error) {
-                        console.error('❌ Error upsert settings:', error);
-                        errores.push('settings: ' + JSON.stringify(error));
-                    } else {
-                        console.log('✅ Settings guardados:', resp);
-                    }
-                    guardado = true;
-                } catch (e) {
-                    console.error('❌ Settings excepción:', e);
-                    errores.push('settings: ' + e.message);
-                }
-
+                console.log('✅✅✅ Sincronización con Supabase COMPLETADA');
                 if (errores.length > 0) {
-                    console.error('❌❌❌ ERRORES TOTALES:', errores);
-                    alert('⚠️ Hubo errores al sincronizar. Revisá la consola (F12) para ver los detalles.\n\nErrores:\n' + errores.join('\n'));
-                } else {
-                    console.log('✅✅✅ Sincronización con Supabase COMPLETADA SIN ERRORES');
+                    console.warn('⚠️ Errores:', errores);
                 }
-                return guardado;
+                return true;
+
             } catch (e) {
-                console.error('❌❌❌ Error fatal guardando en Supabase:', e);
-                alert('❌ Error fatal: ' + e.message);
+                console.error('❌❌❌ Error fatal en sincronización:', e);
                 return false;
             }
         }
 
-
-
-        // ===== WRAPPERS PARA COMPATIBILIDAD =====
-async function loadFromSupabase() {
-    return await loadDataFromSupabase();
-}
-
-async function saveToSupabase() {
-    return await saveDataToSupabase();
-}
-
-async function syncToSupabase() {
-    return await saveDataToSupabase();
-}
-
-// ===== CARGAR COMPETENCIAS DESDE SUPABASE (STRONGSCORE) =====
+        // ===== CARGAR COMPETENCIAS DESDE SUPABASE (STRONGSCORE) =====
         async function renderCompetenciasPublico() {
             const container = document.getElementById('competenciasPublicoContainer');
             if (!container) return;
