@@ -3470,7 +3470,7 @@ select.scoring-form-control{cursor:pointer}
 
 
         // ===== GUARDAR DATOS EN SUPABASE =====
-        async async function deleteMissingFromSupabase(table, localIds, idColumn) {
+        async function deleteMissingFromSupabase(table, localIds, idColumn) {
             try {
                 // Obtener todos los IDs de Supabase
                 const { data: remoteData, error } = await supabaseClient.from(table).select(idColumn);
@@ -3935,7 +3935,7 @@ async function saveToSupabase() {
     return await saveDataToSupabase();
 }
 
-async async function syncToSupabase() {
+async function syncToSupabase() {
     return await saveDataToSupabase();
 }
 
