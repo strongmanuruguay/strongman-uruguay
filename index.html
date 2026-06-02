@@ -3518,11 +3518,15 @@ select.scoring-form-control{cursor:pointer}
                     console.log('🔄 Cargando eventos...');
                     const { data: eventsData, error } = await supabaseClient.from('eventos').select('*').order('fecha', { ascending: true });
                     console.log('📥 Eventos raw:', eventsData ? eventsData.length : 0, 'Error:', error);
-                    if (!error && eventsData && eventsData.length > 0) {
-                        const localEventIds = new Set(data.events.map(e => e.id));
-                        const newEvents = eventsData
-                            .filter(e => !localEventIds.has(e.id))
-                            .map(e => ({
+                    if (!error) {
+                        if (eventsData && eventsData.length > 0) {
+                            // Sobrescribir con datos de Supabase (fuente de verdad)
+                            const remoteIds = new Set(eventsData.map(e => e.id));
+                            const localOnlyEvents = data.events.filter(e => !remoteIds.has(e.id));
+                            if (localOnlyEvents.length > 0) {
+                                console.log('🗑️ Borrando eventos locales que ya no están en Supabase:', localOnlyEvents.length);
+                            }
+                            data.events = eventsData.map(e => ({
                                 id: e.id,
                                 name: e.nombre,
                                 date: e.fecha,
@@ -3533,17 +3537,19 @@ select.scoring-form-control{cursor:pointer}
                                 categories: e.categorias || [],
                                 image: e.imagen_url
                             }));
-                        if (newEvents.length > 0) {
-                            data.events = [...data.events, ...newEvents];
-                            console.log('✅ Eventos mergeados:', newEvents.length, 'nuevos. Total:', data.events.length);
+                            console.log('✅ Eventos cargados desde Supabase:', data.events.length);
                             cargado = true;
                         } else {
-                            console.log('ℹ️ No hay eventos nuevos en Supabase');
+                            // Supabase está vacío, borrar locales también
+                            if (data.events.length > 0) {
+                                console.log('🗑️ Supabase vacío, borrando', data.events.length, 'eventos locales');
+                                data.events = [];
+                                cargado = true;
+                            }
+                            console.log('ℹ️ No hay eventos en Supabase');
                         }
-                    } else if (error) {
-                        console.error('❌ Error cargando eventos:', error);
                     } else {
-                        console.log('ℹ️ No hay eventos en Supabase');
+                        console.error('❌ Error cargando eventos:', error);
                     }
                 } catch (e) { console.warn('Eventos excepción:', e.message); }
 
@@ -3552,11 +3558,9 @@ select.scoring-form-control{cursor:pointer}
                     console.log('🔄 Cargando atletas...');
                     const { data: athletesData, error } = await supabaseClient.from('atletas').select('*').order('nombre', { ascending: true });
                     console.log('📥 Atletas raw:', athletesData ? athletesData.length : 0, 'Error:', error);
-                    if (!error && athletesData && athletesData.length > 0) {
-                        const localAthleteIds = new Set(data.athletes.map(a => a.id));
-                        const newAthletes = athletesData
-                            .filter(a => !localAthleteIds.has(a.id))
-                            .map(a => {
+                    if (!error) {
+                        if (athletesData && athletesData.length > 0) {
+                            data.athletes = athletesData.map(a => {
                                 const parts = (a.nombre || '').split(' ');
                                 return {
                                     id: a.id,
@@ -3572,17 +3576,18 @@ select.scoring-form-control{cursor:pointer}
                                     personalRecords: []
                                 };
                             });
-                        if (newAthletes.length > 0) {
-                            data.athletes = [...data.athletes, ...newAthletes];
-                            console.log('✅ Atletas mergeados:', newAthletes.length, 'nuevos. Total:', data.athletes.length);
+                            console.log('✅ Atletas cargados desde Supabase:', data.athletes.length);
                             cargado = true;
                         } else {
-                            console.log('ℹ️ No hay atletas nuevos en Supabase');
+                            if (data.athletes.length > 0) {
+                                console.log('🗑️ Supabase vacío, borrando', data.athletes.length, 'atletas locales');
+                                data.athletes = [];
+                                cargado = true;
+                            }
+                            console.log('ℹ️ No hay atletas en Supabase');
                         }
-                    } else if (error) {
-                        console.error('❌ Error cargando atletas:', error);
                     } else {
-                        console.log('ℹ️ No hay atletas en Supabase');
+                        console.error('❌ Error cargando atletas:', error);
                     }
                 } catch (e) { console.warn('Atletas excepción:', e.message); }
 
