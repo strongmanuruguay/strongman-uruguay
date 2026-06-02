@@ -1533,7 +1533,6 @@ select.scoring-form-control{cursor:pointer}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <base target="_blank">
 <base target="_blank">
-<base target="_blank">
 </head>
 <body>
     <div class="menu-overlay" id="menuOverlay" onclick="closeMenu()"></div>
@@ -2960,7 +2959,7 @@ select.scoring-form-control{cursor:pointer}
             if (uuidTables.includes(tableName)) {
                 return generateUUID();
             }
-            return Date.now();
+            return Date.now().toString();
         }
 
 
@@ -2992,15 +2991,7 @@ select.scoring-form-control{cursor:pointer}
         document.addEventListener('DOMContentLoaded', async function() {
             // ===== LIMPIAR LOCALSTORAGE (reset completo) =====
             // Borrar TODOS los datos locales para empezar desde cero con Supabase
-            const keysToClear = [
-                'acaf_events', 'acaf_athletes', 'acaf_ranking', 'acaf_gyms',
-                'acaf_records', 'acaf_gallery', 'acaf_rules', 'acaf_courses',
-                'acaf_judges', 'acaf_sponsors', 'acaf_contacts', 'acaf_settings',
-                'acaf_visits', 'acaf_competencias', 'acaf_suscriptores',
-                'acaf_notificaciones', 'productosTienda', 'cartStrongman',
-                'smu_countdown_v2'
-            ];
-            keysToClear.forEach(k => localStorage.removeItem(k));
+            // localStorage cleanup removed - data persists
             console.log('🧹 localStorage limpiado - empezando desde cero');
 
             // Reiniciar data object
@@ -4691,18 +4682,20 @@ async function syncToSupabase() {
             } else if (type === 'contacts') {
                 renderContactsAdmin(container);
             } else {
-                container.innerHTML = items.map(item => `
+                container.innerHTML = items.map(item => {
+                    const idStr = JSON.stringify(item.id);
+                    return `
                     <div class="list-item">
                         <div class="list-item-info">
                             <div class="list-item-title">${item.name || item.title || item.test || `${item.name || ''} ${item.lastName || ''}`}</div>
                             <div class="list-item-subtitle">${item.date || item.location || item.holder || item.level || item.address || ''}</div>
                         </div>
                         <div class="list-item-actions">
-                            <button class="btn btn-small btn-icon" onclick="edit${type.charAt(0).toUpperCase() + type.slice(1)}(${item.id})"><i class="fas fa-edit"></i></button>
-                            <button class="btn btn-small btn-icon btn-danger" onclick="delete${type.charAt(0).toUpperCase() + type.slice(1)}(${item.id})"><i class="fas fa-trash"></i></button>
+                            <button class="btn btn-small btn-icon" onclick="edit${type.charAt(0).toUpperCase() + type.slice(1)}(${idStr})"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-small btn-icon btn-danger" onclick="delete${type.charAt(0).toUpperCase() + type.slice(1)}(${idStr})"><i class="fas fa-trash"></i></button>
                         </div>
                     </div>
-                `).join('');
+                `}).join('');
             }
         }
 
@@ -5062,7 +5055,7 @@ async function syncToSupabase() {
         }
 
         function editGyms(id) {
-            const gym = data.gyms.find(g => g.id === id);
+            const gym = data.gyms.find(g => String(g.id) === String(id));
             if (!gym) return;
             document.getElementById('gymId').value = gym.id;
             document.getElementById('gymName').value = gym.name;
@@ -5072,7 +5065,7 @@ async function syncToSupabase() {
 
         function deleteGyms(id) {
             if (!confirm('¿Eliminar este gimnasio?')) return;
-            data.gyms = data.gyms.filter(g => g.id !== id);
+            data.gyms = data.gyms.filter(g => String(g.id) !== String(id));
             saveAllData();
             renderGyms();
             loadAdminList('gyms');
@@ -5195,7 +5188,7 @@ async function syncToSupabase() {
         }
 
         function editRules(id) {
-            const rule = data.rules.find(r => r.id === id);
+            const rule = data.rules.find(r => String(r.id) === String(id));
             if (!rule) return;
             document.getElementById('ruleId').value = rule.id;
             document.getElementById('ruleCategory').value = rule.category;
@@ -5205,7 +5198,7 @@ async function syncToSupabase() {
 
         function deleteRules(id) {
             if (!confirm('¿Eliminar esta regla?')) return;
-            data.rules = data.rules.filter(r => r.id !== id);
+            data.rules = data.rules.filter(r => String(r.id) !== String(id));
             saveAllData();
             renderRules();
             loadAdminList('rules');
@@ -5243,7 +5236,7 @@ async function syncToSupabase() {
         }
 
         function editCourses(id) {
-            const course = data.courses.find(c => c.id === id);
+            const course = data.courses.find(c => String(c.id) === String(id));
             if (!course) return;
             document.getElementById('courseId').value = course.id;
             document.getElementById('courseTitle').value = course.title;
@@ -5256,7 +5249,7 @@ async function syncToSupabase() {
 
         function deleteCourses(id) {
             if (!confirm('¿Eliminar este curso?')) return;
-            data.courses = data.courses.filter(c => c.id !== id);
+            data.courses = data.courses.filter(c => String(c.id) !== String(id));
             saveAllData();
             renderCourses();
             loadAdminList('courses');
@@ -5312,7 +5305,7 @@ async function syncToSupabase() {
         }
 
         function editJudges(id) {
-            const judge = data.judges.find(j => j.id === id);
+            const judge = data.judges.find(j => String(j.id) === String(id));
             if (!judge) return;
             document.getElementById('judgeId').value = judge.id;
             document.getElementById('judgeName').value = judge.name;
@@ -5324,7 +5317,7 @@ async function syncToSupabase() {
 
         function deleteJudges(id) {
             if (!confirm('¿Eliminar este juez?')) return;
-            data.judges = data.judges.filter(j => j.id !== id);
+            data.judges = data.judges.filter(j => String(j.id) !== String(id));
             saveAllData();
             renderJudges();
             loadAdminList('judges');
@@ -5377,7 +5370,7 @@ async function syncToSupabase() {
         }
 
         function editSponsors(id) {
-            const sponsor = data.sponsors.find(s => s.id === id);
+            const sponsor = data.sponsors.find(s => String(s.id) === String(id));
             if (!sponsor) return;
             document.getElementById('sponsorId').value = sponsor.id;
             document.getElementById('sponsorName').value = sponsor.name;
@@ -5386,7 +5379,7 @@ async function syncToSupabase() {
 
         function deleteSponsors(id) {
             if (!confirm('¿Eliminar este sponsor?')) return;
-            data.sponsors = data.sponsors.filter(s => s.id !== id);
+            data.sponsors = data.sponsors.filter(s => String(s.id) !== String(id));
             saveAllData();
             renderSponsors();
             loadAdminList('sponsors');
