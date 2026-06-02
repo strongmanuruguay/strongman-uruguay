@@ -3200,19 +3200,29 @@ select.scoring-form-control{cursor:pointer}
                     const { data: eventsData, error } = await supabaseClient.from('eventos').select('*').order('fecha', { ascending: true });
                     console.log('📥 Eventos raw:', eventsData ? eventsData.length : 0, 'Error:', error);
                     if (!error && eventsData && eventsData.length > 0) {
-                        data.events = eventsData.map(e => ({
-                            id: e.id,
-                            name: e.nombre,
-                            date: e.fecha,
-                            time: e.hora,
-                            location: e.lugar,
-                            cost: e.costo,
-                            description: e.descripcion,
-                            categories: e.categorias || [],
-                            image: e.imagen_url
-                        }));
-                        console.log('✅ Eventos cargados:', data.events.length);
-                        cargado = true;
+                        // Merge: solo agregar eventos de Supabase que no existan localmente
+                        // No sobrescribir los locales (pueden tener cambios más recientes)
+                        const localEventIds = new Set(data.events.map(e => e.id));
+                        const newEvents = eventsData
+                            .filter(e => !localEventIds.has(e.id))
+                            .map(e => ({
+                                id: e.id,
+                                name: e.nombre,
+                                date: e.fecha,
+                                time: e.hora,
+                                location: e.lugar,
+                                cost: e.costo,
+                                description: e.descripcion,
+                                categories: e.categorias || [],
+                                image: e.imagen_url
+                            }));
+                        if (newEvents.length > 0) {
+                            data.events = [...data.events, ...newEvents];
+                            console.log('✅ Eventos mergeados:', newEvents.length, 'nuevos. Total:', data.events.length);
+                            cargado = true;
+                        } else {
+                            console.log('ℹ️ No hay eventos nuevos en Supabase');
+                        }
                     } else if (error) {
                         console.error('❌ Error cargando eventos:', error);
                     } else {
