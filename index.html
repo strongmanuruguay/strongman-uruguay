@@ -3492,7 +3492,7 @@ select.scoring-form-control{cursor:pointer}
             }
         }
 
-        function saveDataToSupabase() {
+        async function saveDataToSupabase() {
             if (!supabaseClient) initSupabaseMain();
             if (!supabaseClient) {
                 console.error('❌ Supabase no está inicializado');
@@ -3935,7 +3935,7 @@ async function saveToSupabase() {
     return await saveDataToSupabase();
 }
 
-async function syncToSupabase() {
+async async function syncToSupabase() {
     return await saveDataToSupabase();
 }
 
