@@ -3470,7 +3470,29 @@ select.scoring-form-control{cursor:pointer}
 
 
         // ===== GUARDAR DATOS EN SUPABASE =====
-        async function saveDataToSupabase() {
+        async async function deleteMissingFromSupabase(table, localIds, idColumn) {
+            try {
+                // Obtener todos los IDs de Supabase
+                const { data: remoteData, error } = await supabaseClient.from(table).select(idColumn);
+                if (error) {
+                    console.error('❌ Error leyendo', table, error);
+                    return;
+                }
+                const remoteIds = remoteData.map(r => r[idColumn]);
+                const toDelete = remoteIds.filter(rid => !localIds.includes(rid));
+                if (toDelete.length > 0) {
+                    console.log('🗑️ Borrando de', table, ':', toDelete.length, 'registros');
+                    for (const delId of toDelete) {
+                        const { error: delError } = await supabaseClient.from(table).delete().eq(idColumn, delId);
+                        if (delError) console.error('❌ Error borrando', table, delId, delError);
+                    }
+                }
+            } catch (e) {
+                console.error('❌ Error en deleteMissingFromSupabase:', e);
+            }
+        }
+
+        function saveDataToSupabase() {
             if (!supabaseClient) initSupabaseMain();
             if (!supabaseClient) {
                 console.error('❌ Supabase no está inicializado');
@@ -3499,6 +3521,7 @@ select.scoring-form-control{cursor:pointer}
                 // ===== EVENTOS (uuid) =====
                 try {
                     console.log('🔄 Sincronizando eventos...');
+                    await deleteMissingFromSupabase('eventos', data.events.map(e => e.id).filter(Boolean), 'id');
                     for (const ev of data.events) {
                         // Asegurar que el ID sea UUID válido
                         let eventId = ev.id;
@@ -3538,6 +3561,7 @@ select.scoring-form-control{cursor:pointer}
                 // El HTML genera: name, lastName, doc, phone, gender, years, number, hasCard, photo, personalRecords
                 try {
                     console.log('🔄 Sincronizando atletas...');
+                    await deleteMissingFromSupabase('atletas', data.athletes.map(a => a.id).filter(Boolean), 'id');
                     for (const atl of data.athletes) {
                         let atlId = atl.id;
                         if (!atlId || typeof atlId !== 'string' || atlId.length !== 36) {
@@ -3573,6 +3597,7 @@ select.scoring-form-control{cursor:pointer}
                 // El HTML genera: athleteId, gender, category, position, points
                 try {
                     console.log('🔄 Sincronizando ranking nacional...');
+                    await deleteMissingFromSupabase('ranking_nacional', data.ranking.map(r => r.id).filter(Boolean), 'id');
                     for (const rk of data.ranking) {
                         let rkId = rk.id;
                         if (!rkId || typeof rkId !== 'string' || rkId.length !== 36) {
