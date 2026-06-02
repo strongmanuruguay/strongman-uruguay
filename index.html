@@ -3502,6 +3502,348 @@ select.scoring-form-control{cursor:pointer}
             }
         }
 
+        async function loadDataFromSupabase() {
+            if (!supabaseClient) initSupabaseMain();
+            if (!supabaseClient) {
+                console.error('❌ Supabase no está inicializado');
+                return false;
+            }
+
+            let cargado = false;
+            console.log('🔄 Iniciando carga desde Supabase...');
+
+            try {
+                // ===== EVENTOS (uuid) =====
+                try {
+                    console.log('🔄 Cargando eventos...');
+                    const { data: eventsData, error } = await supabaseClient.from('eventos').select('*').order('fecha', { ascending: true });
+                    console.log('📥 Eventos raw:', eventsData ? eventsData.length : 0, 'Error:', error);
+                    if (!error && eventsData && eventsData.length > 0) {
+                        const localEventIds = new Set(data.events.map(e => e.id));
+                        const newEvents = eventsData
+                            .filter(e => !localEventIds.has(e.id))
+                            .map(e => ({
+                                id: e.id,
+                                name: e.nombre,
+                                date: e.fecha,
+                                time: e.hora,
+                                location: e.lugar,
+                                cost: e.costo,
+                                description: e.descripcion,
+                                categories: e.categorias || [],
+                                image: e.imagen_url
+                            }));
+                        if (newEvents.length > 0) {
+                            data.events = [...data.events, ...newEvents];
+                            console.log('✅ Eventos mergeados:', newEvents.length, 'nuevos. Total:', data.events.length);
+                            cargado = true;
+                        } else {
+                            console.log('ℹ️ No hay eventos nuevos en Supabase');
+                        }
+                    } else if (error) {
+                        console.error('❌ Error cargando eventos:', error);
+                    } else {
+                        console.log('ℹ️ No hay eventos en Supabase');
+                    }
+                } catch (e) { console.warn('Eventos excepción:', e.message); }
+
+                // ===== ATLETAS (uuid) =====
+                try {
+                    console.log('🔄 Cargando atletas...');
+                    const { data: athletesData, error } = await supabaseClient.from('atletas').select('*').order('nombre', { ascending: true });
+                    console.log('📥 Atletas raw:', athletesData ? athletesData.length : 0, 'Error:', error);
+                    if (!error && athletesData && athletesData.length > 0) {
+                        const localAthleteIds = new Set(data.athletes.map(a => a.id));
+                        const newAthletes = athletesData
+                            .filter(a => !localAthleteIds.has(a.id))
+                            .map(a => {
+                                const parts = (a.nombre || '').split(' ');
+                                return {
+                                    id: a.id,
+                                    name: parts[0] || '',
+                                    lastName: parts.slice(1).join(' ') || '',
+                                    doc: '',
+                                    phone: '',
+                                    gender: a.categoria || '',
+                                    years: '',
+                                    number: '',
+                                    hasCard: false,
+                                    photo: a.foto_url,
+                                    personalRecords: []
+                                };
+                            });
+                        if (newAthletes.length > 0) {
+                            data.athletes = [...data.athletes, ...newAthletes];
+                            console.log('✅ Atletas mergeados:', newAthletes.length, 'nuevos. Total:', data.athletes.length);
+                            cargado = true;
+                        } else {
+                            console.log('ℹ️ No hay atletas nuevos en Supabase');
+                        }
+                    } else if (error) {
+                        console.error('❌ Error cargando atletas:', error);
+                    } else {
+                        console.log('ℹ️ No hay atletas en Supabase');
+                    }
+                } catch (e) { console.warn('Atletas excepción:', e.message); }
+
+                // ===== RANKING_NACIONAL (uuid) =====
+                try {
+                    console.log('🔄 Cargando ranking nacional...');
+                    const { data: rankingData, error } = await supabaseClient.from('ranking_nacional').select('*').order('posicion', { ascending: true });
+                    if (!error && rankingData && rankingData.length > 0) {
+                        const localRankingIds = new Set(data.ranking.map(r => r.id));
+                        const newRanking = rankingData
+                            .filter(r => !localRankingIds.has(r.id))
+                            .map(r => ({
+                                id: r.id,
+                                athleteId: r.atleta_id,
+                                name: r.nombre,
+                                gender: r.genero,
+                                category: r.categoria,
+                                position: r.posicion,
+                                points: r.puntos
+                            }));
+                        if (newRanking.length > 0) {
+                            data.ranking = [...data.ranking, ...newRanking];
+                            cargado = true;
+                        }
+                    }
+                } catch (e) { console.warn('Ranking excepción:', e.message); }
+
+                // ===== RECORDS (uuid) =====
+                try {
+                    console.log('🔄 Cargando records...');
+                    const { data: recordsData, error } = await supabaseClient.from('records').select('*');
+                    if (!error && recordsData && recordsData.length > 0) {
+                        const localRecordIds = new Set(data.records.map(r => r.id));
+                        const newRecords = recordsData
+                            .filter(r => !localRecordIds.has(r.id))
+                            .map(r => ({
+                                id: r.id,
+                                test: r.prueba,
+                                record: r.marca,
+                                holder: r.atleta,
+                                category: r.categoria,
+                                date: r.fecha,
+                                location: r.lugar,
+                                video: r.video,
+                                image: r.imagen
+                            }));
+                        if (newRecords.length > 0) {
+                            data.records = [...data.records, ...newRecords];
+                            cargado = true;
+                        }
+                    }
+                } catch (e) { console.warn('Records excepción:', e.message); }
+
+                // ===== GIMNASIOS (integer) =====
+                try {
+                    console.log('🔄 Cargando gimnasios...');
+                    const { data: gymsData, error } = await supabaseClient.from('gimnasios').select('*');
+                    if (!error && gymsData && gymsData.length > 0) {
+                        const localGymIds = new Set(data.gyms.map(g => g.id));
+                        const newGyms = gymsData
+                            .filter(g => !localGymIds.has(g.id))
+                            .map(g => ({
+                                id: g.id,
+                                name: g.nombre,
+                                address: g.direccion,
+                                phone: g.telefono,
+                                schedule: g.horario,
+                                services: g.servicios,
+                                map: g.mapa,
+                                image: g.imagen
+                            }));
+                        if (newGyms.length > 0) {
+                            data.gyms = [...data.gyms, ...newGyms];
+                            cargado = true;
+                        }
+                    }
+                } catch (e) { console.warn('Gimnasios excepción:', e.message); }
+
+                // ===== GALERIA (integer) =====
+                try {
+                    console.log('🔄 Cargando galería...');
+                    const { data: galleryData, error } = await supabaseClient.from('galeria').select('*');
+                    if (!error && galleryData && galleryData.length > 0) {
+                        const localGalleryIds = new Set(data.gallery.map(g => g.id));
+                        const newGallery = galleryData
+                            .filter(g => !localGalleryIds.has(g.id))
+                            .map(g => ({
+                                id: g.id,
+                                title: g.titulo,
+                                image: g.imagen,
+                                category: g.categoria
+                            }));
+                        if (newGallery.length > 0) {
+                            data.gallery = [...data.gallery, ...newGallery];
+                            cargado = true;
+                        }
+                    }
+                } catch (e) { console.warn('Galería excepción:', e.message); }
+
+                // ===== REGLAS (integer) =====
+                try {
+                    console.log('🔄 Cargando reglas...');
+                    const { data: rulesData, error } = await supabaseClient.from('reglas').select('*');
+                    if (!error && rulesData && rulesData.length > 0) {
+                        const localRuleIds = new Set(data.rules.map(r => r.id));
+                        const newRules = rulesData
+                            .filter(r => !localRuleIds.has(r.id))
+                            .map(r => ({
+                                id: r.id,
+                                title: r.titulo,
+                                content: r.contenido,
+                                category: r.categoria
+                            }));
+                        if (newRules.length > 0) {
+                            data.rules = [...data.rules, ...newRules];
+                            cargado = true;
+                        }
+                    }
+                } catch (e) { console.warn('Reglas excepción:', e.message); }
+
+                // ===== CURSOS (integer) =====
+                try {
+                    console.log('🔄 Cargando cursos...');
+                    const { data: coursesData, error } = await supabaseClient.from('cursos').select('*');
+                    if (!error && coursesData && coursesData.length > 0) {
+                        const localCourseIds = new Set(data.courses.map(c => c.id));
+                        const newCourses = coursesData
+                            .filter(c => !localCourseIds.has(c.id))
+                            .map(c => ({
+                                id: c.id,
+                                title: c.titulo,
+                                description: c.descripcion,
+                                instructor: c.instructor,
+                                duration: c.duracion,
+                                price: c.precio,
+                                image: c.imagen,
+                                level: c.nivel
+                            }));
+                        if (newCourses.length > 0) {
+                            data.courses = [...data.courses, ...newCourses];
+                            cargado = true;
+                        }
+                    }
+                } catch (e) { console.warn('Cursos excepción:', e.message); }
+
+                // ===== JUECES (integer) =====
+                try {
+                    console.log('🔄 Cargando jueces...');
+                    const { data: judgesData, error } = await supabaseClient.from('jueces').select('*');
+                    if (!error && judgesData && judgesData.length > 0) {
+                        const localJudgeIds = new Set(data.judges.map(j => j.id));
+                        const newJudges = judgesData
+                            .filter(j => !localJudgeIds.has(j.id))
+                            .map(j => ({
+                                id: j.id,
+                                name: j.nombre,
+                                level: j.nivel,
+                                experience: j.experiencia,
+                                image: j.imagen
+                            }));
+                        if (newJudges.length > 0) {
+                            data.judges = [...data.judges, ...newJudges];
+                            cargado = true;
+                        }
+                    }
+                } catch (e) { console.warn('Jueces excepción:', e.message); }
+
+                // ===== SPONSORS (integer) =====
+                try {
+                    console.log('🔄 Cargando sponsors...');
+                    const { data: sponsorsData, error } = await supabaseClient.from('sponsors').select('*');
+                    if (!error && sponsorsData && sponsorsData.length > 0) {
+                        const localSponsorIds = new Set(data.sponsors.map(s => s.id));
+                        const newSponsors = sponsorsData
+                            .filter(s => !localSponsorIds.has(s.id))
+                            .map(s => ({
+                                id: s.id,
+                                name: s.nombre,
+                                logo: s.logo,
+                                url: s.url,
+                                level: s.nivel
+                            }));
+                        if (newSponsors.length > 0) {
+                            data.sponsors = [...data.sponsors, ...newSponsors];
+                            cargado = true;
+                        }
+                    }
+                } catch (e) { console.warn('Sponsors excepción:', e.message); }
+
+                // ===== CONTACTOS (integer) =====
+                try {
+                    console.log('🔄 Cargando contactos...');
+                    const { data: contactsData, error } = await supabaseClient.from('contactos').select('*');
+                    if (!error && contactsData && contactsData.length > 0) {
+                        const localContactIds = new Set(data.contacts.map(c => c.id));
+                        const newContacts = contactsData
+                            .filter(c => !localContactIds.has(c.id))
+                            .map(c => ({
+                                id: c.id,
+                                name: c.nombre,
+                                email: c.email,
+                                phone: c.telefono,
+                                role: c.rol,
+                                image: c.imagen
+                            }));
+                        if (newContacts.length > 0) {
+                            data.contacts = [...data.contacts, ...newContacts];
+                            cargado = true;
+                        }
+                    }
+                } catch (e) { console.warn('Contactos excepción:', e.message); }
+
+                // ===== SETTINGS (integer) =====
+                try {
+                    console.log('🔄 Cargando settings...');
+                    const { data: settingsData, error } = await supabaseClient.from('settings').select('*');
+                    console.log('📥 Settings raw:', settingsData, 'Error:', error);
+                    if (!error && settingsData && settingsData.length > 0) {
+                        data.settings = settingsData.map(s => ({
+                            id: s.id,
+                            key: s.key,
+                            value: s.value
+                        }));
+                        console.log('✅ Settings cargados');
+                        cargado = true;
+                    } else if (error) {
+                        console.error('❌ Error cargando settings:', error);
+                    }
+                } catch (e) { console.warn('Settings excepción:', e.message); }
+
+                // Guardar en localStorage
+                localStorage.setItem('acaf_events', JSON.stringify(data.events));
+                localStorage.setItem('acaf_athletes', JSON.stringify(data.athletes));
+                localStorage.setItem('acaf_ranking', JSON.stringify(data.ranking));
+                localStorage.setItem('acaf_gyms', JSON.stringify(data.gyms));
+                localStorage.setItem('acaf_records', JSON.stringify(data.records));
+                localStorage.setItem('acaf_gallery', JSON.stringify(data.gallery));
+                localStorage.setItem('acaf_rules', JSON.stringify(data.rules));
+                localStorage.setItem('acaf_courses', JSON.stringify(data.courses));
+                localStorage.setItem('acaf_judges', JSON.stringify(data.judges));
+                localStorage.setItem('acaf_sponsors', JSON.stringify(data.sponsors));
+                localStorage.setItem('acaf_contacts', JSON.stringify(data.contacts));
+                localStorage.setItem('acaf_settings', JSON.stringify(data.settings));
+
+                console.log('✅✅✅ Carga desde Supabase completada. cargado=' + cargado);
+                return cargado;
+
+            } catch (e) {
+                console.error('❌❌❌ Error fatal cargando desde Supabase:', e);
+                return false;
+            }
+        }
+
+        function loadFromSupabase() {
+            return loadDataFromSupabase();
+        }
+
+        async function syncToSupabase() {
+            return await saveDataToSupabase();
+        }
+
         async function saveDataToSupabase() {
             if (!supabaseClient) initSupabaseMain();
             if (!supabaseClient) {
