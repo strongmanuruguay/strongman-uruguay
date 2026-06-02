@@ -2989,18 +2989,27 @@ select.scoring-form-control{cursor:pointer}
         };
 
         document.addEventListener('DOMContentLoaded', async function() {
-            // ===== LIMPIAR LOCALSTORAGE (reset completo) =====
-            // Borrar TODOS los datos locales para empezar desde cero con Supabase
-            // localStorage cleanup removed - data persists
-            console.log('🧹 localStorage limpiado - empezando desde cero');
-
-            // Reiniciar data object
+            // ===== INICIALIZAR DATA =====
+            // Cargar datos desde localStorage primero (persistencia local)
             data = {
-                events: [], athletes: [], ranking: [], gyms: [],
-                records: [], gallery: [], rules: [], courses: [],
-                judges: [], sponsors: [], contacts: [],
-                settings: { heroBg: null, logo: null, social: {} },
-                visits: 0
+                events: JSON.parse(localStorage.getItem('acaf_events')) || [],
+                athletes: JSON.parse(localStorage.getItem('acaf_athletes')) || [],
+                ranking: JSON.parse(localStorage.getItem('acaf_ranking')) || [],
+                gyms: JSON.parse(localStorage.getItem('acaf_gyms')) || [],
+                records: JSON.parse(localStorage.getItem('acaf_records')) || [],
+                gallery: JSON.parse(localStorage.getItem('acaf_gallery')) || [],
+                rules: JSON.parse(localStorage.getItem('acaf_rules')) || [],
+                courses: JSON.parse(localStorage.getItem('acaf_courses')) || [],
+                judges: JSON.parse(localStorage.getItem('acaf_judges')) || [],
+                sponsors: JSON.parse(localStorage.getItem('acaf_sponsors')) || [],
+                contacts: JSON.parse(localStorage.getItem('acaf_contacts')) || [],
+                settings: JSON.parse(localStorage.getItem('acaf_settings')) || { heroBg: null, logo: null, social: {} },
+                visits: parseInt(localStorage.getItem('acaf_visits')) || 0,
+                products: JSON.parse(localStorage.getItem('productosTienda')) || [],
+                subscribers: JSON.parse(localStorage.getItem('acaf_suscriptores')) || [],
+                competitions: JSON.parse(localStorage.getItem('acaf_competencias')) || [],
+                cart: JSON.parse(localStorage.getItem('cartStrongman')) || [],
+                competencias: JSON.parse(localStorage.getItem('acaf_competencias')) || []
             };
 
             // ===== CONECTAR SUPABASE =====
