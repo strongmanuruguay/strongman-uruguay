@@ -5771,7 +5771,8 @@ select.scoring-form-control{cursor:pointer}
         let cart = JSON.parse(localStorage.getItem('cartStrongman')) || [];
 
         function loadProducts() {
-            const productos = JSON.parse(localStorage.getItem('productosTienda')) || [];
+            // Usar data.products (sincronizado con Supabase)
+            const productos = data.products || [];
             const grid = document.getElementById('productsContainer');
             if (!grid) return;
             if (productos.length === 0) {
@@ -5780,10 +5781,15 @@ select.scoring-form-control{cursor:pointer}
             }
             grid.innerHTML = productos.map(producto => {
                 let imagenes = ['img/producto-default.jpg'];
-                if (producto.imagenes && Array.isArray(producto.imagenes) && producto.imagenes.length > 0) {
+                // Manejar estructura de data.products: image, image2, image3
+                const imgs = [];
+                if (producto.image) imgs.push(producto.image);
+                if (producto.image2) imgs.push(producto.image2);
+                if (producto.image3) imgs.push(producto.image3);
+                if (imgs.length > 0) {
+                    imagenes = imgs;
+                } else if (producto.imagenes && Array.isArray(producto.imagenes) && producto.imagenes.length > 0) {
                     imagenes = producto.imagenes;
-                } else if (producto.imagen) {
-                    imagenes = [producto.imagen];
                 }
                 let miniaturas = '';
                 if (imagenes.length > 1) {
@@ -5988,7 +5994,7 @@ select.scoring-form-control{cursor:pointer}
         }
 
         function loadProductsList() {
-            const products = JSON.parse(localStorage.getItem('productosTienda')) || [];
+            const products = data.products || [];
             const container = document.getElementById('productsList');
             if (products.length === 0) {
                 container.innerHTML = '<p style="color: var(--text-muted);">No hay productos. Agregá el primero arriba.</p>';
@@ -6085,7 +6091,20 @@ select.scoring-form-control{cursor:pointer}
                         nombre, precio, descripcion, imagenes: imagenesFinales, stock
                     });
                 }
+                // Guardar en data.products para sincronización con Supabase
+                data.products = products.map(p => ({
+                    id: p.id,
+                    name: p.nombre,
+                    price: p.precio,
+                    description: p.descripcion,
+                    image: p.imagenes && p.imagenes[0] ? p.imagenes[0] : '',
+                    image2: p.imagenes && p.imagenes[1] ? p.imagenes[1] : '',
+                    image3: p.imagenes && p.imagenes[2] ? p.imagenes[2] : '',
+                    stock: p.stock || 0,
+                    category: 'general'
+                }));
                 localStorage.setItem('productosTienda', JSON.stringify(products));
+                saveAllData(); // Sincronizar con Supabase
                 loadProductsList();
                 clearProductForm();
                 document.getElementById('preview1').style.display = 'none';
@@ -6135,9 +6154,9 @@ select.scoring-form-control{cursor:pointer}
 
         function deleteProduct(id) {
             if (!confirm('¿Eliminar este producto?')) return;
-            let products = JSON.parse(localStorage.getItem('productosTienda')) || [];
+            let products = data.products || [];
             products = products.filter(p => p.id !== id);
-            localStorage.setItem('productosTienda', JSON.stringify(products));
+            data.products = products; localStorage.setItem('productosTienda', JSON.stringify(products)); saveAllData();
             loadProductsList();
         }
 
