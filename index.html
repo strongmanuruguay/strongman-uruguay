@@ -5806,7 +5806,7 @@ select.scoring-form-control{cursor:pointer}
         }       
        
                // ===== TIENDA Y CARRITO =====
-        let cart = JSON.parse(localStorage.getItem('cartStrongman')) || [];
+        let cart = data.cart || [];
 
         function loadProducts() {
             const productos = JSON.parse(localStorage.getItem('productosTienda')) || [];
@@ -5863,18 +5863,19 @@ select.scoring-form-control{cursor:pointer}
         }
 
         function addToCart(productoId) {
-            const productos = JSON.parse(localStorage.getItem('productosTienda')) || [];
+            const productos = data.products || [];
             const producto = productos.find(p => p.id === productoId);
             if (!producto) return;
-            const itemExistente = cart.find(item => item.id === productoId);
+            if (!data.cart) data.cart = [];
+            const itemExistente = data.cart.find(item => item.id === productoId);
             if (itemExistente) {
                 itemExistente.cantidad++;
             } else {
-                cart.push({
+                data.cart.push({
                     id: producto.id,
-                    nombre: producto.nombre,
-                    precio: producto.precio,
-                    imagen: producto.imagen,
+                    nombre: producto.name,
+                    precio: producto.price,
+                    imagen: producto.image,
                     cantidad: 1
                 });
             }
@@ -5884,11 +5885,12 @@ select.scoring-form-control{cursor:pointer}
         }
 
         function saveCart() {
-            localStorage.setItem('cartStrongman', JSON.stringify(cart));
+            localStorage.setItem('cartStrongman', JSON.stringify(data.cart || []));
         }
 
         function updateCartUI() {
-            const cantidadTotal = cart.reduce((sum, item) => sum + item.cantidad, 0);
+            if (!data.cart) data.cart = [];
+            const cantidadTotal = data.cart.reduce((sum, item) => sum + item.cantidad, 0);
             const badge = document.getElementById('cartCount');
             if (badge) badge.textContent = cantidadTotal;
         }
