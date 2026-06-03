@@ -3438,13 +3438,44 @@ select.scoring-form-control{cursor:pointer}
                     }
                 } catch (e) { console.warn('Contactos excepción:', e.message); }
 
+                // ===== PRODUCTOS (integer) =====
+                try {
+                    console.log('🔄 Cargando productos...');
+                    const { data: productsData, error } = await supabaseClient.from('productos').select('*');
+                    if (!error && productsData && productsData.length > 0) {
+                        data.products = productsData.map(p => ({
+                            id: p.id,
+                            name: p.nombre,
+                            price: p.precio,
+                            description: p.descripcion,
+                            image: p.imagen,
+                            image2: p.imagen2,
+                            image3: p.imagen3,
+                            stock: p.stock,
+                            category: p.categoria
+                        }));
+                        console.log('✅ Productos cargados:', data.products.length);
+                        cargado = true;
+                    } else if (error) {
+                        console.error('❌ Error cargando productos:', error);
+                    } else {
+                        console.log('ℹ️ No hay productos en Supabase');
+                    }
+                } catch (e) { console.warn('Productos excepción:', e.message); }
+
                 // ===== SETTINGS (integer) =====
                 try {
                     console.log('🔄 Cargando settings...');
                     const { data: settingsData, error } = await supabaseClient.from('settings').select('*').eq('id', 1).single();
                     console.log('📥 Settings raw:', settingsData, 'Error:', error);
                     if (!error && settingsData && settingsData.data_json) {
+                        // Preservar logo local (no se sincroniza por ser base64 muy grande)
+                        const localLogo = data.settings.logo;
                         data.settings = { ...data.settings, ...settingsData.data_json };
+                        if (localLogo && localLogo.startsWith('data:')) {
+                            data.settings.logo = localLogo;
+                            console.log('🖼️ Logo local preservado');
+                        }
                         console.log('✅ Settings cargados');
                         cargado = true;
                     } else if (error) {
@@ -3466,6 +3497,7 @@ select.scoring-form-control{cursor:pointer}
                     localStorage.setItem('acaf_sponsors', JSON.stringify(data.sponsors));
                     localStorage.setItem('acaf_contacts', JSON.stringify(data.contacts));
                     localStorage.setItem('acaf_settings', JSON.stringify(data.settings));
+                    localStorage.setItem('productosTienda', JSON.stringify(data.products || []));
                     console.log('✅ Datos de Supabase guardados en localStorage');
                 }
 
@@ -4025,12 +4057,40 @@ select.scoring-form-control{cursor:pointer}
                     imagen: contact.image || ''
                 }));
 
+                // ===== PRODUCTOS =====
+                await syncTable('productos', data.products || [], prod => ({
+                    id: prod.id ? parseInt(prod.id) : undefined,
+                    nombre: prod.name || '',
+                    precio: prod.price ? parseFloat(prod.price) : 0,
+                    descripcion: prod.description || '',
+                    imagen: prod.image || '',
+                    imagen2: prod.image2 || '',
+                    imagen3: prod.image3 || '',
+                    stock: prod.stock ? parseInt(prod.stock) : 0,
+                    categoria: prod.category || 'general'
+                }));
+
                 // ===== SETTINGS =====
-                if (data.settings && data.settings.length > 0) {
-                    await syncTable('settings', data.settings, setting => ({
-                        key: setting.key || '',
-                        value: setting.value || ''
-                    }));
+                // Guardar settings como JSON en Supabase (excluyendo logo base64 que es muy grande)
+                try {
+                    const settingsToSync = { ...data.settings };
+                    // No sincronizar logo base64 (es muy grande), guardar solo en localStorage
+                    if (settingsToSync.logo && settingsToSync.logo.startsWith('data:')) {
+                        delete settingsToSync.logo;
+                    }
+                    const { error } = await supabaseClient.from('settings').upsert({ 
+                        id: 1, 
+                        data_json: settingsToSync 
+                    }, { onConflict: 'id' });
+                    if (error) {
+                        console.error('❌ Error guardando settings:', error);
+                        errores.push('settings: ' + JSON.stringify(error));
+                    } else {
+                        console.log('✅ Settings guardados en Supabase');
+                    }
+                } catch (e) {
+                    console.error('❌ Error settings:', e);
+                    errores.push('settings: ' + e.message);
                 }
 
                 console.log('✅✅✅ Sincronización con Supabase COMPLETADA');
