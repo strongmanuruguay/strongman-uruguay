@@ -6021,6 +6021,36 @@ select.scoring-form-control{cursor:pointer}
             container.innerHTML = html;
         }
 
+        
+        // ===== SUPABASE STORAGE - SUBIR IMÁGENES =====
+        async function uploadImageToStorage(file, folder, filename) {
+            if (!supabaseClient) initSupabaseMain();
+            if (!supabaseClient) {
+                console.error('❌ Supabase no está inicializado');
+                return null;
+            }
+            try {
+                const { data, error } = await supabaseClient.storage
+                    .from('strongman-images')
+                    .upload(`${folder}/${filename}`, file, {
+                        cacheControl: '3600',
+                        upsert: true
+                    });
+                if (error) {
+                    console.error('❌ Error subiendo imagen:', error);
+                    return null;
+                }
+                // Obtener URL pública
+                const { data: urlData } = supabaseClient.storage
+                    .from('strongman-images')
+                    .getPublicUrl(`${folder}/${filename}`);
+                return urlData.publicUrl;
+            } catch (e) {
+                console.error('❌ Error uploadImageToStorage:', e);
+                return null;
+            }
+        }
+
         function saveProduct() {
             const id = document.getElementById('productId').value;
             const nombre = document.getElementById('productName').value.trim();
