@@ -3562,18 +3562,23 @@ select.scoring-form-control{cursor:pointer}
                         if (athletesData && athletesData.length > 0) {
                             data.athletes = athletesData.map(a => {
                                 const parts = (a.nombre || '').split(' ');
+                                let records = [];
+                                try {
+                                    records = a.marcas ? JSON.parse(a.marcas) : [];
+                                } catch(e) { records = []; }
                                 return {
                                     id: a.id,
                                     name: parts[0] || '',
-                                    lastName: parts.slice(1).join(' ') || '',
-                                    doc: '',
-                                    phone: '',
+                                    lastName: a.apellido || parts.slice(1).join(' ') || '',
+                                    doc: a.documento || '',
+                                    phone: a.telefono || '',
+                                    email: a.email || '',
                                     gender: a.categoria || '',
-                                    years: '',
-                                    number: '',
-                                    hasCard: false,
-                                    photo: a.foto_url,
-                                    personalRecords: []
+                                    years: a.anos ? String(a.anos) : '',
+                                    number: a.numero ? String(a.numero) : '',
+                                    hasCard: a.carne === 'SI',
+                                    photo: a.foto_url || '',
+                                    personalRecords: records
                                 };
                             });
                             console.log('✅ Atletas cargados desde Supabase:', data.athletes.length);
@@ -3916,6 +3921,14 @@ select.scoring-form-control{cursor:pointer}
                 await syncTable('atletas', data.athletes, atl => ({
                     id: atl.id && atl.id.length === 36 ? atl.id : generateUUID(),
                     nombre: (atl.name || '') + ' ' + (atl.lastName || ''),
+                    apellido: atl.lastName || '',
+                    documento: atl.doc || '',
+                    telefono: atl.phone || '',
+                    email: atl.email || '',
+                    anos: atl.years ? parseInt(atl.years) : null,
+                    numero: atl.number ? parseInt(atl.number) : null,
+                    carne: atl.hasCard ? 'SI' : 'NO',
+                    marcas: atl.personalRecords ? JSON.stringify(atl.personalRecords) : '[]',
                     categoria: atl.gender || '',
                     peso: null,
                     pais: 'UY',
