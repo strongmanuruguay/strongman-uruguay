@@ -3463,6 +3463,31 @@ select.scoring-form-control{cursor:pointer}
                     }
                 } catch (e) { console.warn('Productos excepción:', e.message); }
 
+                // ===== PRODUCTOS (integer) =====
+                try {
+                    console.log('🔄 Cargando productos...');
+                    const { data: productsData, error } = await supabaseClient.from('productos').select('*');
+                    if (!error && productsData && productsData.length > 0) {
+                        data.products = productsData.map(p => ({
+                            id: p.id,
+                            name: p.nombre,
+                            price: p.precio,
+                            description: p.descripcion,
+                            image: p.imagen,
+                            image2: p.imagen2,
+                            image3: p.imagen3,
+                            stock: p.stock,
+                            category: p.categoria
+                        }));
+                        console.log('✅ Productos cargados:', data.products.length);
+                        cargado = true;
+                    } else if (error) {
+                        console.error('❌ Error cargando productos:', error);
+                    } else {
+                        console.log('ℹ️ No hay productos en Supabase');
+                    }
+                } catch (e) { console.warn('Productos excepción:', e.message); }
+
                 // ===== SETTINGS (integer) =====
                 try {
                     console.log('🔄 Cargando settings...');
@@ -4055,6 +4080,19 @@ select.scoring-form-control{cursor:pointer}
                     telefono: contact.phone || '',
                     rol: contact.role || '',
                     imagen: contact.image || ''
+                }));
+
+                // ===== PRODUCTOS =====
+                await syncTable('productos', data.products || [], prod => ({
+                    id: prod.id ? parseInt(prod.id) : undefined,
+                    nombre: prod.name || '',
+                    precio: prod.price ? parseFloat(prod.price) : 0,
+                    descripcion: prod.description || '',
+                    imagen: prod.image || '',
+                    imagen2: prod.image2 || '',
+                    imagen3: prod.image3 || '',
+                    stock: prod.stock ? parseInt(prod.stock) : 0,
+                    categoria: prod.category || 'general'
                 }));
 
                 // ===== PRODUCTOS =====
@@ -5771,8 +5809,7 @@ select.scoring-form-control{cursor:pointer}
         let cart = JSON.parse(localStorage.getItem('cartStrongman')) || [];
 
         function loadProducts() {
-            // Usar data.products (sincronizado con Supabase)
-            const productos = data.products || [];
+            const productos = JSON.parse(localStorage.getItem('productosTienda')) || [];
             const grid = document.getElementById('productsContainer');
             if (!grid) return;
             if (productos.length === 0) {
@@ -5781,15 +5818,10 @@ select.scoring-form-control{cursor:pointer}
             }
             grid.innerHTML = productos.map(producto => {
                 let imagenes = ['img/producto-default.jpg'];
-                // Manejar estructura de data.products: image, image2, image3
-                const imgs = [];
-                if (producto.image) imgs.push(producto.image);
-                if (producto.image2) imgs.push(producto.image2);
-                if (producto.image3) imgs.push(producto.image3);
-                if (imgs.length > 0) {
-                    imagenes = imgs;
-                } else if (producto.imagenes && Array.isArray(producto.imagenes) && producto.imagenes.length > 0) {
+                if (producto.imagenes && Array.isArray(producto.imagenes) && producto.imagenes.length > 0) {
                     imagenes = producto.imagenes;
+                } else if (producto.imagen) {
+                    imagenes = [producto.imagen];
                 }
                 let miniaturas = '';
                 if (imagenes.length > 1) {
@@ -5994,7 +6026,7 @@ select.scoring-form-control{cursor:pointer}
         }
 
         function loadProductsList() {
-            const products = data.products || [];
+            const products = JSON.parse(localStorage.getItem('productosTienda')) || [];
             const container = document.getElementById('productsList');
             if (products.length === 0) {
                 container.innerHTML = '<p style="color: var(--text-muted);">No hay productos. Agregá el primero arriba.</p>';
@@ -6019,36 +6051,6 @@ select.scoring-form-control{cursor:pointer}
             });
             html += '</div>';
             container.innerHTML = html;
-        }
-
-        
-        // ===== SUPABASE STORAGE - SUBIR IMÁGENES =====
-        async function uploadImageToStorage(file, folder, filename) {
-            if (!supabaseClient) initSupabaseMain();
-            if (!supabaseClient) {
-                console.error('❌ Supabase no está inicializado');
-                return null;
-            }
-            try {
-                const { data, error } = await supabaseClient.storage
-                    .from('strongman-images')
-                    .upload(`${folder}/${filename}`, file, {
-                        cacheControl: '3600',
-                        upsert: true
-                    });
-                if (error) {
-                    console.error('❌ Error subiendo imagen:', error);
-                    return null;
-                }
-                // Obtener URL pública
-                const { data: urlData } = supabaseClient.storage
-                    .from('strongman-images')
-                    .getPublicUrl(`${folder}/${filename}`);
-                return urlData.publicUrl;
-            } catch (e) {
-                console.error('❌ Error uploadImageToStorage:', e);
-                return null;
-            }
         }
 
         function saveProduct() {
@@ -6121,20 +6123,7 @@ select.scoring-form-control{cursor:pointer}
                         nombre, precio, descripcion, imagenes: imagenesFinales, stock
                     });
                 }
-                // Guardar en data.products para sincronización con Supabase
-                data.products = products.map(p => ({
-                    id: p.id,
-                    name: p.nombre,
-                    price: p.precio,
-                    description: p.descripcion,
-                    image: p.imagenes && p.imagenes[0] ? p.imagenes[0] : '',
-                    image2: p.imagenes && p.imagenes[1] ? p.imagenes[1] : '',
-                    image3: p.imagenes && p.imagenes[2] ? p.imagenes[2] : '',
-                    stock: p.stock || 0,
-                    category: 'general'
-                }));
                 localStorage.setItem('productosTienda', JSON.stringify(products));
-                saveAllData(); // Sincronizar con Supabase
                 loadProductsList();
                 clearProductForm();
                 document.getElementById('preview1').style.display = 'none';
@@ -6184,9 +6173,9 @@ select.scoring-form-control{cursor:pointer}
 
         function deleteProduct(id) {
             if (!confirm('¿Eliminar este producto?')) return;
-            let products = data.products || [];
+            let products = JSON.parse(localStorage.getItem('productosTienda')) || [];
             products = products.filter(p => p.id !== id);
-            data.products = products; localStorage.setItem('productosTienda', JSON.stringify(products)); saveAllData();
+            localStorage.setItem('productosTienda', JSON.stringify(products));
             loadProductsList();
         }
 
