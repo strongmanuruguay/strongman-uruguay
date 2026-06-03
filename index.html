@@ -1533,6 +1533,7 @@ select.scoring-form-control{cursor:pointer}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <base target="_blank">
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
     <div class="menu-overlay" id="menuOverlay" onclick="closeMenu()"></div>
@@ -3044,7 +3045,8 @@ select.scoring-form-control{cursor:pointer}
             if (notifAsunto) notifAsunto.addEventListener('input', actualizarPreviewEmail);
             if (notifMensaje) notifMensaje.addEventListener('input', actualizarPreviewEmail);
 
-            // Tienda
+            // Tienda - cargar desde Supabase primero, luego renderizar
+            await loadProductsFromSupabase();
             loadProducts();
             updateCartUI();
 
@@ -3145,6 +3147,7 @@ select.scoring-form-control{cursor:pointer}
             localStorage.setItem('acaf_sponsors', JSON.stringify(data.sponsors));
             localStorage.setItem('acaf_contacts', JSON.stringify(data.contacts));
             localStorage.setItem('acaf_settings', JSON.stringify(data.settings));
+            localStorage.setItem('productosTienda', JSON.stringify(data.products || []));
 
             // Guardar en Supabase (persistencia en la nube)
             if (supabaseClient) {
@@ -3445,41 +3448,21 @@ select.scoring-form-control{cursor:pointer}
                     if (!error && productsData && productsData.length > 0) {
                         data.products = productsData.map(p => ({
                             id: p.id,
+                            nombre: p.nombre,
                             name: p.nombre,
+                            precio: p.precio,
                             price: p.precio,
+                            descripcion: p.descripcion,
                             description: p.descripcion,
+                            imagenes: [p.imagen, p.imagen2, p.imagen3].filter(Boolean),
                             image: p.imagen,
                             image2: p.imagen2,
                             image3: p.imagen3,
                             stock: p.stock,
                             category: p.categoria
                         }));
-                        console.log('✅ Productos cargados:', data.products.length);
-                        cargado = true;
-                    } else if (error) {
-                        console.error('❌ Error cargando productos:', error);
-                    } else {
-                        console.log('ℹ️ No hay productos en Supabase');
-                    }
-                } catch (e) { console.warn('Productos excepción:', e.message); }
-
-                // ===== PRODUCTOS (integer) =====
-                try {
-                    console.log('🔄 Cargando productos...');
-                    const { data: productsData, error } = await supabaseClient.from('productos').select('*');
-                    if (!error && productsData && productsData.length > 0) {
-                        data.products = productsData.map(p => ({
-                            id: p.id,
-                            name: p.nombre,
-                            price: p.precio,
-                            description: p.descripcion,
-                            image: p.imagen,
-                            image2: p.imagen2,
-                            image3: p.imagen3,
-                            stock: p.stock,
-                            category: p.categoria
-                        }));
-                        console.log('✅ Productos cargados:', data.products.length);
+                        localStorage.setItem('productosTienda', JSON.stringify(data.products));
+                        console.log('✅ Productos cargados desde Supabase:', data.products.length);
                         cargado = true;
                     } else if (error) {
                         console.error('❌ Error cargando productos:', error);
@@ -4080,19 +4063,6 @@ select.scoring-form-control{cursor:pointer}
                     telefono: contact.phone || '',
                     rol: contact.role || '',
                     imagen: contact.image || ''
-                }));
-
-                // ===== PRODUCTOS =====
-                await syncTable('productos', data.products || [], prod => ({
-                    id: prod.id ? parseInt(prod.id) : undefined,
-                    nombre: prod.name || '',
-                    precio: prod.price ? parseFloat(prod.price) : 0,
-                    descripcion: prod.description || '',
-                    imagen: prod.image || '',
-                    imagen2: prod.image2 || '',
-                    imagen3: prod.image3 || '',
-                    stock: prod.stock ? parseInt(prod.stock) : 0,
-                    categoria: prod.category || 'general'
                 }));
 
                 // ===== PRODUCTOS =====
@@ -4762,7 +4732,8 @@ select.scoring-form-control{cursor:pointer}
         }
 
         function applySettings() {
-            if (data.settings.heroBg) {
+            // Aplicar fondo hero
+            if (data.settings && data.settings.heroBg) {
                 const heroVideo = document.getElementById('heroVideo');
                 if (data.settings.heroBg.type === 'video') {
                     heroVideo.src = data.settings.heroBg.src;
@@ -4775,15 +4746,51 @@ select.scoring-form-control{cursor:pointer}
                     document.querySelector('.hero').style.backgroundPosition = 'center';
                 }
             }
-            if (data.settings.logo) {
-                document.getElementById('heroLogoImg').src = data.settings.logo;
+
+            // Aplicar logo principal - intentar desde data.settings.logo, fallback a localStorage
+            const logoImg = document.getElementById('heroLogoImg');
+            const navLogoImg = document.querySelector('.nav-logo img');
+            let logoSrc = null;
+
+            if (data.settings && data.settings.logo) {
+                logoSrc = data.settings.logo;
+            } else {
+                // Fallback: intentar cargar desde localStorage directo
+                const savedSettings = JSON.parse(localStorage.getItem('acaf_settings')) || {};
+                if (savedSettings.logo) {
+                    logoSrc = savedSettings.logo;
+                    data.settings.logo = savedSettings.logo;
+                }
             }
-            if (data.settings.social) {
+
+            if (logoSrc && logoImg) {
+                logoImg.src = logoSrc;
+                logoImg.style.display = 'block';
+            }
+            if (logoSrc && navLogoImg) {
+                navLogoImg.src = logoSrc;
+            }
+
+            // Aplicar redes sociales
+            if (data.settings && data.settings.social) {
                 const socialLinks = document.querySelectorAll('.social-links a');
-                if (data.settings.social.facebook) socialLinks[0].href = data.settings.social.facebook;
-                if (data.settings.social.instagram) socialLinks[1].href = data.settings.social.instagram;
-                if (data.settings.social.youtube) socialLinks[2].href = data.settings.social.youtube;
-                if (data.settings.social.tiktok) socialLinks[3].href = data.settings.social.tiktok;
+                if (data.settings.social.facebook && socialLinks[0]) socialLinks[0].href = data.settings.social.facebook;
+                if (data.settings.social.instagram && socialLinks[1]) socialLinks[1].href = data.settings.social.instagram;
+                if (data.settings.social.youtube && socialLinks[2]) socialLinks[2].href = data.settings.social.youtube;
+                if (data.settings.social.tiktok && socialLinks[3]) socialLinks[3].href = data.settings.social.tiktok;
+            }
+
+            // Aplicar fondos de secciones
+            if (data.settings && data.settings.sectionBgs) {
+                Object.entries(data.settings.sectionBgs).forEach(([section, bg]) => {
+                    const el = document.getElementById(section);
+                    if (el) {
+                        el.style.backgroundImage = `url(${bg})`;
+                        el.style.backgroundSize = 'cover';
+                        el.style.backgroundPosition = 'center';
+                        el.style.backgroundAttachment = 'fixed';
+                    }
+                });
             }
         }
 
@@ -5691,12 +5698,35 @@ select.scoring-form-control{cursor:pointer}
                 return;
             }
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = async function(e) {
+                if (!data.settings) data.settings = {};
                 data.settings.logo = e.target.result;
-                saveAllData();
+
+                // Guardar en localStorage inmediatamente
+                localStorage.setItem('acaf_settings', JSON.stringify(data.settings));
+
+                // Aplicar visualmente
                 applySettings();
+
                 const preview = document.getElementById('logoPreview');
-                preview.innerHTML = `<img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">`;
+                if (preview) {
+                    preview.innerHTML = `<img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">`;
+                }
+
+                // Sincronizar con Supabase (settings sin el logo base64, solo referencia)
+                if (supabaseClient) {
+                    try {
+                        const settingsToSync = { ...data.settings };
+                        delete settingsToSync.logo; // No sincronizar base64
+                        await supabaseClient.from('settings').upsert({ 
+                            id: 1, 
+                            data_json: settingsToSync 
+                        }, { onConflict: 'id' });
+                    } catch (err) {
+                        console.warn('⚠️ No se pudo sincronizar settings:', err);
+                    }
+                }
+
                 alert('Logo actualizado correctamente');
             };
             reader.readAsDataURL(fileInput.files[0]);
@@ -5806,10 +5836,10 @@ select.scoring-form-control{cursor:pointer}
         }       
        
                // ===== TIENDA Y CARRITO =====
-        let cart = data.cart || [];
+        let cart = JSON.parse(localStorage.getItem('cartStrongman')) || [];
 
         function loadProducts() {
-            const productos = JSON.parse(localStorage.getItem('productosTienda')) || [];
+            const productos = data.products || [];
             const grid = document.getElementById('productsContainer');
             if (!grid) return;
             if (productos.length === 0) {
@@ -5822,6 +5852,8 @@ select.scoring-form-control{cursor:pointer}
                     imagenes = producto.imagenes;
                 } else if (producto.imagen) {
                     imagenes = [producto.imagen];
+                } else if (producto.image) {
+                    imagenes = [producto.image];
                 }
                 let miniaturas = '';
                 if (imagenes.length > 1) {
@@ -5842,7 +5874,7 @@ select.scoring-form-control{cursor:pointer}
                     <div style="position: relative;">
                         <img id="main-img-${producto.id}"
                              src="${imagenes[0]}" 
-                             alt="${producto.nombre}" 
+                             alt="${producto.nombre || producto.name}" 
                              class="producto-imagen"
                              onclick="openImageZoom('${imagenes[0]}')"
                              style="cursor: zoom-in;"
@@ -5851,9 +5883,9 @@ select.scoring-form-control{cursor:pointer}
                     </div>
                     ${miniaturas}
                     <div class="producto-info">
-                        <h3 class="producto-nombre">${producto.nombre}</h3>
-                        <p class="producto-precio">$${producto.precio.toLocaleString()}</p>
-                        <p class="producto-descripcion">${producto.descripcion || ''}</p>
+                        <h3 class="producto-nombre">${producto.nombre || producto.name}</h3>
+                        <p class="producto-precio">$${(producto.precio || producto.price || 0).toLocaleString()}</p>
+                        <p class="producto-descripcion">${producto.descripcion || producto.description || ''}</p>
                         <button class="btn-agregar" onclick="addToCart('${producto.id}')">
                             Agregar al carrito
                         </button>
@@ -5863,19 +5895,17 @@ select.scoring-form-control{cursor:pointer}
         }
 
         function addToCart(productoId) {
-            const productos = data.products || [];
-            const producto = productos.find(p => p.id === productoId);
+            const producto = data.products.find(p => String(p.id) === String(productoId));
             if (!producto) return;
-            if (!data.cart) data.cart = [];
-            const itemExistente = data.cart.find(item => item.id === productoId);
+            const itemExistente = cart.find(item => item.id === productoId);
             if (itemExistente) {
                 itemExistente.cantidad++;
             } else {
-                data.cart.push({
+                cart.push({
                     id: producto.id,
-                    nombre: producto.name,
-                    precio: producto.price,
-                    imagen: producto.image,
+                    nombre: producto.nombre,
+                    precio: producto.precio,
+                    imagen: producto.imagen,
                     cantidad: 1
                 });
             }
@@ -5885,12 +5915,11 @@ select.scoring-form-control{cursor:pointer}
         }
 
         function saveCart() {
-            localStorage.setItem('cartStrongman', JSON.stringify(data.cart || []));
+            localStorage.setItem('cartStrongman', JSON.stringify(cart));
         }
 
         function updateCartUI() {
-            if (!data.cart) data.cart = [];
-            const cantidadTotal = data.cart.reduce((sum, item) => sum + item.cantidad, 0);
+            const cantidadTotal = cart.reduce((sum, item) => sum + item.cantidad, 0);
             const badge = document.getElementById('cartCount');
             if (badge) badge.textContent = cantidadTotal;
         }
@@ -5911,13 +5940,14 @@ select.scoring-form-control{cursor:pointer}
                 cartFooter.style.display = 'none';
             } else {
                 cartBody.innerHTML = cart.map(item => {
-                    const productos = JSON.parse(localStorage.getItem('productosTienda')) || [];
-                    const producto = productos.find(p => p.id === item.id);
+                    const producto = data.products.find(p => String(p.id) === String(item.id));
                     let imagen = 'img/producto-default.jpg';
                     if (producto && producto.imagenes && producto.imagenes.length > 0) {
                         imagen = producto.imagenes[0];
                     } else if (producto && producto.imagen) {
                         imagen = producto.imagen;
+                    } else if (producto && producto.image) {
+                        imagen = producto.image;
                     }
                     return `
                     <div class="cart-item" data-id="${item.id}">
@@ -6028,7 +6058,7 @@ select.scoring-form-control{cursor:pointer}
         }
 
         function loadProductsList() {
-            const products = JSON.parse(localStorage.getItem('productosTienda')) || [];
+            const products = data.products || [];
             const container = document.getElementById('productsList');
             if (products.length === 0) {
                 container.innerHTML = '<p style="color: var(--text-muted);">No hay productos. Agregá el primero arriba.</p>';
@@ -6036,13 +6066,14 @@ select.scoring-form-control{cursor:pointer}
             }
             let html = '<div style="display: grid; gap: 1rem;">';
             products.forEach(p => {
+                const img = p.imagenes && p.imagenes.length > 0 ? p.imagenes[0] : (p.imagen || p.image || 'img/producto-default.jpg');
                 html += `
                     <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; display: flex; gap: 1rem; align-items: center; border: 1px solid rgba(255,255,255,0.1);">
-                        <img src="${p.imagen || 'img/producto-default.jpg'}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;" onerror="this.src='img/producto-default.jpg'">
+                        <img src="${img}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;" onerror="this.src='img/producto-default.jpg'">
                         <div style="flex: 1;">
-                            <div style="font-weight: bold; color: var(--gold);">${p.nombre}</div>
-                            <div style="color: var(--text-muted); font-size: 0.9rem;">$${p.precio.toLocaleString()} - Stock: ${p.stock || 0}</div>
-                            <div style="color: var(--text-muted); font-size: 0.8rem;">${p.descripcion || ''}</div>
+                            <div style="font-weight: bold; color: var(--gold);">${p.nombre || p.name}</div>
+                            <div style="color: var(--text-muted); font-size: 0.9rem;">$${(p.precio || p.price || 0).toLocaleString()} - Stock: ${p.stock || 0}</div>
+                            <div style="color: var(--text-muted); font-size: 0.8rem;">${p.descripcion || p.description || ''}</div>
                         </div>
                         <div>
                             <button class="btn btn-sm" onclick="editProduct('${p.id}')" style="margin-right: 0.5rem;">✏️</button>
@@ -6173,11 +6204,20 @@ select.scoring-form-control{cursor:pointer}
             document.getElementById('shopFormTitle').textContent = 'Editar Producto';
         }
 
-        function deleteProduct(id) {
+        async function deleteProduct(id) {
             if (!confirm('¿Eliminar este producto?')) return;
-            let products = JSON.parse(localStorage.getItem('productosTienda')) || [];
-            products = products.filter(p => p.id !== id);
-            localStorage.setItem('productosTienda', JSON.stringify(products));
+            data.products = data.products.filter(p => String(p.id) !== String(id));
+            localStorage.setItem('productosTienda', JSON.stringify(data.products));
+
+            // Sincronizar con Supabase
+            if (supabaseClient) {
+                try {
+                    await syncProductsToSupabase();
+                } catch (e) {
+                    console.error('Error sincronizando tras borrado:', e);
+                }
+            }
+
             loadProductsList();
         }
 
@@ -6198,10 +6238,9 @@ select.scoring-form-control{cursor:pointer}
         }
 
         function changeProductImage(productId, index) {
-            const productos = JSON.parse(localStorage.getItem('productosTienda')) || [];
-            const producto = productos.find(p => p.id === productId);
+            const producto = data.products.find(p => String(p.id) === String(productId));
             if (!producto) return;
-            let imagenes = producto.imagenes || [producto.imagen] || ['img/producto-default.jpg'];
+            let imagenes = producto.imagenes || (producto.imagen ? [producto.imagen] : (producto.image ? [producto.image] : ['img/producto-default.jpg']));
             const mainImg = document.getElementById(`main-img-${productId}`);
             mainImg.src = imagenes[index];
             mainImg.onclick = function() { openImageZoom(imagenes[index]); };
