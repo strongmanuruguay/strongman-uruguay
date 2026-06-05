@@ -5771,7 +5771,6 @@ select.scoring-form-control{cursor:pointer}
                // ===== TIENDA Y CARRITO =====
         let cart = JSON.parse(localStorage.getItem('cartStrongman')) || [];
 
-        // Convertir fila de Supabase a objeto producto con array de imágenes
         function rowToProducto(row) {
             const imagenes = [];
             if (row.imagen) imagenes.push(row.imagen);
@@ -5790,7 +5789,6 @@ select.scoring-form-control{cursor:pointer}
             };
         }
 
-        // Convertir objeto producto a fila de Supabase
         function productoToRow(p) {
             const row = {
                 nombre: p.nombre,
@@ -5799,7 +5797,9 @@ select.scoring-form-control{cursor:pointer}
                 stock: p.stock || 0,
                 categoria: p.categoria || 'general'
             };
-            if (p.id) row.id = p.id;
+            if (p.id && p.id !== null && p.id !== undefined && p.id !== '' && String(p.id).indexOf('local_') !== 0) {
+                row.id = parseInt(p.id);
+            }
             if (p.imagenes && p.imagenes.length > 0) {
                 row.imagen = p.imagenes[0];
                 if (p.imagenes.length > 1) row.imagen2 = p.imagenes[1];
@@ -5812,9 +5812,17 @@ select.scoring-form-control{cursor:pointer}
 
         async function loadProductsFromSupabase() {
             try {
-                if (!supabaseClient) return JSON.parse(localStorage.getItem('productosTienda')) || [];
+                if (!supabaseClient) {
+                    console.log('Supabase no disponible, usando localStorage');
+                    return JSON.parse(localStorage.getItem('productosTienda')) || [];
+                }
+                console.log('Cargando productos desde Supabase...');
                 const { data, error } = await supabaseClient.from('productos').select('*').order('created_at', { ascending: false });
-                if (error) throw error;
+                if (error) {
+                    console.error('Error cargando de Supabase:', error);
+                    return JSON.parse(localStorage.getItem('productosTienda')) || [];
+                }
+                console.log('Productos cargados:', data ? data.length : 0);
                 const productos = (data || []).map(rowToProducto);
                 localStorage.setItem('productosTienda', JSON.stringify(productos));
                 return productos;
@@ -5826,14 +5834,32 @@ select.scoring-form-control{cursor:pointer}
 
         async function saveProductToSupabase(producto) {
             try {
-                if (!supabaseClient) return false;
+                if (!supabaseClient) {
+                    console.log('Supabase no disponible');
+                    return false;
+                }
                 const row = productoToRow(producto);
-                if (producto.id) {
-                    const { error } = await supabaseClient.from('productos').update(row).eq('id', producto.id);
-                    return !error;
+                console.log('Guardando producto en Supabase:', row);
+
+                if (producto.id && String(producto.id).indexOf('local_') !== 0) {
+                    const { data, error } = await supabaseClient.from('productos').update(row).eq('id', parseInt(producto.id)).select();
+                    if (error) {
+                        console.error('Error actualizando:', error);
+                        return false;
+                    }
+                    console.log('Producto actualizado:', data);
+                    return true;
                 } else {
-                    const { error } = await supabaseClient.from('productos').insert([row]);
-                    return !error;
+                    const { data, error } = await supabaseClient.from('productos').insert([row]).select();
+                    if (error) {
+                        console.error('Error insertando:', error);
+                        return false;
+                    }
+                    console.log('Producto insertado:', data);
+                    if (data && data.length > 0 && data[0].id) {
+                        producto.id = data[0].id;
+                    }
+                    return true;
                 }
             } catch (e) { 
                 console.error('Error guardando producto:', e);
@@ -5843,9 +5869,18 @@ select.scoring-form-control{cursor:pointer}
 
         async function deleteProductFromSupabase(id) {
             try {
-                if (!supabaseClient) return false;
-                const { error } = await supabaseClient.from('productos').delete().eq('id', id);
-                return !error;
+                if (!supabaseClient) {
+                    console.log('Supabase no disponible');
+                    return false;
+                }
+                console.log('Eliminando producto de Supabase:', id);
+                const { data, error } = await supabaseClient.from('productos').delete().eq('id', parseInt(id)).select();
+                if (error) {
+                    console.error('Error eliminando:', error);
+                    return false;
+                }
+                console.log('Producto eliminado:', data);
+                return true;
             } catch (e) { 
                 console.error('Error eliminando producto:', e);
                 return false; 
@@ -5963,7 +5998,6 @@ select.scoring-form-control{cursor:pointer}
 
         async function openShopModal() {
             document.getElementById('shopModal').classList.add('active');
-            // Primero cargar desde Supabase, luego mostrar
             await loadProductsFromSupabase();
             loadProductsList();
         }
@@ -5978,7 +6012,6 @@ select.scoring-form-control{cursor:pointer}
             if (!tbody) return;
             tbody.innerHTML = '<tr><td colspan="5" class="text-center" style="padding:2rem;color:var(--text-muted);"><i class="fas fa-spinner fa-spin"></i> Cargando productos...</td></tr>';
 
-            // Cargar desde Supabase primero
             const productos = await loadProductsFromSupabase();
 
             if (productos.length === 0) {
@@ -5996,7 +6029,6 @@ select.scoring-form-control{cursor:pointer}
             const stock = parseInt(document.getElementById('productStock').value) || 0;
             if (!nombre || isNaN(precio)) { scoringShowToast('Completa nombre y precio'); return; }
 
-            // Leer las 3 imágenes de los previews
             const imagenes = [];
             for (let i = 1; i <= 3; i++) {
                 const previewDiv = document.getElementById('preview' + i);
@@ -6009,7 +6041,6 @@ select.scoring-form-control{cursor:pointer}
             }
 
             const producto = { 
-                id: id ? parseInt(id) : null, 
                 nombre, 
                 precio, 
                 descripcion, 
@@ -6019,16 +6050,31 @@ select.scoring-form-control{cursor:pointer}
                 created_at: new Date().toISOString() 
             };
 
+            if (id && id !== '' && id !== 'null' && id !== 'undefined') {
+                producto.id = parseInt(id);
+            }
+
+            console.log('Guardando producto:', producto);
             const saved = await saveProductToSupabase(producto);
+            console.log('Resultado guardado:', saved);
             scoringShowToast(saved ? 'Producto guardado en la nube' : 'Producto guardado localmente');
 
-            const productos = JSON.parse(localStorage.getItem('productosTienda')) || [];
-            const idx = productos.findIndex(p => p.id === producto.id);
-            if (idx >= 0) productos[idx] = producto; else productos.push(producto);
-            localStorage.setItem('productosTienda', JSON.stringify(productos));
+            if (saved) {
+                await loadProductsFromSupabase();
+            } else {
+                const productos = JSON.parse(localStorage.getItem('productosTienda')) || [];
+                if (producto.id) {
+                    const idx = productos.findIndex(p => p.id === producto.id);
+                    if (idx >= 0) productos[idx] = producto; else productos.push(producto);
+                } else {
+                    producto.id = 'local_' + Date.now();
+                    productos.push(producto);
+                }
+                localStorage.setItem('productosTienda', JSON.stringify(productos));
+            }
 
             clearProductForm();
-            loadProductsList();
+            await loadProductsList();
             loadProducts();
         }
 
@@ -6042,7 +6088,6 @@ select.scoring-form-control{cursor:pointer}
             document.getElementById('productDesc').value = p.descripcion || '';
             document.getElementById('productStock').value = p.stock || 0;
 
-            // Cargar las 3 imágenes en los previews
             const imgs = p.imagenes || [];
             for (let i = 0; i < 3; i++) {
                 const previewNum = i + 1;
@@ -6070,10 +6115,15 @@ select.scoring-form-control{cursor:pointer}
 
         async function deleteProduct(id) {
             if (!confirm('Eliminar este producto?')) return;
-            await deleteProductFromSupabase(id);
+
+            if (String(id).indexOf('local_') !== 0) {
+                await deleteProductFromSupabase(id);
+            }
+
             let productos = JSON.parse(localStorage.getItem('productosTienda')) || [];
             productos = productos.filter(p => p.id !== id);
             localStorage.setItem('productosTienda', JSON.stringify(productos));
+
             loadProductsList();
             loadProducts();
             scoringShowToast('Producto eliminado');
@@ -6106,7 +6156,7 @@ select.scoring-form-control{cursor:pointer}
         }
 
         function changeProductImage(previewId) {
-            if (!confirm('¿Eliminar esta imagen?')) return;
+            if (!confirm('Eliminar esta imagen?')) return;
             const previewDiv = document.getElementById(previewId);
             if (previewDiv) {
                 const img = previewDiv.querySelector('img');
@@ -6116,7 +6166,6 @@ select.scoring-form-control{cursor:pointer}
                 }
                 previewDiv.style.display = 'none';
             }
-            // Limpiar el input correspondiente
             const inputNum = previewId.replace('preview', '');
             const input = document.getElementById('productImage' + inputNum);
             if (input) input.value = '';
@@ -6136,7 +6185,6 @@ select.scoring-form-control{cursor:pointer}
             document.getElementById('productPrice').value = '';
             document.getElementById('productDesc').value = '';
             document.getElementById('productStock').value = '0';
-            // Limpiar los 3 inputs y previews
             for (let i = 1; i <= 3; i++) {
                 const input = document.getElementById('productImage' + i);
                 if (input) input.value = '';
@@ -7699,14 +7747,6 @@ function openCountdownConfigModal() {
     </div>
 
     <!-- MODAL CARRITO -->
-    <div 
-
-    <!-- BOTÓN FLOTANTE CARRITO -->
-    <div class="cart-float-btn" id="cartFloatBtn" onclick="openCart()" title="Ver carrito">
-        <i class="fas fa-shopping-cart" style="font-size: 1.5rem; color: #000;"></i>
-        <span class="cart-count" id="cartCount">0</span>
-    </div>
-
     <div id="cartModal" class="modal">
         <div class="modal-content cart-drawer">
             <div class="modal-header" style="background: var(--gold); color: #000;">
