@@ -5771,6 +5771,7 @@ select.scoring-form-control{cursor:pointer}
                // ===== TIENDA Y CARRITO =====
         let cart = JSON.parse(localStorage.getItem('cartStrongman')) || [];
 
+        // Convertir fila de Supabase a objeto producto con array de imágenes
         function rowToProducto(row) {
             const imagenes = [];
             if (row.imagen) imagenes.push(row.imagen);
@@ -5789,6 +5790,7 @@ select.scoring-form-control{cursor:pointer}
             };
         }
 
+        // Convertir objeto producto a fila de Supabase
         function productoToRow(p) {
             const row = {
                 nombre: p.nombre,
@@ -5817,6 +5819,7 @@ select.scoring-form-control{cursor:pointer}
                 localStorage.setItem('productosTienda', JSON.stringify(productos));
                 return productos;
             } catch (e) {
+                console.error('Error cargando productos:', e);
                 return JSON.parse(localStorage.getItem('productosTienda')) || [];
             }
         }
@@ -5832,7 +5835,10 @@ select.scoring-form-control{cursor:pointer}
                     const { error } = await supabaseClient.from('productos').insert([row]);
                     return !error;
                 }
-            } catch (e) { return false; }
+            } catch (e) { 
+                console.error('Error guardando producto:', e);
+                return false; 
+            }
         }
 
         async function deleteProductFromSupabase(id) {
@@ -5840,7 +5846,10 @@ select.scoring-form-control{cursor:pointer}
                 if (!supabaseClient) return false;
                 const { error } = await supabaseClient.from('productos').delete().eq('id', id);
                 return !error;
-            } catch (e) { return false; }
+            } catch (e) { 
+                console.error('Error eliminando producto:', e);
+                return false; 
+            }
         }
 
         function loadProducts() {
@@ -5945,10 +5954,11 @@ select.scoring-form-control{cursor:pointer}
         function sendWhatsAppOrder() {
             if (cart.length === 0) return;
             const total = cart.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+            const numeroWhatsApp = '59894896954';
             let mensaje = 'Hola! Quiero hacer un pedido de Strongman Uruguay:%0A%0A';
             cart.forEach(item => { mensaje += `• ${item.nombre} x${item.cantidad} - $${item.precio * item.cantidad} UYU%0A`; });
             mensaje += `%0ATotal: $${total} UYU%0A%0AGracias!`;
-            window.open(`https://wa.me/?text=${mensaje}`, '_blank');
+            window.open(`https://wa.me/${numeroWhatsApp}?text=${mensaje}`, '_blank');
         }
 
         function openShopModal() {
@@ -6026,6 +6036,7 @@ select.scoring-form-control{cursor:pointer}
                     const img = document.createElement('img');
                     img.src = e.target.result;
                     img.className = 'product-preview-img';
+                    img.style = 'width:80px;height:80px;object-fit:cover;border-radius:8px;margin:5px;cursor:pointer;';
                     img.onclick = function() { changeProductImage(this); };
                     preview.appendChild(img);
                 };
@@ -7600,9 +7611,15 @@ function openCountdownConfigModal() {
     </div>
 
     <!-- MODAL CARRITO -->
-    <div </script>
+    <div 
 
-    id="cartModal" class="modal">
+    <!-- BOTÓN FLOTANTE CARRITO -->
+    <div class="cart-float-btn" id="cartFloatBtn" onclick="openCart()" title="Ver carrito">
+        <i class="fas fa-shopping-cart" style="font-size: 1.5rem; color: #000;"></i>
+        <span class="cart-count" id="cartCount">0</span>
+    </div>
+
+    <div id="cartModal" class="modal">
         <div class="modal-content cart-drawer">
             <div class="modal-header" style="background: var(--gold); color: #000;">
                 <h2><i class="fas fa-shopping-cart"></i> Tu Carrito</h2>
