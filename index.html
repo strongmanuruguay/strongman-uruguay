@@ -722,6 +722,16 @@
     width: 60px; height: 60px; background: var(--gold);
     border-radius: 50%; display: flex; align-items: center; justify-content: center;
     cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 1000; transition: transform 0.3s;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+@media (max-width: 768px) {
+    .cart-float-btn {
+        bottom: 80px;
+        right: 15px;
+        width: 55px;
+        height: 55px;
+    }
 }
 
         .cart-float-btn:hover { transform: scale(1.1); }
@@ -1531,6 +1541,7 @@ select.scoring-form-control{cursor:pointer}
 
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<base target="_blank">
 <base target="_blank">
 <base target="_blank">
 <base target="_blank">
@@ -3045,9 +3056,16 @@ select.scoring-form-control{cursor:pointer}
             if (notifAsunto) notifAsunto.addEventListener('input', actualizarPreviewEmail);
             if (notifMensaje) notifMensaje.addEventListener('input', actualizarPreviewEmail);
 
-            // Tienda
-            loadProducts();
-            updateCartUI();
+            // Tienda - cargar productos desde Supabase primero
+            loadProductsFromSupabase().then(productos => {
+                console.log('✅ Tienda inicializada con', productos.length, 'productos');
+                loadProducts();
+                updateCartUI();
+            }).catch(err => {
+                console.error('❌ Error inicializando tienda:', err);
+                loadProducts();
+                updateCartUI();
+            });
 
             // Scoring (StrongScore - NO tocar)
             const cb = document.getElementById('scPrbCombinada');
@@ -3532,350 +3550,6 @@ select.scoring-form-control{cursor:pointer}
                 }
             } catch (e) {
                 console.error('❌ Error en deleteMissingFromSupabase:', e);
-            }
-        }
-
-        async function loadDataFromSupabase() {
-            if (!supabaseClient) initSupabaseMain();
-            if (!supabaseClient) {
-                console.error('❌ Supabase no está inicializado');
-                return false;
-            }
-
-            let cargado = false;
-            console.log('🔄 Iniciando carga desde Supabase...');
-
-            try {
-                // ===== EVENTOS (uuid) =====
-                try {
-                    console.log('🔄 Cargando eventos...');
-                    const { data: eventsData, error } = await supabaseClient.from('eventos').select('*').order('fecha', { ascending: true });
-                    console.log('📥 Eventos raw:', eventsData ? eventsData.length : 0, 'Error:', error);
-                    if (!error) {
-                        if (eventsData && eventsData.length > 0) {
-                            // Sobrescribir con datos de Supabase (fuente de verdad)
-                            const remoteIds = new Set(eventsData.map(e => e.id));
-                            const localOnlyEvents = data.events.filter(e => !remoteIds.has(e.id));
-                            if (localOnlyEvents.length > 0) {
-                                console.log('🗑️ Borrando eventos locales que ya no están en Supabase:', localOnlyEvents.length);
-                            }
-                            data.events = eventsData.map(e => ({
-                                id: e.id,
-                                name: e.nombre,
-                                date: e.fecha,
-                                time: e.hora,
-                                location: e.lugar,
-                                cost: e.costo,
-                                description: e.descripcion,
-                                categories: e.categorias || [],
-                                image: e.imagen_url
-                            }));
-                            console.log('✅ Eventos cargados desde Supabase:', data.events.length);
-                            cargado = true;
-                        } else {
-                            // Supabase está vacío, borrar locales también
-                            if (data.events.length > 0) {
-                                console.log('🗑️ Supabase vacío, borrando', data.events.length, 'eventos locales');
-                                data.events = [];
-                                cargado = true;
-                            }
-                            console.log('ℹ️ No hay eventos en Supabase');
-                        }
-                    } else {
-                        console.error('❌ Error cargando eventos:', error);
-                    }
-                } catch (e) { console.warn('Eventos excepción:', e.message); }
-
-                // ===== ATLETAS (uuid) =====
-                try {
-                    console.log('🔄 Cargando atletas...');
-                    const { data: athletesData, error } = await supabaseClient.from('atletas').select('*').order('nombre', { ascending: true });
-                    console.log('📥 Atletas raw:', athletesData ? athletesData.length : 0, 'Error:', error);
-                    if (!error) {
-                        if (athletesData && athletesData.length > 0) {
-                            data.athletes = athletesData.map(a => {
-                                const parts = (a.nombre || '').split(' ');
-                                let records = [];
-                                try {
-                                    records = a.marcas ? JSON.parse(a.marcas) : [];
-                                } catch(e) { records = []; }
-                                return {
-                                    id: a.id,
-                                    name: parts[0] || '',
-                                    lastName: a.apellido || parts.slice(1).join(' ') || '',
-                                    doc: a.documento || '',
-                                    phone: a.telefono || '',
-                                    email: a.email || '',
-                                    gender: a.categoria || '',
-                                    years: a.anos ? String(a.anos) : '',
-                                    number: a.numero ? String(a.numero) : '',
-                                    hasCard: a.carne === 'SI',
-                                    photo: a.foto_url || '',
-                                    personalRecords: records
-                                };
-                            });
-                            console.log('✅ Atletas cargados desde Supabase:', data.athletes.length);
-                            cargado = true;
-                        } else {
-                            if (data.athletes.length > 0) {
-                                console.log('🗑️ Supabase vacío, borrando', data.athletes.length, 'atletas locales');
-                                data.athletes = [];
-                                cargado = true;
-                            }
-                            console.log('ℹ️ No hay atletas en Supabase');
-                        }
-                    } else {
-                        console.error('❌ Error cargando atletas:', error);
-                    }
-                } catch (e) { console.warn('Atletas excepción:', e.message); }
-
-                // ===== RANKING_NACIONAL (uuid) =====
-                try {
-                    console.log('🔄 Cargando ranking nacional...');
-                    const { data: rankingData, error } = await supabaseClient.from('ranking_nacional').select('*').order('posicion', { ascending: true });
-                    if (!error && rankingData && rankingData.length > 0) {
-                        const localRankingIds = new Set(data.ranking.map(r => r.id));
-                        const newRanking = rankingData
-                            .filter(r => !localRankingIds.has(r.id))
-                            .map(r => ({
-                                id: r.id,
-                                athleteId: r.atleta_id,
-                                name: r.nombre,
-                                gender: r.genero,
-                                category: r.categoria,
-                                position: r.posicion,
-                                points: r.puntos
-                            }));
-                        if (newRanking.length > 0) {
-                            data.ranking = [...data.ranking, ...newRanking];
-                            cargado = true;
-                        }
-                    }
-                } catch (e) { console.warn('Ranking excepción:', e.message); }
-
-                // ===== RECORDS (uuid) =====
-                try {
-                    console.log('🔄 Cargando records...');
-                    const { data: recordsData, error } = await supabaseClient.from('records').select('*');
-                    if (!error && recordsData && recordsData.length > 0) {
-                        const localRecordIds = new Set(data.records.map(r => r.id));
-                        const newRecords = recordsData
-                            .filter(r => !localRecordIds.has(r.id))
-                            .map(r => ({
-                                id: r.id,
-                                test: r.prueba,
-                                record: r.marca,
-                                holder: r.atleta,
-                                category: r.categoria,
-                                date: r.fecha,
-                                location: r.lugar,
-                                video: r.video,
-                                image: r.imagen
-                            }));
-                        if (newRecords.length > 0) {
-                            data.records = [...data.records, ...newRecords];
-                            cargado = true;
-                        }
-                    }
-                } catch (e) { console.warn('Records excepción:', e.message); }
-
-                // ===== GIMNASIOS (integer) =====
-                try {
-                    console.log('🔄 Cargando gimnasios...');
-                    const { data: gymsData, error } = await supabaseClient.from('gimnasios').select('*');
-                    if (!error && gymsData && gymsData.length > 0) {
-                        const localGymIds = new Set(data.gyms.map(g => g.id));
-                        const newGyms = gymsData
-                            .filter(g => !localGymIds.has(g.id))
-                            .map(g => ({
-                                id: g.id,
-                                name: g.nombre,
-                                address: g.direccion,
-                                phone: g.telefono,
-                                schedule: g.horario,
-                                services: g.servicios,
-                                map: g.mapa,
-                                image: g.imagen
-                            }));
-                        if (newGyms.length > 0) {
-                            data.gyms = [...data.gyms, ...newGyms];
-                            cargado = true;
-                        }
-                    }
-                } catch (e) { console.warn('Gimnasios excepción:', e.message); }
-
-                // ===== GALERIA (integer) =====
-                try {
-                    console.log('🔄 Cargando galería...');
-                    const { data: galleryData, error } = await supabaseClient.from('galeria').select('*');
-                    if (!error && galleryData && galleryData.length > 0) {
-                        const localGalleryIds = new Set(data.gallery.map(g => g.id));
-                        const newGallery = galleryData
-                            .filter(g => !localGalleryIds.has(g.id))
-                            .map(g => ({
-                                id: g.id,
-                                title: g.titulo,
-                                image: g.imagen,
-                                category: g.categoria
-                            }));
-                        if (newGallery.length > 0) {
-                            data.gallery = [...data.gallery, ...newGallery];
-                            cargado = true;
-                        }
-                    }
-                } catch (e) { console.warn('Galería excepción:', e.message); }
-
-                // ===== REGLAS (integer) =====
-                try {
-                    console.log('🔄 Cargando reglas...');
-                    const { data: rulesData, error } = await supabaseClient.from('reglas').select('*');
-                    if (!error && rulesData && rulesData.length > 0) {
-                        const localRuleIds = new Set(data.rules.map(r => r.id));
-                        const newRules = rulesData
-                            .filter(r => !localRuleIds.has(r.id))
-                            .map(r => ({
-                                id: r.id,
-                                title: r.titulo,
-                                content: r.contenido,
-                                category: r.categoria
-                            }));
-                        if (newRules.length > 0) {
-                            data.rules = [...data.rules, ...newRules];
-                            cargado = true;
-                        }
-                    }
-                } catch (e) { console.warn('Reglas excepción:', e.message); }
-
-                // ===== CURSOS (integer) =====
-                try {
-                    console.log('🔄 Cargando cursos...');
-                    const { data: coursesData, error } = await supabaseClient.from('cursos').select('*');
-                    if (!error && coursesData && coursesData.length > 0) {
-                        const localCourseIds = new Set(data.courses.map(c => c.id));
-                        const newCourses = coursesData
-                            .filter(c => !localCourseIds.has(c.id))
-                            .map(c => ({
-                                id: c.id,
-                                title: c.titulo,
-                                description: c.descripcion,
-                                instructor: c.instructor,
-                                duration: c.duracion,
-                                price: c.precio,
-                                image: c.imagen,
-                                level: c.nivel
-                            }));
-                        if (newCourses.length > 0) {
-                            data.courses = [...data.courses, ...newCourses];
-                            cargado = true;
-                        }
-                    }
-                } catch (e) { console.warn('Cursos excepción:', e.message); }
-
-                // ===== JUECES (integer) =====
-                try {
-                    console.log('🔄 Cargando jueces...');
-                    const { data: judgesData, error } = await supabaseClient.from('jueces').select('*');
-                    if (!error && judgesData && judgesData.length > 0) {
-                        const localJudgeIds = new Set(data.judges.map(j => j.id));
-                        const newJudges = judgesData
-                            .filter(j => !localJudgeIds.has(j.id))
-                            .map(j => ({
-                                id: j.id,
-                                name: j.nombre,
-                                level: j.nivel,
-                                experience: j.experiencia,
-                                image: j.imagen
-                            }));
-                        if (newJudges.length > 0) {
-                            data.judges = [...data.judges, ...newJudges];
-                            cargado = true;
-                        }
-                    }
-                } catch (e) { console.warn('Jueces excepción:', e.message); }
-
-                // ===== SPONSORS (integer) =====
-                try {
-                    console.log('🔄 Cargando sponsors...');
-                    const { data: sponsorsData, error } = await supabaseClient.from('sponsors').select('*');
-                    if (!error && sponsorsData && sponsorsData.length > 0) {
-                        const localSponsorIds = new Set(data.sponsors.map(s => s.id));
-                        const newSponsors = sponsorsData
-                            .filter(s => !localSponsorIds.has(s.id))
-                            .map(s => ({
-                                id: s.id,
-                                name: s.nombre,
-                                logo: s.logo,
-                                url: s.url,
-                                level: s.nivel
-                            }));
-                        if (newSponsors.length > 0) {
-                            data.sponsors = [...data.sponsors, ...newSponsors];
-                            cargado = true;
-                        }
-                    }
-                } catch (e) { console.warn('Sponsors excepción:', e.message); }
-
-                // ===== CONTACTOS (integer) =====
-                try {
-                    console.log('🔄 Cargando contactos...');
-                    const { data: contactsData, error } = await supabaseClient.from('contactos').select('*');
-                    if (!error && contactsData && contactsData.length > 0) {
-                        const localContactIds = new Set(data.contacts.map(c => c.id));
-                        const newContacts = contactsData
-                            .filter(c => !localContactIds.has(c.id))
-                            .map(c => ({
-                                id: c.id,
-                                name: c.nombre,
-                                email: c.email,
-                                phone: c.telefono,
-                                role: c.rol,
-                                image: c.imagen
-                            }));
-                        if (newContacts.length > 0) {
-                            data.contacts = [...data.contacts, ...newContacts];
-                            cargado = true;
-                        }
-                    }
-                } catch (e) { console.warn('Contactos excepción:', e.message); }
-
-                // ===== SETTINGS (integer) =====
-                try {
-                    console.log('🔄 Cargando settings...');
-                    const { data: settingsData, error } = await supabaseClient.from('settings').select('*');
-                    console.log('📥 Settings raw:', settingsData, 'Error:', error);
-                    if (!error && settingsData && settingsData.length > 0) {
-                        data.settings = settingsData.map(s => ({
-                            id: s.id,
-                            key: s.key,
-                            value: s.value
-                        }));
-                        console.log('✅ Settings cargados');
-                        cargado = true;
-                    } else if (error) {
-                        console.error('❌ Error cargando settings:', error);
-                    }
-                } catch (e) { console.warn('Settings excepción:', e.message); }
-
-                // Guardar en localStorage
-                localStorage.setItem('acaf_events', JSON.stringify(data.events));
-                localStorage.setItem('acaf_athletes', JSON.stringify(data.athletes));
-                localStorage.setItem('acaf_ranking', JSON.stringify(data.ranking));
-                localStorage.setItem('acaf_gyms', JSON.stringify(data.gyms));
-                localStorage.setItem('acaf_records', JSON.stringify(data.records));
-                localStorage.setItem('acaf_gallery', JSON.stringify(data.gallery));
-                localStorage.setItem('acaf_rules', JSON.stringify(data.rules));
-                localStorage.setItem('acaf_courses', JSON.stringify(data.courses));
-                localStorage.setItem('acaf_judges', JSON.stringify(data.judges));
-                localStorage.setItem('acaf_sponsors', JSON.stringify(data.sponsors));
-                localStorage.setItem('acaf_contacts', JSON.stringify(data.contacts));
-                localStorage.setItem('acaf_settings', JSON.stringify(data.settings));
-
-                console.log('✅✅✅ Carga desde Supabase completada. cargado=' + cargado);
-                return cargado;
-
-            } catch (e) {
-                console.error('❌❌❌ Error fatal cargando desde Supabase:', e);
-                return false;
             }
         }
 
@@ -5812,14 +5486,22 @@ select.scoring-form-control{cursor:pointer}
 
         async function loadProductsFromSupabase() {
             try {
-                if (!supabaseClient) return JSON.parse(localStorage.getItem('productosTienda')) || [];
+                if (!supabaseClient) {
+                    console.log('⚠️ Supabase no disponible, usando localStorage');
+                    return JSON.parse(localStorage.getItem('productosTienda')) || [];
+                }
                 const { data, error } = await supabaseClient.from('productos').select('*').order('created_at', { ascending: false });
-                if (error) throw error;
+                if (error) {
+                    console.error('❌ Error Supabase productos:', error);
+                    throw error;
+                }
+                console.log('📥 Productos raw de Supabase:', data ? data.length : 0);
                 const productos = (data || []).map(rowToProducto);
+                console.log('✅ Productos convertidos:', productos.length);
                 localStorage.setItem('productosTienda', JSON.stringify(productos));
                 return productos;
             } catch (e) {
-                console.error('Error cargando productos:', e);
+                console.error('❌ Error cargando productos:', e);
                 return JSON.parse(localStorage.getItem('productosTienda')) || [];
             }
         }
@@ -5973,13 +5655,28 @@ select.scoring-form-control{cursor:pointer}
 
         function loadProductsList() {
             const productos = JSON.parse(localStorage.getItem('productosTienda')) || [];
-            const tbody = document.getElementById('productsTableBody');
-            if (!tbody) return;
+            const container = document.getElementById('productsList');
+            if (!container) return;
             if (productos.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center" style="padding:2rem;color:var(--text-muted);">No hay productos. Agrega el primero.</td></tr>';
+                container.innerHTML = '<p style="color:var(--text-muted);padding:2rem;text-align:center;">No hay productos. Agrega el primero.</p>';
                 return;
             }
-            tbody.innerHTML = productos.map(p => `<tr><td><img src="${(p.imagenes && p.imagenes.length > 0) ? p.imagenes[0] : 'https://placehold.co/40x40/1a1a2e/c9a227?text=P'}" style="width:40px;height:40px;object-fit:cover;border-radius:6px;"></td><td><strong>${p.nombre}</strong></td><td style="color:var(--gold);font-weight:600;">$${p.precio}</td><td>${p.stock || 0}</td><td><button class="btn btn-outline" onclick="editProduct(${p.id})" style="padding:0.4rem 0.7rem;font-size:0.8rem;margin-right:0.3rem;"><i class="fas fa-edit"></i></button><button class="btn btn-outline" onclick="deleteProduct(${p.id})" style="padding:0.4rem 0.7rem;font-size:0.8rem;color:var(--danger);"><i class="fas fa-trash"></i></button></td></tr>`).join('');
+            container.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1rem;">' + productos.map(p => {
+                const img = (p.imagenes && p.imagenes.length > 0) ? p.imagenes[0] : 'https://placehold.co/300x200/1a1a2e/c9a227?text=Sin+Imagen';
+                return `<div style="background:var(--secondary);border:1px solid rgba(255,255,255,0.1);border-radius:12px;overflow:hidden;">
+                    <img src="${img}" style="width:100%;height:150px;object-fit:cover;">
+                    <div style="padding:1rem;">
+                        <h4 style="color:var(--text);margin-bottom:0.5rem;">${p.nombre}</h4>
+                        <p style="color:var(--gold);font-weight:bold;font-size:1.2rem;margin-bottom:0.5rem;">$${p.precio} UYU</p>
+                        <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:0.5rem;">Stock: ${p.stock || 0}</p>
+                        <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1rem;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">${p.descripcion || 'Sin descripción'}</p>
+                        <div style="display:flex;gap:0.5rem;">
+                            <button class="btn btn-outline" onclick="editProduct(${p.id})" style="flex:1;padding:0.5rem;font-size:0.85rem;"><i class="fas fa-edit"></i> Editar</button>
+                            <button class="btn btn-danger" onclick="deleteProduct(${p.id})" style="padding:0.5rem;font-size:0.85rem;"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('') + '</div>';
         }
 
         async function saveProduct() {
@@ -5989,15 +5686,55 @@ select.scoring-form-control{cursor:pointer}
             const descripcion = document.getElementById('productDesc').value.trim();
             const stock = parseInt(document.getElementById('productStock').value) || 0;
             if (!nombre || isNaN(precio)) { scoringShowToast('Completa nombre y precio'); return; }
+
+            // Recolectar imágenes de los previews
             const imagenes = [];
-            document.querySelectorAll('.product-preview-img').forEach(img => { if (img.src && !img.src.includes('placehold.co')) imagenes.push(img.src); });
-            const producto = { id: id ? parseInt(id) : null, nombre, precio, descripcion, stock, categoria: 'general', imagenes: imagenes.length > 0 ? imagenes : ['https://placehold.co/300x300/1a1a2e/c9a227?text=Producto'], created_at: new Date().toISOString() };
-            const saved = await saveProductToSupabase(producto);
-            scoringShowToast(saved ? 'Producto guardado en la nube' : 'Producto guardado localmente');
+            document.querySelectorAll('#preview1 img, #preview2 img, #preview3 img').forEach(img => { 
+                if (img.src && !img.src.includes('placehold.co')) imagenes.push(img.src); 
+            });
+
+            const producto = { 
+                id: id ? parseInt(id) : null, 
+                nombre, 
+                precio, 
+                descripcion, 
+                stock, 
+                categoria: 'general', 
+                imagenes: imagenes.length > 0 ? imagenes : ['https://placehold.co/300x300/1a1a2e/c9a227?text=Producto'], 
+                created_at: new Date().toISOString() 
+            };
+
+            console.log('💾 Guardando producto:', producto);
+
+            // Guardar en Supabase primero
+            let savedToSupabase = false;
+            if (supabaseClient) {
+                try {
+                    const row = productoToRow(producto);
+                    if (producto.id) {
+                        const { error } = await supabaseClient.from('productos').update(row).eq('id', producto.id);
+                        if (!error) savedToSupabase = true;
+                        else console.error('❌ Error update Supabase:', error);
+                    } else {
+                        const { data, error } = await supabaseClient.from('productos').insert([row]).select();
+                        if (!error && data && data.length > 0) {
+                            producto.id = data[0].id;
+                            savedToSupabase = true;
+                        } else console.error('❌ Error insert Supabase:', error);
+                    }
+                } catch (e) {
+                    console.error('❌ Error Supabase:', e);
+                }
+            }
+
+            scoringShowToast(savedToSupabase ? '✅ Producto guardado en la nube' : '⚠️ Producto guardado localmente');
+
+            // Actualizar localStorage
             const productos = JSON.parse(localStorage.getItem('productosTienda')) || [];
             const idx = productos.findIndex(p => p.id === producto.id);
             if (idx >= 0) productos[idx] = producto; else productos.push(producto);
             localStorage.setItem('productosTienda', JSON.stringify(productos));
+
             clearProductForm();
             loadProductsList();
             loadProducts();
@@ -6018,14 +5755,27 @@ select.scoring-form-control{cursor:pointer}
         }
 
         async function deleteProduct(id) {
-            if (!confirm('Eliminar este producto?')) return;
-            await deleteProductFromSupabase(id);
+            if (!confirm('¿Eliminar este producto?')) return;
+
+            // Eliminar de Supabase
+            if (supabaseClient) {
+                try {
+                    const { error } = await supabaseClient.from('productos').delete().eq('id', id);
+                    if (error) console.error('❌ Error eliminando de Supabase:', error);
+                    else console.log('✅ Producto eliminado de Supabase');
+                } catch (e) {
+                    console.error('❌ Error:', e);
+                }
+            }
+
+            // Eliminar de localStorage
             let productos = JSON.parse(localStorage.getItem('productosTienda')) || [];
             productos = productos.filter(p => p.id !== id);
             localStorage.setItem('productosTienda', JSON.stringify(productos));
+
             loadProductsList();
             loadProducts();
-            scoringShowToast('Producto eliminado');
+            scoringShowToast('🗑️ Producto eliminado');
         }
 
         function previewImage(input) {
@@ -6069,7 +5819,23 @@ select.scoring-form-control{cursor:pointer}
             if (cartModal && cartModal.classList.contains('active') && e.target === cartModal) closeCart();
         });
 
-        document.addEventListener('DOMContentLoaded', function() { updateCartUI(); });
+        document.addEventListener('DOMContentLoaded', function() { 
+            updateCartUI();
+            // Asegurar que el botón del carrito funcione en móvil
+            const cartBtn = document.getElementById('cartFloatBtn');
+            if (cartBtn) {
+                cartBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openCart();
+                });
+                cartBtn.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openCart();
+                });
+            }
+        });
 
 // ===== COMPETENCIAS =====
         function openCompetenciasModal() {
