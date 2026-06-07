@@ -5628,7 +5628,7 @@ select.scoring-form-control{cursor:pointer}
             }
 
             const antes = cart.length;
-            cart = cart.filter(item => item.id !== id);
+            cart = cart.filter(item => String(item.id) !== String(productoId));
             const despues = cart.length;
 
             console.log(`🗑️ Carrito: ${antes} → ${despues} items`);
@@ -5657,7 +5657,7 @@ select.scoring-form-control{cursor:pointer}
                 return;
             }
 
-            const item = cart.find(item => item.id === productoId);
+            const item = cart.find(item => String(item.id) === String(productoId));
             if (!item) {
                 console.error('❌ Producto no encontrado en carrito:', productoId);
                 scoringShowToast('❌ Producto no encontrado en carrito');
@@ -5666,7 +5666,7 @@ select.scoring-form-control{cursor:pointer}
 
             item.cantidad += delta;
             if (item.cantidad <= 0) {
-                cart = cart.filter(i => i.id !== productoId);
+                cart = cart.filter(i => String(i.id) !== String(productoId));
                 console.log('🗑️ Producto removido del carrito (cantidad 0)');
             }
 
