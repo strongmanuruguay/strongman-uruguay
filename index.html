@@ -1935,9 +1935,6 @@ select.scoring-form-control{cursor:pointer}
                         <button class="admin-tab" onclick="switchTab('records')">Récords</button>
                         <button class="admin-tab" onclick="switchTab('gallery')">Galería</button>
                         <button class="admin-tab" onclick="switchTab('rules')">Reglas</button>
-                        <button class="admin-tab" onclick="switchTab('system')">Sistema</button>
-                        <button class="admin-tab" onclick="switchTab('system')">Sistema</button>
-                        <button class="admin-tab" onclick="switchTab('system')">Sistema</button>
                         <button class="admin-tab" onclick="switchTab('courses')">Cursos</button>
                         <button class="admin-tab" onclick="switchTab('judges')">Jueces</button>
                         <button class="admin-tab" onclick="switchTab('sponsors')">Sponsors</button>
@@ -2543,29 +2540,6 @@ select.scoring-form-control{cursor:pointer}
                                     <label>Fecha y Hora del Evento *</label>
                                     <input type="datetime-local" id="cdCfgFecha" style="width: 100%; padding: 0.8rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px;">
                                 </div>
-                <!-- Panel Sistema -->
-                <div id="panel-system" class="admin-panel">
-                    <h3 style="color: var(--gold); margin-bottom: 1.5rem;"><i class="fas fa-tools"></i> Mantenimiento</h3>
-                    <p style="color: var(--text-muted); margin-bottom: 2rem;">Opciones de limpieza para solucionar problemas de sincronización.</p>
-
-                    <div style="background: var(--secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 2rem; margin-bottom: 2rem;">
-                        <h4 style="color: var(--danger); margin-bottom: 1rem;"><i class="fas fa-exclamation-triangle"></i> Limpiar Carrito y Productos</h4>
-                        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Elimina los productos del carrito y la tienda guardados localmente. Los datos en Supabase no se verán afectados. Usalo si tenés productos "fantasma" o errores de ID.</p>
-
-                        <button class="btn btn-danger" onclick="adminClearLocalStorage()" style="width: 100%; padding: 1rem; font-size: 1rem;">
-                            <i class="fas fa-trash-alt"></i> Limpiar Carrito y Productos Locales
-                        </button>
-                    </div>
-
-                    <div style="background: var(--secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 2rem;">
-                        <h4 style="color: var(--gold); margin-bottom: 1rem;"><i class="fas fa-sync-alt"></i> Sincronización</h4>
-                        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Recarga todos los datos desde Supabase.</p>
-
-                        <button class="btn btn-primary" onclick="adminForceSync()" style="width: 100%; padding: 1rem; font-size: 1rem;">
-                            <i class="fas fa-cloud-download-alt"></i> Forzar Sincronización con Supabase
-                        </button>
-                    </div>
-                </div>
                                 <div class="form-group">
                                     <label>Lugar (opcional)</label>
                                     <input type="text" id="cdCfgLugar" placeholder="Ej: Montevideo, Uruguay" style="width: 100%; padding: 0.8rem; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 5px;">
@@ -3585,52 +3559,7 @@ select.scoring-form-control{cursor:pointer}
             return loadDataFromSupabase();
         }
 
-        async function adminClearLocalStorage() {
-            if (!confirm('⚠️ ¿Estás seguro?\n\nEsto eliminará los productos del carrito y la tienda guardados localmente.\n\nLos datos en Supabase NO se verán afectados.\n\n¿Continuar?')) {
-                return;
-            }
-
-            console.log('🧹 Limpiando carrito y productos locales...');
-            const items = ['productosTienda', 'cartStrongman'];
-
-            let count = 0;
-            items.forEach(item => {
-                if (localStorage.getItem(item) !== null) {
-                    localStorage.removeItem(item);
-                    count++;
-                    console.log('🗑️ Eliminado:', item);
-                }
-            });
-
-            scoringShowToast(`🧹 ${count} item(s) eliminado(s). Recargando...`);
-            console.log(`✅ ${count} item(s) eliminado(s)`);
-
-            // Recargar la página después de 1.5 segundos
-            setTimeout(() => {
-                location.reload();
-            }, 1500);
-        }
-
-        function adminForceSync() {
-            console.log('🔄 Forzando sincronización con Supabase...');
-            scoringShowToast('🔄 Sincronizando con Supabase...');
-
-            // Limpiar flags de carga
-            localStorage.removeItem('strongman_data_loaded');
-            localStorage.removeItem('strongman_data_loading');
-
-            // Recargar datos
-            loadDataFromSupabase().then(() => {
-                scoringShowToast('✅ Sincronización completada');
-                console.log('✅ Datos sincronizados');
-                location.reload();
-            }).catch(err => {
-                console.error('❌ Error en sincronización:', err);
-                scoringShowToast('❌ Error en sincronización');
-            });
-        }
-
-        function syncToSupabase() {() {
+        async function syncToSupabase() {
             return await saveDataToSupabase();
         }
 
