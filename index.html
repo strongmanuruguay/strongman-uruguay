@@ -3182,7 +3182,9 @@ select.scoring-form-control{cursor:pointer}
         // Código migrado desde el archivo de integración existente
 
         const SUPABASE_URL = 'https://kiojyhfqwjaoppgwoyjt.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_1MUOcELIRMoDlKdpUA7_fw_gYJ2dQHE';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtpb2p5aGZxd2phb3BwZ3dveWp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NzY3MjgsImV4cCI6MjA5NTQ1MjcyOH0.Nd24E0kQJKjcypjz45MELtPD-eq91URunn6UVL2PL4Y';
+
+
 
         let supabaseClient = null;
 
@@ -5562,9 +5564,15 @@ select.scoring-form-control{cursor:pointer}
         }
 
         function addToCart(productoId) {
-            console.log('🛒 addToCart llamado con ID:', productoId);
+            console.log('🛒 addToCart llamado con ID:', productoId, 'tipo:', typeof productoId);
 
-            if (!productoId && productoId !== 0) {
+            // Convertir a número si es string numérico
+            let id = productoId;
+            if (typeof productoId === 'string' && !isNaN(parseInt(productoId))) {
+                id = parseInt(productoId);
+            }
+
+            if (!id && id !== 0) {
                 console.error('❌ addToCart: ID inválido');
                 scoringShowToast('❌ Error: ID inválido');
                 return;
@@ -5604,9 +5612,15 @@ select.scoring-form-control{cursor:pointer}
         }
 
         function removeFromCart(productoId) {
-            console.log('🗑️ removeFromCart llamado con ID:', productoId);
+            console.log('🗑️ removeFromCart llamado con ID:', productoId, 'tipo:', typeof productoId);
 
-            if (!productoId && productoId !== 0) {
+            // Convertir a número si es string numérico
+            let id = productoId;
+            if (typeof productoId === 'string' && !isNaN(parseInt(productoId))) {
+                id = parseInt(productoId);
+            }
+
+            if (!id && id !== 0) {
                 console.error('❌ removeFromCart: ID inválido');
                 scoringShowToast('❌ Error: ID inválido');
                 return;
@@ -5630,7 +5644,13 @@ select.scoring-form-control{cursor:pointer}
         function updateCartItemQuantity(productoId, delta) {
             console.log('🛒 updateCartItemQuantity:', productoId, delta);
 
-            if (!productoId && productoId !== 0) {
+            // Convertir a número si es string numérico
+            let id = productoId;
+            if (typeof productoId === 'string' && !isNaN(parseInt(productoId))) {
+                id = parseInt(productoId);
+            }
+
+            if (!id && id !== 0) {
                 console.error('❌ updateCartItemQuantity: ID inválido');
                 scoringShowToast('❌ Error: ID inválido');
                 return;
@@ -5772,7 +5792,7 @@ select.scoring-form-control{cursor:pointer}
                 btn.addEventListener('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    const id = parseInt(this.getAttribute('data-id'));
+                    const id = this.getAttribute('data-id');
                     console.log('🖱️ Click editar, ID:', id);
                     editProduct(id);
                 });
@@ -5782,7 +5802,7 @@ select.scoring-form-control{cursor:pointer}
                 btn.addEventListener('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    const id = parseInt(this.getAttribute('data-id'));
+                    const id = this.getAttribute('data-id');
                     console.log('🖱️ Click borrar, ID:', id);
                     deleteProduct(id);
                 });
@@ -5879,10 +5899,16 @@ select.scoring-form-control{cursor:pointer}
         }
 
         function editProduct(id) {
-            console.log('✏️ Editando producto ID:', id);
+            console.log('✏️ Editando producto ID:', id, 'tipo:', typeof id);
 
-            if (!id) {
-                console.error('❌ ID de producto inválido');
+            // Convertir a número si es string numérico, o usar como string
+            let productId = id;
+            if (typeof id === 'string' && !isNaN(parseInt(id))) {
+                productId = parseInt(id);
+            }
+
+            if (!productId && productId !== 0) {
+                console.error('❌ ID de producto inválido:', id);
                 scoringShowToast('❌ Error: ID inválido');
                 return;
             }
@@ -5927,10 +5953,16 @@ select.scoring-form-control{cursor:pointer}
         }
 
         async function deleteProduct(id) {
-            console.log('🗑️ Intentando borrar producto ID:', id);
+            console.log('🗑️ Intentando borrar producto ID:', id, 'tipo:', typeof id);
 
-            if (!id) {
-                console.error('❌ ID de producto inválido');
+            // Convertir a número si es string numérico, o usar como string
+            let productId = id;
+            if (typeof id === 'string' && !isNaN(parseInt(id))) {
+                productId = parseInt(id);
+            }
+
+            if (!productId && productId !== 0) {
+                console.error('❌ ID de producto inválido:', id);
                 scoringShowToast('❌ Error: ID inválido');
                 return;
             }
