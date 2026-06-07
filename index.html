@@ -5547,7 +5547,7 @@ select.scoring-form-control{cursor:pointer}
                 }
                 grid.innerHTML = productos.map(p => {
                     const img = (p.imagenes && p.imagenes.length > 0) ? p.imagenes[0] : 'https://placehold.co/300x300/1a1a2e/c9a227?text=Producto';
-                    return `<div class="product-card" style="background:var(--card-bg);border-radius:12px;overflow:hidden;transition:all 0.3s;box-shadow:0 4px 15px rgba(0,0,0,0.3);border:1px solid var(--border-color);" onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 8px 25px rgba(201,162,39,0.2)';" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 15px rgba(0,0,0,0.3)';"><div style="position:relative;overflow:hidden;height:200px;cursor:pointer;" onclick="openImageZoom('${img}', '${p.nombre.replace(/'/g, "\'")}')"><img src="${img}" alt="${p.nombre}" style="width:100%;height:100%;object-fit:cover;transition:transform 0.5s;" onmouseover="this.style.transform='scale(1.1)';" onmouseout="this.style.transform='scale(1)';"></div><div style="padding:1.2rem;"><h3 style="font-size:1.1rem;margin-bottom:0.5rem;color:var(--text);font-weight:600;">${p.nombre}</h3><p style="color:var(--gold);font-size:1.3rem;font-weight:700;margin-bottom:0.8rem;">$${p.precio} UYU</p><p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1rem;line-height:1.4;">${p.descripcion || ''}</p><div style="display:flex;gap:0.5rem;"><button class="btn btn-primary" onclick="addToCart(${p.id})" style="flex:1;font-size:0.85rem;padding:0.6rem;"><i class="fas fa-cart-plus"></i> Agregar</button><button class="btn btn-outline" onclick="openProductDetail(${p.id})" style="padding:0.6rem 0.8rem;font-size:0.85rem;"><i class="fas fa-eye"></i></button></div></div></div>`;
+                    return `<div class="product-card" style="background:var(--card-bg);border-radius:12px;overflow:hidden;transition:all 0.3s;box-shadow:0 4px 15px rgba(0,0,0,0.3);border:1px solid var(--border-color);" onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 8px 25px rgba(201,162,39,0.2)';" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 15px rgba(0,0,0,0.3)';"><div style="position:relative;overflow:hidden;height:200px;cursor:pointer;" onclick="openImageZoom('${img}', '${p.nombre.replace(/'/g, "\'")}')"><img src="${img}" alt="${p.nombre}" style="width:100%;height:100%;object-fit:cover;transition:transform 0.5s;" onmouseover="this.style.transform='scale(1.1)';" onmouseout="this.style.transform='scale(1)';"></div><div style="padding:1.2rem;"><h3 style="font-size:1.1rem;margin-bottom:0.5rem;color:var(--text);font-weight:600;">${p.nombre}</h3><p style="color:var(--gold);font-size:1.3rem;font-weight:700;margin-bottom:0.8rem;">$${p.precio} UYU</p><p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1rem;line-height:1.4;">${p.descripcion || ''}</p><div style="display:flex;gap:0.5rem;"><button class="btn btn-primary" onclick="addToCart('${p.id}')" style="flex:1;font-size:0.85rem;padding:0.6rem;"><i class="fas fa-cart-plus"></i> Agregar</button><button class="btn btn-outline" onclick="openProductDetail('${p.id}')" style="padding:0.6rem 0.8rem;font-size:0.85rem;"><i class="fas fa-eye"></i></button></div></div></div>`;
                 }).join('');
             });
         }
@@ -5580,7 +5580,7 @@ select.scoring-form-control{cursor:pointer}
             }
 
             const productos = JSON.parse(localStorage.getItem('productosTienda')) || [];
-            const producto = productos.find(p => p.id === productoId);
+            const producto = productos.find(p => String(p.id) === String(productoId));
 
             if (!producto) {
                 console.error('❌ Producto no encontrado en tienda:', productoId);
@@ -5590,14 +5590,14 @@ select.scoring-form-control{cursor:pointer}
 
             console.log('✅ Producto encontrado:', producto.nombre, 'ID:', producto.id);
 
-            const itemExistente = cart.find(item => item.id === productoId);
+            const itemExistente = cart.find(item => String(item.id) === String(productoId));
             if (itemExistente) { 
                 itemExistente.cantidad++; 
                 console.log('🛒 Cantidad aumentada:', itemExistente.cantidad);
             }
             else { 
                 const cartItem = {
-                    id: producto.id,
+                    id: String(producto.id),
                     nombre: producto.nombre,
                     precio: producto.precio,
                     imagenes: producto.imagenes || [],
@@ -5723,7 +5723,7 @@ select.scoring-form-control{cursor:pointer}
             } else {
                 cartBody.innerHTML = cart.map(item => {
                     const img = (item.imagenes && item.imagenes.length > 0) ? item.imagenes[0] : 'https://placehold.co/60x60/1a1a2e/c9a227?text=P';
-                    return `<div class="cart-item" style="display:flex;gap:1rem;padding:1rem;border-bottom:1px solid var(--border-color);align-items:center;"><img src="${img}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;"><div style="flex:1;"><h4 style="font-size:0.95rem;margin-bottom:0.3rem;">${item.nombre}</h4><p style="color:var(--gold);font-weight:600;">$${item.precio} c/u</p></div><div style="display:flex;align-items:center;gap:0.5rem;"><button class="btn btn-outline" onclick="updateCartItemQuantity(${item.id}, -1)" style="padding:0.3rem 0.6rem;font-size:0.8rem;">-</button><span style="font-weight:600;min-width:20px;text-align:center;">${item.cantidad}</span><button class="btn btn-outline" onclick="updateCartItemQuantity(${item.id}, 1)" style="padding:0.3rem 0.6rem;font-size:0.8rem;">+</button></div><button class="btn btn-outline" onclick="removeFromCart(${item.id})" style="padding:0.3rem 0.6rem;color:var(--danger);"><i class="fas fa-trash"></i></button></div>`;
+                    return `<div class="cart-item" style="display:flex;gap:1rem;padding:1rem;border-bottom:1px solid var(--border-color);align-items:center;"><img src="${img}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;"><div style="flex:1;"><h4 style="font-size:0.95rem;margin-bottom:0.3rem;">${item.nombre}</h4><p style="color:var(--gold);font-weight:600;">$${item.precio} c/u</p></div><div style="display:flex;align-items:center;gap:0.5rem;"><button class="btn btn-outline" onclick="updateCartItemQuantity('${item.id}', -1)" style="padding:0.3rem 0.6rem;font-size:0.8rem;">-</button><span style="font-weight:600;min-width:20px;text-align:center;">${item.cantidad}</span><button class="btn btn-outline" onclick="updateCartItemQuantity('${item.id}', 1)" style="padding:0.3rem 0.6rem;font-size:0.8rem;">+</button></div><button class="btn btn-outline" onclick="removeFromCart('${item.id}')" style="padding:0.3rem 0.6rem;color:var(--danger);"><i class="fas fa-trash"></i></button></div>`;
                 }).join('');
                 const total = cart.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
                 if (totalElement) totalElement.textContent = total.toLocaleString();
@@ -5915,7 +5915,7 @@ select.scoring-form-control{cursor:pointer}
             }
 
             const productos = JSON.parse(localStorage.getItem('productosTienda')) || [];
-            const p = productos.find(prod => prod.id === id);
+            const p = productos.find(prod => String(prod.id) === String(id));
 
             if (!p) {
                 console.error('❌ Producto no encontrado en localStorage');
@@ -6000,7 +6000,7 @@ select.scoring-form-control{cursor:pointer}
             // Eliminar de localStorage
             let productos = JSON.parse(localStorage.getItem('productosTienda')) || [];
             const antes = productos.length;
-            productos = productos.filter(p => p.id !== id);
+            productos = productos.filter(p => String(p.id) !== String(id));
             const despues = productos.length;
             localStorage.setItem('productosTienda', JSON.stringify(productos));
 
