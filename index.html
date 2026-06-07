@@ -5661,6 +5661,25 @@ select.scoring-form-control{cursor:pointer}
             openCart();
         }
 
+        function cleanInvalidCartItems() {
+            console.log('🧹 Limpiando items inválidos del carrito...');
+            const antes = cart.length;
+            cart = cart.filter(item => {
+                const valid = item && item.id && item.id !== null && item.id !== undefined && item.id !== 'null' && item.id !== 'undefined';
+                if (!valid) console.log('🗑️ Item inválido removido:', item);
+                return valid;
+            });
+            const despues = cart.length;
+            if (antes !== despues) {
+                localStorage.setItem('cartStrongman', JSON.stringify(cart));
+                console.log(`🧹 Carrito limpiado: ${antes} → ${despues} items`);
+                scoringShowToast(`🧹 ${antes - despues} item(s) inválido(s) removido(s)`);
+            } else {
+                console.log('✅ Carrito limpio, no hay items inválidos');
+            }
+            updateCartUI();
+        }
+
         function updateCartUI() {
             const cantidadTotal = cart.reduce((sum, item) => sum + item.cantidad, 0);
             const badge = document.getElementById('cartCount');
@@ -5782,9 +5801,15 @@ select.scoring-form-control{cursor:pointer}
 
             // Recolectar imágenes de los previews
             const imagenes = [];
+            // Buscar en productPreview (donde se cargan las imágenes)
+            document.querySelectorAll('#productPreview img').forEach(img => { 
+                if (img.src && !img.src.includes('placehold.co')) imagenes.push(img.src); 
+            });
+            // También buscar en preview1, preview2, preview3 como fallback
             document.querySelectorAll('#preview1 img, #preview2 img, #preview3 img').forEach(img => { 
                 if (img.src && !img.src.includes('placehold.co')) imagenes.push(img.src); 
             });
+            console.log('📸 Imágenes encontradas:', imagenes.length);
 
             const producto = { 
                 id: id ? parseInt(id) : null, 
@@ -5801,26 +5826,46 @@ select.scoring-form-control{cursor:pointer}
 
             // Guardar en Supabase primero
             let savedToSupabase = false;
+            let supabaseError = null;
             if (supabaseClient) {
                 try {
                     const row = productoToRow(producto);
+                    console.log('📤 Enviando a Supabase:', row);
                     if (producto.id) {
                         const { error } = await supabaseClient.from('productos').update(row).eq('id', producto.id);
-                        if (!error) savedToSupabase = true;
-                        else console.error('❌ Error update Supabase:', error);
+                        if (!error) {
+                            savedToSupabase = true;
+                            console.log('✅ Producto actualizado en Supabase');
+                        } else {
+                            supabaseError = error;
+                            console.error('❌ Error update Supabase:', error);
+                        }
                     } else {
                         const { data, error } = await supabaseClient.from('productos').insert([row]).select();
                         if (!error && data && data.length > 0) {
                             producto.id = data[0].id;
                             savedToSupabase = true;
-                        } else console.error('❌ Error insert Supabase:', error);
+                            console.log('✅ Producto insertado en Supabase, ID:', data[0].id);
+                        } else {
+                            supabaseError = error;
+                            console.error('❌ Error insert Supabase:', error);
+                        }
                     }
                 } catch (e) {
+                    supabaseError = e;
                     console.error('❌ Error Supabase:', e);
                 }
+            } else {
+                console.log('⚠️ Supabase no disponible');
             }
 
-            scoringShowToast(savedToSupabase ? '✅ Producto guardado en la nube' : '⚠️ Producto guardado localmente');
+            if (savedToSupabase) {
+                scoringShowToast('✅ Producto guardado en la nube');
+            } else if (supabaseError) {
+                scoringShowToast('❌ Error Supabase: ' + (supabaseError.message || 'Error desconocido'));
+            } else {
+                scoringShowToast('⚠️ Producto guardado localmente');
+            }
 
             // Actualizar localStorage
             const productos = JSON.parse(localStorage.getItem('productosTienda')) || [];
@@ -5933,17 +5978,24 @@ select.scoring-form-control{cursor:pointer}
             scoringShowToast('🗑️ Producto eliminado');
         }
 
-        function previewImage(input) {
-            const preview = document.getElementById('productPreview');
+        function previewImage(input, previewId) {
+            const preview = document.getElementById(previewId || 'productPreview');
+            if (!preview) {
+                console.error('❌ Preview no encontrado:', previewId);
+                return;
+            }
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
+                    preview.style.display = 'block';
+                    preview.innerHTML = ''; // Limpiar preview anterior
                     const img = document.createElement('img');
                     img.src = e.target.result;
                     img.className = 'product-preview-img';
                     img.style = 'width:80px;height:80px;object-fit:cover;border-radius:8px;margin:5px;cursor:pointer;';
                     img.onclick = function() { changeProductImage(this); };
                     preview.appendChild(img);
+                    console.log('✅ Imagen cargada en preview:', previewId);
                 };
                 reader.readAsDataURL(input.files[0]);
             }
@@ -5975,6 +6027,8 @@ select.scoring-form-control{cursor:pointer}
         });
 
         document.addEventListener('DOMContentLoaded', function() { 
+            // Limpiar items inválidos del carrito al iniciar
+            cleanInvalidCartItems();
             updateCartUI();
             // Asegurar que el botón del carrito funcione en móvil
             const cartBtn = document.getElementById('cartFloatBtn');
