@@ -1545,6 +1545,7 @@ select.scoring-form-control{cursor:pointer}
 <base target="_blank">
 <base target="_blank">
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
     <div class="menu-overlay" id="menuOverlay" onclick="closeMenu()"></div>
@@ -5627,7 +5628,7 @@ select.scoring-form-control{cursor:pointer}
             }
 
             const antes = cart.length;
-            cart = cart.filter(item => item.id !== productoId);
+            cart = cart.filter(item => item.id !== id);
             const despues = cart.length;
 
             console.log(`🗑️ Carrito: ${antes} → ${despues} items`);
