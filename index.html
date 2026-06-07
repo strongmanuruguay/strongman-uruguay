@@ -5562,33 +5562,96 @@ select.scoring-form-control{cursor:pointer}
         }
 
         function addToCart(productoId) {
+            console.log('🛒 addToCart llamado con ID:', productoId);
+
+            if (!productoId && productoId !== 0) {
+                console.error('❌ addToCart: ID inválido');
+                scoringShowToast('❌ Error: ID inválido');
+                return;
+            }
+
             const productos = JSON.parse(localStorage.getItem('productosTienda')) || [];
             const producto = productos.find(p => p.id === productoId);
-            if (!producto) return;
+
+            if (!producto) {
+                console.error('❌ Producto no encontrado en tienda:', productoId);
+                scoringShowToast('❌ Producto no encontrado');
+                return;
+            }
+
+            console.log('✅ Producto encontrado:', producto.nombre, 'ID:', producto.id);
+
             const itemExistente = cart.find(item => item.id === productoId);
-            if (itemExistente) { itemExistente.cantidad++; }
-            else { cart.push({...producto, cantidad: 1}); }
+            if (itemExistente) { 
+                itemExistente.cantidad++; 
+                console.log('🛒 Cantidad aumentada:', itemExistente.cantidad);
+            }
+            else { 
+                const cartItem = {
+                    id: producto.id,
+                    nombre: producto.nombre,
+                    precio: producto.precio,
+                    imagenes: producto.imagenes || [],
+                    cantidad: 1
+                };
+                cart.push(cartItem); 
+                console.log('🛒 Nuevo item en carrito:', cartItem);
+            }
+
             localStorage.setItem('cartStrongman', JSON.stringify(cart));
             updateCartUI();
-            scoringShowToast(`\u2705 ${producto.nombre} agregado al carrito`);
+            scoringShowToast(`✅ ${producto.nombre} agregado al carrito`);
         }
 
         function removeFromCart(productoId) {
+            console.log('🗑️ removeFromCart llamado con ID:', productoId);
+
+            if (!productoId && productoId !== 0) {
+                console.error('❌ removeFromCart: ID inválido');
+                scoringShowToast('❌ Error: ID inválido');
+                return;
+            }
+
+            const antes = cart.length;
             cart = cart.filter(item => item.id !== productoId);
+            const despues = cart.length;
+
+            console.log(`🗑️ Carrito: ${antes} → ${despues} items`);
+
             localStorage.setItem('cartStrongman', JSON.stringify(cart));
             updateCartUI();
             openCart();
+
+            if (despues < antes) {
+                scoringShowToast('🗑️ Producto eliminado del carrito');
+            }
         }
 
         function updateCartItemQuantity(productoId, delta) {
-            const item = cart.find(item => item.id === productoId);
-            if (item) {
-                item.cantidad += delta;
-                if (item.cantidad <= 0) cart = cart.filter(i => i.id !== productoId);
-                localStorage.setItem('cartStrongman', JSON.stringify(cart));
-                updateCartUI();
-                openCart();
+            console.log('🛒 updateCartItemQuantity:', productoId, delta);
+
+            if (!productoId && productoId !== 0) {
+                console.error('❌ updateCartItemQuantity: ID inválido');
+                scoringShowToast('❌ Error: ID inválido');
+                return;
             }
+
+            const item = cart.find(item => item.id === productoId);
+            if (!item) {
+                console.error('❌ Producto no encontrado en carrito:', productoId);
+                scoringShowToast('❌ Producto no encontrado en carrito');
+                return;
+            }
+
+            item.cantidad += delta;
+            if (item.cantidad <= 0) {
+                cart = cart.filter(i => i.id !== productoId);
+                console.log('🗑️ Producto removido del carrito (cantidad 0)');
+            }
+
+            localStorage.setItem('cartStrongman', JSON.stringify(cart));
+            updateCartUI();
+            openCart();
         }
 
         function clearCart() {
