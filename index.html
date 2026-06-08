@@ -5447,7 +5447,7 @@ select.scoring-form-control{cursor:pointer}
        
                // ===== TIENDA Y CARRITO =====
         let cart = JSON.parse(localStorage.getItem('cartStrongman')) || [];
-            updateCartUI();
+            setTimeout(() => updateCartUI(), 100);
 
         // Convertir fila de Supabase a objeto producto con array de imágenes
         function rowToProducto(row) {
@@ -5568,8 +5568,20 @@ select.scoring-form-control{cursor:pointer}
             const modal = document.createElement('div');
             modal.className = 'modal active';
             modal.id = 'productDetailModal';
-            modal.innerHTML = `<div class="modal-content" style="max-width:500px;"><div class="modal-header"><h2>${p.nombre}</h2><button class="close-btn" onclick="document.getElementById('productDetailModal').remove()">&times;</button></div><div class="modal-body" style="padding:0;"><div style="position:relative;">${imgs.map((img, idx) => `<img src="${img}" class="pdt-img-${idx}" style="width:100%;height:250px;object-fit:cover;${idx > 0 ? 'display:none;' : ''}" onclick="openImageZoom('${img}', '${p.nombre.replace(/'/g, "\'")}')">`).join('')}</div>${imgs.length > 1 ? `<div style="display:flex;justify-content:center;gap:0.5rem;padding:0.8rem;background:var(--card-bg);border-bottom:1px solid var(--border-color);">${imgs.map((img, idx) => `<img src="${img}" onclick="document.querySelectorAll('[class^=\'pdt-img-\']').forEach((el,i)=>el.style.display=i===${idx}?'block':'none');this.style.border='2px solid var(--gold)';document.querySelectorAll('[class^=\'pdt-thumb-\']').forEach((el,i)=>el.style.border=i===${idx}?'2px solid var(--gold)':'2px solid transparent');" class="pdt-thumb-${idx}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;cursor:pointer;border:${idx===0?'2px solid var(--gold)':'2px solid transparent'};transition:all 0.2s;">`).join('')}</div>` : ''}<div style="padding:1.5rem;"><p style="color:var(--gold);font-size:1.5rem;font-weight:700;margin-bottom:1rem;">$${p.precio} UYU</p><p style="color:var(--text-muted);line-height:1.6;margin-bottom:1.5rem;">${p.descripcion || 'Sin descripcion'}</p>${p.stock ? `<p style="color:var(--success);margin-bottom:1rem;"><i class="fas fa-check-circle"></i> Stock disponible: ${p.stock}</p>` : ''}<button class="btn btn-success" onclick="addToCart('${p.id}'); document.getElementById('productDetailModal').remove();" style="width:100%;"><i class="fas fa-cart-plus"></i> Agregar al carrito</button></div></div></div>`;
+            modal.innerHTML = `<div class="modal-content" style="max-width:500px;"><div class="modal-header"><h2>${p.nombre}</h2><button class="close-btn" onclick="document.getElementById('productDetailModal').remove()">&times;</button></div><div class="modal-body" style="padding:0;"><div style="position:relative;" id="pdtGallery">${imgs.map((img, idx) => `<img src="${img}" id="pdt-img-${idx}" style="width:100%;height:250px;object-fit:cover;${idx > 0 ? 'display:none;' : ''}" onclick="openImageZoom('${img}', '${p.nombre.replace(/'/g, "\'")}')">`).join('')}</div>${imgs.length > 1 ? `<div style="display:flex;justify-content:center;gap:0.5rem;padding:0.8rem;background:var(--card-bg);border-bottom:1px solid var(--border-color);" id="pdtThumbs">${imgs.map((img, idx) => `<img src="${img}" onclick="switchDetailImage(${idx})" id="pdt-thumb-${idx}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;cursor:pointer;border:${idx===0?'2px solid var(--gold)':'2px solid transparent'};transition:all 0.2s;">`).join('')}</div>` : ''}<div style="padding:1.5rem;"><p style="color:var(--gold);font-size:1.5rem;font-weight:700;margin-bottom:1rem;">$${p.precio} UYU</p><p style="color:var(--text-muted);line-height:1.6;margin-bottom:1.5rem;">${p.descripcion || 'Sin descripcion'}</p>${p.stock ? `<p style="color:var(--success);margin-bottom:1rem;"><i class="fas fa-check-circle"></i> Stock disponible: ${p.stock}</p>` : ''}<button class="btn btn-success" onclick="addToCart('${p.id}'); document.getElementById('productDetailModal').remove();" style="width:100%;"><i class="fas fa-cart-plus"></i> Agregar al carrito</button></div></div></div>`;
             document.body.appendChild(modal);
+        }
+
+        function switchDetailImage(idx) {
+            const gallery = document.getElementById('pdtGallery');
+            const thumbs = document.getElementById('pdtThumbs');
+            if (!gallery) return;
+            const images = gallery.querySelectorAll('img');
+            images.forEach((img, i) => { img.style.display = i === idx ? 'block' : 'none'; });
+            if (thumbs) {
+                const thumbImgs = thumbs.querySelectorAll('img');
+                thumbImgs.forEach((img, i) => { img.style.border = i === idx ? '2px solid var(--gold)' : '2px solid transparent'; });
+            }
         }
 
         function addToCart(productoId) {
@@ -5715,9 +5727,12 @@ select.scoring-form-control{cursor:pointer}
             if (badge) {
                 badge.textContent = cantidadTotal;
                 badge.style.display = cantidadTotal > 0 ? 'flex' : 'none';
+                badge.style.alignItems = 'center';
+                badge.style.justifyContent = 'center';
             }
             const floatBtn = document.getElementById('cartFloatBtn');
             if (floatBtn) floatBtn.style.display = cantidadTotal > 0 ? 'flex' : 'none';
+            console.log('🛒 Cart UI actualizado:', cantidadTotal, 'items');
         }
 
         function openCart() {
