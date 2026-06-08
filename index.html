@@ -5447,7 +5447,12 @@ select.scoring-form-control{cursor:pointer}
        
                // ===== TIENDA Y CARRITO =====
         let cart = JSON.parse(localStorage.getItem('cartStrongman')) || [];
-            setTimeout(() => updateCartUI(), 100);
+            // Inicializar cart UI cuando el DOM esté listo
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => updateCartUI());
+            } else {
+                updateCartUI();
+            }
 
         // Convertir fila de Supabase a objeto producto con array de imágenes
         function rowToProducto(row) {
@@ -5628,6 +5633,31 @@ select.scoring-form-control{cursor:pointer}
             }
 
             localStorage.setItem('cartStrongman', JSON.stringify(cart));
+
+            // Bajar stock del producto
+            if (producto.stock > 0) {
+                producto.stock--;
+                console.log('📦 Stock reducido:', producto.stock);
+                // Actualizar en localStorage
+                const productos = JSON.parse(localStorage.getItem('productosTienda')) || [];
+                const idx = productos.findIndex(p => String(p.id) === String(productoId));
+                if (idx >= 0) {
+                    productos[idx].stock = producto.stock;
+                    localStorage.setItem('productosTienda', JSON.stringify(productos));
+                    // Actualizar en Supabase
+                    if (supabaseClient) {
+                        try {
+                            supabaseClient.from('productos').update({ stock: producto.stock }).eq('id', producto.id).then(({error}) => {
+                                if (error) console.error('❌ Error actualizando stock:', error);
+                                else console.log('✅ Stock actualizado en Supabase');
+                            });
+                        } catch (e) {
+                            console.error('❌ Error Supabase stock:', e);
+                        }
+                    }
+                }
+            }
+
             updateCartUI();
             scoringShowToast(`✅ ${producto.nombre} agregado al carrito`);
         }
@@ -5654,6 +5684,27 @@ select.scoring-form-control{cursor:pointer}
             console.log(`🗑️ Carrito: ${antes} → ${despues} items`);
 
             localStorage.setItem('cartStrongman', JSON.stringify(cart));
+
+            // Recuperar stock del producto
+            const productos = JSON.parse(localStorage.getItem('productosTienda')) || [];
+            const prodIdx = productos.findIndex(p => String(p.id) === String(productoId));
+            if (prodIdx >= 0) {
+                productos[prodIdx].stock = (productos[prodIdx].stock || 0) + 1;
+                console.log('📦 Stock recuperado:', productos[prodIdx].stock);
+                localStorage.setItem('productosTienda', JSON.stringify(productos));
+                // Actualizar en Supabase
+                if (supabaseClient) {
+                    try {
+                        supabaseClient.from('productos').update({ stock: productos[prodIdx].stock }).eq('id', productos[prodIdx].id).then(({error}) => {
+                            if (error) console.error('❌ Error recuperando stock:', error);
+                            else console.log('✅ Stock recuperado en Supabase');
+                        });
+                    } catch (e) {
+                        console.error('❌ Error Supabase stock:', e);
+                    }
+                }
+            }
+
             updateCartUI();
             openCart();
 
@@ -5725,10 +5776,12 @@ select.scoring-form-control{cursor:pointer}
             const cantidadTotal = cart.reduce((sum, item) => sum + item.cantidad, 0);
             const badge = document.getElementById('cartCount');
             if (badge) {
-                badge.textContent = cantidadTotal;
+                badge.textContent = cantidadTotal > 0 ? cantidadTotal : '0';
                 badge.style.display = cantidadTotal > 0 ? 'flex' : 'none';
                 badge.style.alignItems = 'center';
                 badge.style.justifyContent = 'center';
+                badge.style.fontSize = '0.75rem';
+                badge.style.fontWeight = 'bold';
             }
             const floatBtn = document.getElementById('cartFloatBtn');
             if (floatBtn) floatBtn.style.display = cantidadTotal > 0 ? 'flex' : 'none';
