@@ -5735,10 +5735,72 @@ select.scoring-form-control{cursor:pointer}
                 return;
             }
 
+            const cantidadAnterior = item.cantidad;
             item.cantidad += delta;
+
             if (item.cantidad <= 0) {
+                // Recuperar todo el stock que tenía en el carrito
+                const cantidadRecuperar = cantidadAnterior;
                 cart = cart.filter(i => String(i.id) !== String(productoId));
-                console.log('🗑️ Producto removido del carrito (cantidad 0)');
+                console.log('🗑️ Producto removido del carrito (cantidad 0), recuperando stock:', cantidadRecuperar);
+
+                // Recuperar stock
+                const productos = JSON.parse(localStorage.getItem('productosTienda')) || [];
+                const prodIdx = productos.findIndex(p => String(p.id) === String(productoId));
+                if (prodIdx >= 0) {
+                    productos[prodIdx].stock = (productos[prodIdx].stock || 0) + cantidadRecuperar;
+                    console.log('📦 Stock recuperado:', productos[prodIdx].stock);
+                    localStorage.setItem('productosTienda', JSON.stringify(productos));
+                    // Actualizar en Supabase
+                    if (supabaseClient) {
+                        try {
+                            supabaseClient.from('productos').update({ stock: productos[prodIdx].stock }).eq('id', productos[prodIdx].id).then(({error}) => {
+                                if (error) console.error('❌ Error recuperando stock:', error);
+                                else console.log('✅ Stock recuperado en Supabase');
+                            });
+                        } catch (e) {
+                            console.error('❌ Error Supabase stock:', e);
+                        }
+                    }
+                }
+            } else if (delta < 0) {
+                // Solo bajó en 1, recuperar 1 de stock
+                const productos = JSON.parse(localStorage.getItem('productosTienda')) || [];
+                const prodIdx = productos.findIndex(p => String(p.id) === String(productoId));
+                if (prodIdx >= 0) {
+                    productos[prodIdx].stock = (productos[prodIdx].stock || 0) + 1;
+                    console.log('📦 Stock recuperado (+1):', productos[prodIdx].stock);
+                    localStorage.setItem('productosTienda', JSON.stringify(productos));
+                    if (supabaseClient) {
+                        try {
+                            supabaseClient.from('productos').update({ stock: productos[prodIdx].stock }).eq('id', productos[prodIdx].id).then(({error}) => {
+                                if (error) console.error('❌ Error recuperando stock:', error);
+                                else console.log('✅ Stock recuperado en Supabase');
+                            });
+                        } catch (e) {
+                            console.error('❌ Error Supabase stock:', e);
+                        }
+                    }
+                }
+            } else if (delta > 0) {
+                // Subió en 1, bajar 1 de stock
+                const productos = JSON.parse(localStorage.getItem('productosTienda')) || [];
+                const prodIdx = productos.findIndex(p => String(p.id) === String(productoId));
+                if (prodIdx >= 0 && productos[prodIdx].stock > 0) {
+                    productos[prodIdx].stock--;
+                    console.log('📦 Stock reducido (-1):', productos[prodIdx].stock);
+                    localStorage.setItem('productosTienda', JSON.stringify(productos));
+                    if (supabaseClient) {
+                        try {
+                            supabaseClient.from('productos').update({ stock: productos[prodIdx].stock }).eq('id', productos[prodIdx].id).then(({error}) => {
+                                if (error) console.error('❌ Error actualizando stock:', error);
+                                else console.log('✅ Stock actualizado en Supabase');
+                            });
+                        } catch (e) {
+                            console.error('❌ Error Supabase stock:', e);
+                        }
+                    }
+                }
             }
 
             localStorage.setItem('cartStrongman', JSON.stringify(cart));
@@ -5776,12 +5838,22 @@ select.scoring-form-control{cursor:pointer}
             const cantidadTotal = cart.reduce((sum, item) => sum + item.cantidad, 0);
             const badge = document.getElementById('cartCount');
             if (badge) {
-                badge.textContent = cantidadTotal > 0 ? cantidadTotal : '0';
-                badge.style.display = cantidadTotal > 0 ? 'flex' : 'none';
-                badge.style.alignItems = 'center';
-                badge.style.justifyContent = 'center';
-                badge.style.fontSize = '0.75rem';
-                badge.style.fontWeight = 'bold';
+                if (cantidadTotal > 0) {
+                    badge.textContent = cantidadTotal;
+                    badge.style.display = 'flex';
+                    badge.style.alignItems = 'center';
+                    badge.style.justifyContent = 'center';
+                    badge.style.fontSize = '0.75rem';
+                    badge.style.fontWeight = 'bold';
+                    badge.style.background = 'var(--danger)';
+                    badge.style.color = 'white';
+                    badge.style.borderRadius = '50%';
+                    badge.style.width = '24px';
+                    badge.style.height = '24px';
+                } else {
+                    badge.textContent = '';
+                    badge.style.display = 'none';
+                }
             }
             const floatBtn = document.getElementById('cartFloatBtn');
             if (floatBtn) floatBtn.style.display = cantidadTotal > 0 ? 'flex' : 'none';
@@ -7708,7 +7780,7 @@ function openCountdownConfigModal() {
     <!-- BOTÓN FLOTANTE CARRITO -->
     <div class="cart-float-btn" onclick="openCart()" title="Ver carrito">
         <i class="fas fa-shopping-cart" style="font-size: 1.5rem; color: #000;"></i>
-        <span class="cart-count" id="cartCount">0</span>
+        <span class="cart-count" id="cartCount" style="display:none;"></span>
     </div>
 
     <!-- MODAL CARRITO -->
@@ -7717,7 +7789,7 @@ function openCountdownConfigModal() {
     <!-- BOTÓN FLOTANTE CARRITO -->
     <div class="cart-float-btn" id="cartFloatBtn" onclick="openCart()" title="Ver carrito">
         <i class="fas fa-shopping-cart" style="font-size: 1.5rem; color: #000;"></i>
-        <span class="cart-count" id="cartCount">0</span>
+        <span class="cart-count" id="cartCount" style="display:none;"></span>
     </div>
 
     <div id="cartModal" class="modal">
