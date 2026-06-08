@@ -5488,25 +5488,31 @@ select.scoring-form-control{cursor:pointer}
         }
 
         async function loadProductsFromSupabase() {
-            try {
-                if (!supabaseClient) {
-                    console.log('⚠️ Supabase no disponible, usando localStorage');
-                    return JSON.parse(localStorage.getItem('productosTienda')) || [];
+            return new Promise(async (resolve) => {
+                try {
+                    if (!supabaseClient) {
+                        console.log('⚠️ Supabase no disponible, usando localStorage');
+                        resolve(JSON.parse(localStorage.getItem('productosTienda')) || []);
+                        return;
+                    }
+                    const { data, error } = await supabaseClient.from('productos').select('*').order('created_at', { ascending: false });
+                    if (error) {
+                        console.error('❌ Error Supabase productos:', error);
+                        scoringShowToast('❌ Error cargando productos: ' + error.message);
+                        resolve(JSON.parse(localStorage.getItem('productosTienda')) || []);
+                        return;
+                    }
+                    console.log('📥 Productos raw de Supabase:', data ? data.length : 0);
+                    const productos = (data || []).map(rowToProducto);
+                    console.log('✅ Productos convertidos:', productos.length);
+                    localStorage.setItem('productosTienda', JSON.stringify(productos));
+                    resolve(productos);
+                } catch (e) {
+                    console.error('❌ Error cargando productos:', e);
+                    scoringShowToast('❌ Error de conexión, usando datos locales');
+                    resolve(JSON.parse(localStorage.getItem('productosTienda')) || []);
                 }
-                const { data, error } = await supabaseClient.from('productos').select('*').order('created_at', { ascending: false });
-                if (error) {
-                    console.error('❌ Error Supabase productos:', error);
-                    throw error;
-                }
-                console.log('📥 Productos raw de Supabase:', data ? data.length : 0);
-                const productos = (data || []).map(rowToProducto);
-                console.log('✅ Productos convertidos:', productos.length);
-                localStorage.setItem('productosTienda', JSON.stringify(productos));
-                return productos;
-            } catch (e) {
-                console.error('❌ Error cargando productos:', e);
-                return JSON.parse(localStorage.getItem('productosTienda')) || [];
-            }
+            });
         }
 
         async function saveProductToSupabase(producto) {
@@ -5820,17 +5826,16 @@ select.scoring-form-control{cursor:pointer}
             const stock = parseInt(document.getElementById('productStock').value) || 0;
             if (!nombre || isNaN(precio)) { scoringShowToast('Completa nombre y precio'); return; }
 
-            // Recolectar imágenes de los previews
+            // Recolectar imágenes de los previews (sin duplicados)
             const imagenes = [];
-            // Buscar en productPreview (donde se cargan las imágenes)
-            document.querySelectorAll('#productPreview img').forEach(img => { 
-                if (img.src && !img.src.includes('placehold.co')) imagenes.push(img.src); 
+            const seen = new Set();
+            document.querySelectorAll('#productPreview img, #preview1 img, #preview2 img, #preview3 img').forEach(img => { 
+                if (img.src && !img.src.includes('placehold.co') && !seen.has(img.src)) {
+                    imagenes.push(img.src);
+                    seen.add(img.src);
+                } 
             });
-            // También buscar en preview1, preview2, preview3 como fallback
-            document.querySelectorAll('#preview1 img, #preview2 img, #preview3 img').forEach(img => { 
-                if (img.src && !img.src.includes('placehold.co')) imagenes.push(img.src); 
-            });
-            console.log('📸 Imágenes encontradas:', imagenes.length);
+            console.log('📸 Imágenes encontradas:', imagenes.length, imagenes);
 
             const producto = { 
                 id: id ? parseInt(id) : null, 
@@ -5890,7 +5895,7 @@ select.scoring-form-control{cursor:pointer}
 
             // Actualizar localStorage
             const productos = JSON.parse(localStorage.getItem('productosTienda')) || [];
-            const idx = productos.findIndex(p => p.id === producto.id);
+            const idx = productos.findIndex(p => String(p.id) === String(producto.id));
             if (idx >= 0) productos[idx] = producto; else productos.push(producto);
             localStorage.setItem('productosTienda', JSON.stringify(productos));
 
