@@ -4909,8 +4909,10 @@ function renderAthletes() {
                     const handleEdit = function(e) {
                         e.preventDefault();
                         e.stopPropagation();
-                        const itemType = this.getAttribute('data-type');
-                        const itemId = this.getAttribute('data-id');
+                        const target = e.currentTarget || this;
+                        const itemType = target.getAttribute('data-type');
+                        const itemId = target.getAttribute('data-id');
+                        console.log('✏️ Editando', itemType, 'ID:', itemId);
                         const funcName = 'edit' + itemType.charAt(0).toUpperCase() + itemType.slice(1);
                         if (typeof window[funcName] === 'function') {
                             window[funcName](itemId);
@@ -4926,8 +4928,10 @@ function renderAthletes() {
                     const handleDelete = function(e) {
                         e.preventDefault();
                         e.stopPropagation();
-                        const itemType = this.getAttribute('data-type');
-                        const itemId = this.getAttribute('data-id');
+                        const target = e.currentTarget || this;
+                        const itemType = target.getAttribute('data-type');
+                        const itemId = target.getAttribute('data-id');
+                        console.log('🗑️ Borrando', itemType, 'ID:', itemId);
                         const funcName = 'delete' + itemType.charAt(0).toUpperCase() + itemType.slice(1);
                         if (typeof window[funcName] === 'function') {
                             window[funcName](itemId);
