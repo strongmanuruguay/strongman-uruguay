@@ -1539,8 +1539,69 @@ select.scoring-form-control{cursor:pointer}
 }
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
+
+        /* ===== MARCAS PERSONALES - RESPONSIVE ===== */
+        .records-list {
+            margin-top: 1rem;
+            padding: 0.8rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: left;
+        }
+        .records-list h4 {
+            color: var(--accent-light);
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: left;
+        }
+        .record-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.9rem;
+        }
+        .record-item:last-child {
+            border-bottom: none;
+        }
+        .record-item span:first-child {
+            color: var(--text-muted);
+            flex: 1;
+            text-align: left;
+        }
+        .record-value {
+            color: var(--gold);
+            font-weight: 600;
+            margin-left: 0.5rem;
+            text-align: right;
+        }
+        @media (max-width: 768px) {
+            .records-list {
+                padding: 0.6rem;
+                margin-top: 0.8rem;
+            }
+            .records-list h4 {
+                font-size: 0.8rem;
+            }
+            .record-item {
+                flex-direction: row;
+                align-items: center;
+                padding: 0.35rem 0;
+                gap: 0.5rem;
+            }
+            .record-value {
+                margin-left: auto;
+                font-size: 0.9rem;
+                white-space: nowrap;
+            }
+        }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<base target="_blank">
 <base target="_blank">
 <base target="_blank">
 <base target="_blank">
@@ -4018,7 +4079,47 @@ select.scoring-form-control{cursor:pointer}
             }).join('');
         }
 
-        function renderAthletes() {
+        
+        // ===== NORMALIZAR MARCAS PERSONALES =====
+        function normalizePersonalRecords(athlete) {
+            if (!athlete) return;
+            if (!athlete.personalRecords) {
+                athlete.personalRecords = [];
+                return;
+            }
+            // Si es string, intentar parsear
+            if (typeof athlete.personalRecords === 'string') {
+                const str = athlete.personalRecords.trim();
+                // Intentar JSON primero
+                if (str.startsWith('[') || str.startsWith('{')) {
+                    try {
+                        const parsed = JSON.parse(str);
+                        if (Array.isArray(parsed)) {
+                            athlete.personalRecords = parsed.filter(r => r && r.test && r.value);
+                            return;
+                        }
+                    } catch (e) {
+                        // No es JSON válido, continuar con formato alternativo
+                    }
+                }
+                // Formato: "prueba:valor,prueba2:valor2"
+                const records = str.split(',').filter(m => m.trim()).map(m => {
+                    const p = m.trim().split(':');
+                    return { test: (p[0] || '').trim(), value: (p[1] || '').trim() };
+                }).filter(r => r.test && r.value);
+                athlete.personalRecords = records;
+                return;
+            }
+            // Si no es array, convertir a array vacío
+            if (!Array.isArray(athlete.personalRecords)) {
+                athlete.personalRecords = [];
+                return;
+            }
+            // Asegurar que cada elemento tenga test y value
+            athlete.personalRecords = athlete.personalRecords.filter(r => r && r.test && r.value);
+        }
+
+function renderAthletes() {
             const container = document.getElementById('athletesContainer');
             let athletes = data.athletes;
             if (currentAthleteFilter !== 'all') athletes = athletes.filter(a => a.gender === currentAthleteFilter);
@@ -4026,8 +4127,10 @@ select.scoring-form-control{cursor:pointer}
                 container.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;"><i class="fas fa-users"></i><p>No hay atletas registrados</p></div>';
                 return;
             }
-            container.innerHTML = athletes.map(athlete => `
-                <div class="profile-card" id="athlete-card-${athlete.id}">
+            container.innerHTML = athletes.map(athlete => {
+                // NORMALIZAR marcas personales antes de renderizar
+                normalizePersonalRecords(athlete);
+                return `<div class="profile-card" id="athlete-card-${athlete.id}">
                     <div class="profile-image" style="display: flex; align-items: center; justify-content: center; margin: 0 auto; overflow: hidden;">
                         ${athlete.photo ? `<img src="${athlete.photo}" style="width: 100%; height: 100%; object-fit: cover;">` : '<i class="fas fa-user" style="font-size: 3rem; color: var(--text-muted);"></i>'}
                     </div>
@@ -4043,19 +4146,37 @@ select.scoring-form-control{cursor:pointer}
                     </div>
                     ${athlete.personalRecords && athlete.personalRecords.length > 0 ? `
                         <div class="records-list">
-                            <h4 style="color: var(--accent-light); margin-bottom: 0.5rem; font-size: 0.9rem;">MARCAS PERSONALES</h4>
+                            <h4><i class="fas fa-dumbbell"></i> MARCAS PERSONALES</h4>
                             ${athlete.personalRecords.map(r => `
-                                <div class="record-item"><span>${r.test}</span><span class="record-value">${r.value}</span></div>
+                                <div class="record-item">
+                                    <span>${r.test}</span>
+                                    <span class="record-value">${r.value}</span>
+                                </div>
                             `).join('')}
                         </div>
                     ` : ''}
                     <div style="margin-top: 0.5rem; display: flex; gap: 0.5rem; justify-content: center;">
-                        <button class="btn btn-small btn-danger" onclick="deleteAthletePublic('${athlete.id}')" title="Borrar atleta">
+                        <button class="btn btn-small btn-danger delete-athlete-btn" 
+                                data-athlete-id="${athlete.id}" 
+                                title="Borrar atleta"
+                                style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
-                </div>
-            `).join('');
+                </div>`;
+            }).join('');
+
+            // Agregar event listeners para botones de borrado (mejor soporte táctil)
+            container.querySelectorAll('.delete-athlete-btn').forEach(btn => {
+                const handleDelete = function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const id = this.getAttribute('data-athlete-id');
+                    deleteAthletePublic(id);
+                };
+                btn.addEventListener('click', handleDelete);
+                btn.addEventListener('touchend', handleDelete);
+            });
         }
 
         async function saveAthleteToSupabase(athlete) {
@@ -4158,25 +4279,77 @@ select.scoring-form-control{cursor:pointer}
         }
 
         async function deleteAthletePublic(id) {
-            if (!confirm('¿Eliminar este atleta?')) return;
+            console.log('🗑️ deleteAthletePublic llamado con ID:', id, 'tipo:', typeof id);
 
-            // Borrar de Supabase
-            const deleted = await deleteAthleteFromSupabase(id);
-            if (!deleted) {
-                scoringShowToast('❌ Error borrando atleta');
+            // Validar ID
+            const targetId = String(id);
+            if (!targetId || targetId === 'null' || targetId === 'undefined' || targetId === 'NaN') {
+                console.error('❌ ID inválido:', id);
+                scoringShowToast('❌ Error: ID de atleta inválido');
                 return;
             }
 
-            // Borrar del array local
-            data.athletes = data.athletes.filter(a => String(a.id) !== String(id));
+            // Confirmación con manejo de errores para móvil
+            let confirmed = false;
+            try {
+                confirmed = confirm('¿Eliminar este atleta permanentemente?');
+            } catch (e) {
+                console.error('Error en confirm:', e);
+                confirmed = window.confirm('¿Eliminar este atleta permanentemente?');
+            }
 
-            // Actualizar localStorage
-            localStorage.setItem('athletesData', JSON.stringify(data.athletes));
+            if (!confirmed) {
+                console.log('❌ Borrado cancelado por usuario');
+                return;
+            }
+
+            // Buscar atleta para obtener el ID real
+            const athlete = data.athletes.find(a => String(a.id) === targetId);
+            if (!athlete) {
+                console.error('❌ Atleta no encontrado con ID:', targetId);
+                scoringShowToast('❌ Atleta no encontrado');
+                return;
+            }
+
+            const athleteId = athlete.id;
+
+            // Borrar de Supabase
+            let deletedFromSupabase = false;
+            if (supabaseClient) {
+                try {
+                    console.log('🗑️ Eliminando de Supabase, ID:', athleteId);
+                    const { error } = await supabaseClient.from('atletas').delete().eq('id', athleteId);
+                    if (error) {
+                        console.error('❌ Error borrando de Supabase:', error);
+                    } else {
+                        deletedFromSupabase = true;
+                        console.log('✅ Atleta borrado de Supabase');
+                    }
+                } catch (e) {
+                    console.error('❌ Error Supabase:', e);
+                }
+            }
+
+            // Borrar del array local
+            const antes = data.athletes.length;
+            data.athletes = data.athletes.filter(a => String(a.id) !== String(athleteId));
+            const despues = data.athletes.length;
+
+            console.log(`🗑️ Atletas: ${antes} → ${despues}`);
+
+            // Actualizar localStorage y Supabase
+            localStorage.setItem('acaf_athletes', JSON.stringify(data.athletes));
+            await saveAllData();
 
             // Re-renderizar
             renderAthletes();
+            updateCounters();
 
-            scoringShowToast('🗑️ Atleta eliminado');
+            if (despues < antes) {
+                scoringShowToast('🗑️ Atleta eliminado correctamente');
+            } else {
+                scoringShowToast('⚠️ No se pudo eliminar el atleta');
+            }
         }
 
         async function renderRanking() {
@@ -4841,19 +5014,24 @@ select.scoring-form-control{cursor:pointer}
                 doc: document.getElementById('athleteDoc').value,
                 phone: document.getElementById('athletePhone').value,
                 gender: document.getElementById('athleteGender').value,
-                years: parseInt(document.getElementById('athleteYears').value),
-                number: parseInt(document.getElementById('athleteNumber').value),
+                years: parseInt(document.getElementById('athleteYears').value) || 0,
+                number: parseInt(document.getElementById('athleteNumber').value) || 0,
                 hasCard: document.getElementById('athleteCard').checked,
                 photo: null,
                 personalRecords: []
             };
+            // Recolectar marcas personales de los inputs
             const recordNames = document.querySelectorAll('.record-name');
             const recordValues = document.querySelectorAll('.record-value');
             for (let i = 0; i < recordNames.length; i++) {
-                if (recordNames[i].value && recordValues[i].value) {
-                    athleteData.personalRecords.push({ test: recordNames[i].value, value: recordValues[i].value });
+                const test = recordNames[i].value.trim();
+                const value = recordValues[i].value.trim();
+                if (test && value) {
+                    athleteData.personalRecords.push({ test: test, value: value });
                 }
             }
+            console.log('💾 Guardando atleta con', athleteData.personalRecords.length, 'marcas personales');
+
             const fileInput = document.getElementById('athletePhoto');
             if (fileInput.files && fileInput.files[0]) {
                 const reader = new FileReader();
@@ -4864,7 +5042,7 @@ select.scoring-form-control{cursor:pointer}
                 reader.readAsDataURL(fileInput.files[0]);
             } else {
                 if (id) {
-                    const existing = data.athletes.find(a => a.id === parseInt(id));
+                    const existing = data.athletes.find(a => String(a.id) === String(id));
                     if (existing) athleteData.photo = existing.photo;
                 }
                 finishSaveAthlete(athleteData, id);
@@ -4872,11 +5050,28 @@ select.scoring-form-control{cursor:pointer}
         }
 
         function finishSaveAthlete(athleteData, id) {
+            // Asegurar que personalRecords sea array válido
+            if (!athleteData.personalRecords) {
+                athleteData.personalRecords = [];
+            }
+            if (!Array.isArray(athleteData.personalRecords)) {
+                athleteData.personalRecords = [];
+            }
+            // Filtrar solo registros válidos
+            athleteData.personalRecords = athleteData.personalRecords.filter(r => r && r.test && r.value);
+
             if (id) {
-                const index = data.athletes.findIndex(a => a.id === parseInt(id));
-                if (index !== -1) data.athletes[index] = athleteData;
+                // Buscar por comparación de strings para soportar IDs string y number
+                const index = data.athletes.findIndex(a => String(a.id) === String(id));
+                if (index !== -1) {
+                    data.athletes[index] = athleteData;
+                    console.log('✅ Atleta actualizado en índice:', index);
+                } else {
+                    console.error('❌ No se encontró atleta para actualizar, ID:', id);
+                }
             } else {
                 data.athletes.push(athleteData);
+                console.log('✅ Nuevo atleta agregado');
             }
             saveAllData();
             renderAthletes();
@@ -4884,7 +5079,7 @@ select.scoring-form-control{cursor:pointer}
             updateRankingAthletesSelect();
             loadRecordAthletesSelect();
             resetAthleteForm();
-            alert('Atleta guardado correctamente');
+            scoringShowToast('✅ Atleta guardado correctamente');
         }
 
         function addRecordField() {
@@ -4903,29 +5098,35 @@ select.scoring-form-control{cursor:pointer}
         }
 
         function editAthletes(id) {
-            const athlete = data.athletes.find(a => a.id === id);
-            if (!athlete) return;
+            const athlete = data.athletes.find(a => String(a.id) === String(id));
+            if (!athlete) {
+                console.error('❌ Atleta no encontrado para editar, ID:', id);
+                return;
+            }
+            // NORMALIZAR marcas personales antes de editar
+            normalizePersonalRecords(athlete);
+
             document.getElementById('athleteId').value = athlete.id;
-            document.getElementById('athleteName').value = athlete.name;
-            document.getElementById('athleteLastName').value = athlete.lastName;
-            document.getElementById('athleteDoc').value = athlete.doc;
-            document.getElementById('athletePhone').value = athlete.phone;
-            document.getElementById('athleteGender').value = athlete.gender;
-            document.getElementById('athleteYears').value = athlete.years;
-            document.getElementById('athleteNumber').value = athlete.number;
-            document.getElementById('athleteCard').checked = athlete.hasCard;
+            document.getElementById('athleteName').value = athlete.name || '';
+            document.getElementById('athleteLastName').value = athlete.lastName || '';
+            document.getElementById('athleteDoc').value = athlete.doc || '';
+            document.getElementById('athletePhone').value = athlete.phone || '';
+            document.getElementById('athleteGender').value = athlete.gender || 'male';
+            document.getElementById('athleteYears').value = athlete.years || '';
+            document.getElementById('athleteNumber').value = athlete.number || '';
+            document.getElementById('athleteCard').checked = athlete.hasCard || false;
             const container = document.getElementById('personalRecords');
             container.innerHTML = '';
-            if (athlete.personalRecords) {
+            if (athlete.personalRecords && athlete.personalRecords.length > 0) {
                 athlete.personalRecords.forEach(r => {
                     const div = document.createElement('div');
                     div.className = 'form-row';
                     div.innerHTML = `
                         <div class="form-group">
-                            <input type="text" placeholder="Prueba" class="record-name" value="${r.test}">
+                            <input type="text" placeholder="Prueba" class="record-name" value="${r.test || ''}">
                         </div>
                         <div class="form-group">
-                            <input type="text" placeholder="Marca" class="record-value" value="${r.value}">
+                            <input type="text" placeholder="Marca" class="record-value" value="${r.value || ''}">
                         </div>
                     `;
                     container.appendChild(div);
