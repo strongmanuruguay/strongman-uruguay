@@ -3321,6 +3321,29 @@ select.scoring-form-control{cursor:pointer}
                     if (!error && athletesData && athletesData.length > 0) {
                         data.athletes = athletesData.map(a => {
                             const parts = (a.nombre || '').split(' ');
+                            // Parsear marcas personales correctamente
+                            let personalRecords = [];
+                            const marcasRaw = (a.marcas || '').trim();
+                            if (marcasRaw) {
+                                // Si parece JSON array, parsearlo
+                                if (marcasRaw.startsWith('[') && marcasRaw.endsWith(']')) {
+                                    try {
+                                        const parsed = JSON.parse(marcasRaw);
+                                        if (Array.isArray(parsed)) {
+                                            personalRecords = parsed.filter(r => r && r.test && r.value);
+                                        }
+                                    } catch (e) {
+                                        // No es JSON válido, intentar formato alternativo
+                                    }
+                                }
+                                // Si no se parseó como JSON, intentar formato "prueba:valor,prueba2:valor2"
+                                if (personalRecords.length === 0) {
+                                    personalRecords = marcasRaw.split(',').filter(m => m.trim()).map(m => {
+                                        const p = m.trim().split(':');
+                                        return { test: (p[0] || '').trim(), value: (p[1] || '').trim() };
+                                    }).filter(r => r.test && r.value);
+                                }
+                            }
                             return {
                                 id: a.id,
                                 name: parts[0] || '',
@@ -3332,10 +3355,7 @@ select.scoring-form-control{cursor:pointer}
                                 number: a.numero || '',
                                 hasCard: a.carne ? true : false,
                                 photo: a.imagen || '',
-                                personalRecords: (a.marcas || '').split(',').filter(m => m.trim()).map(m => {
-                                    const p = m.trim().split(':');
-                                    return { test: p[0] || '', value: p[1] || '' };
-                                }),
+                                personalRecords: personalRecords,
                                 bio: a.biografia || '',
                                 instagram: a.instagram || '',
                                 weight: a.peso || '',
@@ -4090,7 +4110,7 @@ select.scoring-form-control{cursor:pointer}
             // Si es string, intentar parsear
             if (typeof athlete.personalRecords === 'string') {
                 const str = athlete.personalRecords.trim();
-                // Intentar JSON primero
+                // Intentar JSON primero (nuevo formato)
                 if (str.startsWith('[') || str.startsWith('{')) {
                     try {
                         const parsed = JSON.parse(str);
@@ -4099,10 +4119,10 @@ select.scoring-form-control{cursor:pointer}
                             return;
                         }
                     } catch (e) {
-                        // No es JSON válido, continuar con formato alternativo
+                        console.warn('⚠️ No se pudo parsear JSON de marcas:', str.substring(0, 50));
                     }
                 }
-                // Formato: "prueba:valor,prueba2:valor2"
+                // Formato antiguo: "prueba:valor,prueba2:valor2"
                 const records = str.split(',').filter(m => m.trim()).map(m => {
                     const p = m.trim().split(':');
                     return { test: (p[0] || '').trim(), value: (p[1] || '').trim() };
@@ -4185,8 +4205,8 @@ function renderAthletes() {
                 return null;
             }
             try {
-                // Convertir marcas personales a string
-                const marcasStr = (athlete.personalRecords || []).map(r => `${r.test}:${r.value}`).join(',');
+                // Convertir marcas personales a JSON string para mejor compatibilidad
+                const marcasStr = JSON.stringify((athlete.personalRecords || []).filter(r => r && r.test && r.value));
 
                 const atletaData = {
                     nombre: `${athlete.name} ${athlete.lastName}`.trim(),
@@ -4242,7 +4262,7 @@ function renderAthletes() {
                 return null;
             }
             try {
-                const marcasStr = (athlete.personalRecords || []).map(r => `${r.test}:${r.value}`).join(',');
+                const marcasStr = JSON.stringify((athlete.personalRecords || []).filter(r => r && r.test && r.value));
 
                 const atletaData = {
                     nombre: `${athlete.name} ${athlete.lastName}`.trim(),
