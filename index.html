@@ -5082,14 +5082,19 @@ function renderAthletes() {
                 photo: null,
                 personalRecords: []
             };
-            // Recolectar marcas personales de los inputs
+            // Recolectar marcas personales de los inputs - con validación de existencia
             const recordNames = document.querySelectorAll('.record-name');
             const recordValues = document.querySelectorAll('.record-value');
-            for (let i = 0; i < recordNames.length; i++) {
-                const test = recordNames[i].value.trim();
-                const value = recordValues[i].value.trim();
-                if (test && value) {
-                    athleteData.personalRecords.push({ test: test, value: value });
+            const minLength = Math.min(recordNames.length, recordValues.length);
+            for (let i = 0; i < minLength; i++) {
+                const nameInput = recordNames[i];
+                const valueInput = recordValues[i];
+                if (nameInput && valueInput) {
+                    const test = (nameInput.value || '').trim();
+                    const value = (valueInput.value || '').trim();
+                    if (test && value) {
+                        athleteData.personalRecords.push({ test: test, value: value });
+                    }
                 }
             }
             console.log('💾 Guardando atleta con', athleteData.personalRecords.length, 'marcas personales');
