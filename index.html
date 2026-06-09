@@ -3353,7 +3353,7 @@ select.scoring-form-control{cursor:pointer}
                                 gender: a.categoria || '',
                                 years: a.anos || '',
                                 number: a.numero || '',
-                                hasCard: a.carne ? true : false,
+                                hasCard: a.carne === 'SI' ? true : false,
                                 photo: a.imagen || '',
                                 personalRecords: personalRecords,
                                 bio: a.biografia || '',
@@ -3725,7 +3725,7 @@ select.scoring-form-control{cursor:pointer}
                     email: atl.email || '',
                     anos: atl.years ? parseInt(atl.years) : null,
                     numero: atl.number ? parseInt(atl.number) : null,
-                    carne: atl.hasCard ? 'SI' : 'NO',
+                    carne: atl.hasCard ? 'SI' : '',
                     marcas: atl.personalRecords ? JSON.stringify(atl.personalRecords) : '[]',
                     categoria: atl.gender || '',
                     peso: null,
@@ -4175,28 +4175,11 @@ function renderAthletes() {
                             `).join('')}
                         </div>
                     ` : ''}
-                    <div style="margin-top: 0.5rem; display: flex; gap: 0.5rem; justify-content: center;">
-                        <button class="btn btn-small btn-danger delete-athlete-btn" 
-                                data-athlete-id="${athlete.id}" 
-                                title="Borrar atleta"
-                                style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
+                    
                 </div>`;
             }).join('');
 
-            // Agregar event listeners para botones de borrado (mejor soporte táctil)
-            container.querySelectorAll('.delete-athlete-btn').forEach(btn => {
-                const handleDelete = function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const id = this.getAttribute('data-athlete-id');
-                    deleteAthletePublic(id);
-                };
-                btn.addEventListener('click', handleDelete);
-                btn.addEventListener('touchend', handleDelete);
-            });
+            
         }
 
         async function saveAthleteToSupabase(athlete) {
