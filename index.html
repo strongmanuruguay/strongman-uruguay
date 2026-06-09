@@ -2102,7 +2102,7 @@ select.scoring-form-control{cursor:pointer}
                     <!-- PANEL ATLETAS -->
                     <div id="panel-athletes" class="admin-panel">
                         <h3>Gestionar Atletas</h3>
-                        <form id="athleteForm" onsubmit="saveAthlete(event)">
+                        <form id="athleteForm">
                             <input type="hidden" id="athleteId">
                             <div class="form-row">
                                 <div class="form-group">
@@ -3139,6 +3139,16 @@ select.scoring-form-control{cursor:pointer}
 
             // Contador regresivo
             initCountdown();
+            // ===== EVENT LISTENER PARA FORMULARIO DE ATLETA (soporte móvil) =====
+            const athleteForm = document.getElementById('athleteForm');
+            if (athleteForm) {
+                athleteForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    console.log('📱 Formulario de atleta enviado (event listener)');
+                    saveAthlete(e);
+                });
+            }
+
         });
 
         
@@ -4864,9 +4874,11 @@ function renderAthletes() {
             } else if (type === 'contacts') {
                 renderContactsAdmin(container);
             } else {
+                // Usar data attributes en lugar de onclick inline para mejor soporte táctil
                 container.innerHTML = items.map(item => {
                     const idVal = item.id;
-                    const idStr = typeof idVal === 'string' ? "'" + idVal + "'" : idVal;
+                    const idStr = String(idVal);
+                    const typeCapitalized = type.charAt(0).toUpperCase() + type.slice(1);
                     return `
                     <div class="list-item">
                         <div class="list-item-info">
@@ -4874,11 +4886,58 @@ function renderAthletes() {
                             <div class="list-item-subtitle">${item.date || item.location || item.holder || item.level || item.address || ''}</div>
                         </div>
                         <div class="list-item-actions">
-                            <button class="btn btn-small btn-icon" onclick="edit${type.charAt(0).toUpperCase() + type.slice(1)}(${idStr})"><i class="fas fa-edit"></i></button>
-                            <button class="btn btn-small btn-icon btn-danger" onclick="delete${type.charAt(0).toUpperCase() + type.slice(1)}(${idStr})"><i class="fas fa-trash"></i></button>
+                            <button class="btn btn-small btn-icon admin-edit-btn" 
+                                    data-type="${type}" 
+                                    data-id="${idStr}"
+                                    data-action="edit"
+                                    style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-small btn-icon btn-danger admin-delete-btn" 
+                                    data-type="${type}" 
+                                    data-id="${idStr}"
+                                    data-action="delete"
+                                    style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
+                                <i class="fas fa-trash"></i>
+                            </button>
                         </div>
                     </div>
                 `}).join('');
+
+                // Agregar event listeners después de renderizar (mejor soporte táctil)
+                container.querySelectorAll('.admin-edit-btn').forEach(btn => {
+                    const handleEdit = function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const itemType = this.getAttribute('data-type');
+                        const itemId = this.getAttribute('data-id');
+                        const funcName = 'edit' + itemType.charAt(0).toUpperCase() + itemType.slice(1);
+                        if (typeof window[funcName] === 'function') {
+                            window[funcName](itemId);
+                        } else {
+                            console.error('❌ Función no encontrada:', funcName);
+                        }
+                    };
+                    btn.addEventListener('click', handleEdit);
+                    btn.addEventListener('touchend', handleEdit);
+                });
+
+                container.querySelectorAll('.admin-delete-btn').forEach(btn => {
+                    const handleDelete = function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const itemType = this.getAttribute('data-type');
+                        const itemId = this.getAttribute('data-id');
+                        const funcName = 'delete' + itemType.charAt(0).toUpperCase() + itemType.slice(1);
+                        if (typeof window[funcName] === 'function') {
+                            window[funcName](itemId);
+                        } else {
+                            console.error('❌ Función no encontrada:', funcName);
+                        }
+                    };
+                    btn.addEventListener('click', handleDelete);
+                    btn.addEventListener('touchend', handleDelete);
+                });
             }
         }
 
@@ -5137,15 +5196,36 @@ function renderAthletes() {
             }
         }
 
-        function deleteAthletes(id) {
+        async function deleteAthletes(id) {
             if (!confirm('¿Eliminar este atleta?')) return;
-            data.athletes = data.athletes.filter(a => a.id !== id);
-            data.ranking = data.ranking.filter(r => r.athleteId !== id);
-            saveAllData();
+
+            // Borrar de Supabase primero
+            if (supabaseClient) {
+                try {
+                    const { error } = await supabaseClient.from('atletas').delete().eq('id', id);
+                    if (error) console.error('❌ Error borrando de Supabase:', error);
+                    else console.log('✅ Atleta borrado de Supabase');
+                } catch (e) {
+                    console.error('❌ Error Supabase:', e);
+                }
+            }
+
+            // Borrar del array local usando comparación de strings
+            const antes = data.athletes.length;
+            data.athletes = data.athletes.filter(a => String(a.id) !== String(id));
+            data.ranking = data.ranking.filter(r => String(r.athleteId) !== String(id));
+
+            console.log(`🗑️ Atletas: ${antes} → ${data.athletes.length}`);
+
+            // Guardar en localStorage y sincronizar con Supabase
+            localStorage.setItem('acaf_athletes', JSON.stringify(data.athletes));
+            await saveAllData();
+
             renderAthletes();
             loadAdminList('athletes');
             updateRankingAthletesSelect();
             loadRecordAthletesSelect();
+            scoringShowToast('🗑️ Atleta eliminado');
         }
 
         function resetAthleteForm() {
