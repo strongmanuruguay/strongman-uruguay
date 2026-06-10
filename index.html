@@ -1607,7 +1607,6 @@ select.scoring-form-control{cursor:pointer}
 <base target="_blank">
 <base target="_blank">
 <base target="_blank">
-<base target="_blank">
 </head>
 <body>
     <div class="menu-overlay" id="menuOverlay" onclick="closeMenu()"></div>
@@ -3064,38 +3063,27 @@ select.scoring-form-control{cursor:pointer}
         };
 
         document.addEventListener('DOMContentLoaded', async function() {
-            // ===== VERIFICAR SI HUBO BORRADO RECIENTE EN OTRO DISPOSITIVO =====
-            // Esto fuerza a recargar desde Supabase cuando otro dispositivo borró algo
-            const lastDelete = parseInt(localStorage.getItem('acaf_last_delete') || '0');
-            const now = Date.now();
-            const fiveMinutes = 5 * 60 * 1000;
-            const shouldReloadFromSupabase = (now - lastDelete) < fiveMinutes;
-
-            if (shouldReloadFromSupabase) {
-                console.log('🔄 Detectado borrado reciente, ignorando localStorage...');
-            }
-
             // ===== INICIALIZAR DATA =====
-            // Si hubo borrado reciente, empezar con arrays vacíos para forzar carga desde Supabase
+            // Cargar datos desde localStorage primero (persistencia local)
             data = {
-                events: shouldReloadFromSupabase ? [] : (JSON.parse(localStorage.getItem('acaf_events')) || []),
-                athletes: shouldReloadFromSupabase ? [] : (JSON.parse(localStorage.getItem('acaf_athletes')) || []),
-                ranking: shouldReloadFromSupabase ? [] : (JSON.parse(localStorage.getItem('acaf_ranking')) || []),
-                gyms: shouldReloadFromSupabase ? [] : (JSON.parse(localStorage.getItem('acaf_gyms')) || []),
-                records: shouldReloadFromSupabase ? [] : (JSON.parse(localStorage.getItem('acaf_records')) || []),
-                gallery: shouldReloadFromSupabase ? [] : (JSON.parse(localStorage.getItem('acaf_gallery')) || []),
-                rules: shouldReloadFromSupabase ? [] : (JSON.parse(localStorage.getItem('acaf_rules')) || []),
-                courses: shouldReloadFromSupabase ? [] : (JSON.parse(localStorage.getItem('acaf_courses')) || []),
-                judges: shouldReloadFromSupabase ? [] : (JSON.parse(localStorage.getItem('acaf_judges')) || []),
-                sponsors: shouldReloadFromSupabase ? [] : (JSON.parse(localStorage.getItem('acaf_sponsors')) || []),
-                contacts: shouldReloadFromSupabase ? [] : (JSON.parse(localStorage.getItem('acaf_contacts')) || []),
-                settings: shouldReloadFromSupabase ? { heroBg: null, logo: null, social: {} } : (JSON.parse(localStorage.getItem('acaf_settings')) || { heroBg: null, logo: null, social: {} }),
+                events: JSON.parse(localStorage.getItem('acaf_events')) || [],
+                athletes: JSON.parse(localStorage.getItem('acaf_athletes')) || [],
+                ranking: JSON.parse(localStorage.getItem('acaf_ranking')) || [],
+                gyms: JSON.parse(localStorage.getItem('acaf_gyms')) || [],
+                records: JSON.parse(localStorage.getItem('acaf_records')) || [],
+                gallery: JSON.parse(localStorage.getItem('acaf_gallery')) || [],
+                rules: JSON.parse(localStorage.getItem('acaf_rules')) || [],
+                courses: JSON.parse(localStorage.getItem('acaf_courses')) || [],
+                judges: JSON.parse(localStorage.getItem('acaf_judges')) || [],
+                sponsors: JSON.parse(localStorage.getItem('acaf_sponsors')) || [],
+                contacts: JSON.parse(localStorage.getItem('acaf_contacts')) || [],
+                settings: JSON.parse(localStorage.getItem('acaf_settings')) || { heroBg: null, logo: null, social: {} },
                 visits: parseInt(localStorage.getItem('acaf_visits')) || 0,
-                products: shouldReloadFromSupabase ? [] : (JSON.parse(localStorage.getItem('productosTienda')) || []),
-                subscribers: shouldReloadFromSupabase ? [] : (JSON.parse(localStorage.getItem('acaf_suscriptores')) || []),
-                competitions: shouldReloadFromSupabase ? [] : (JSON.parse(localStorage.getItem('acaf_competencias')) || []),
+                products: JSON.parse(localStorage.getItem('productosTienda')) || [],
+                subscribers: JSON.parse(localStorage.getItem('acaf_suscriptores')) || [],
+                competitions: JSON.parse(localStorage.getItem('acaf_competencias')) || [],
                 cart: JSON.parse(localStorage.getItem('cartStrongman')) || [],
-                competencias: shouldReloadFromSupabase ? [] : (JSON.parse(localStorage.getItem('acaf_competencias')) || [])
+                competencias: JSON.parse(localStorage.getItem('acaf_competencias')) || []
             };
 
             // ===== CONECTAR SUPABASE =====
@@ -5241,9 +5229,6 @@ function renderAthletes() {
             // Guardar en localStorage y sincronizar con Supabase
             localStorage.setItem('acaf_athletes', JSON.stringify(data.athletes));
             await saveAllData();
-
-            // MARCAR que hubo un cambio reciente para que otros dispositivos recarguen desde Supabase
-            localStorage.setItem('acaf_last_delete', Date.now().toString());
 
             renderAthletes();
             loadAdminList('athletes');
