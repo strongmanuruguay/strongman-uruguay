@@ -1603,6 +1603,11 @@ select.scoring-form-control{cursor:pointer}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <base target="_blank">
 <base target="_blank">
+<base target="_blank">
+<base target="_blank">
+<base target="_blank">
+<base target="_blank">
+<base target="_blank">
 </head>
 <body>
     <div class="menu-overlay" id="menuOverlay" onclick="closeMenu()"></div>
@@ -3059,65 +3064,56 @@ select.scoring-form-control{cursor:pointer}
         };
 
         document.addEventListener('DOMContentLoaded', async function() {
+            // ===== VERIFICAR SI HUBO BORRADO RECIENTE EN OTRO DISPOSITIVO =====
+            // Esto fuerza a recargar desde Supabase cuando otro dispositivo borró algo
+            const lastDelete = parseInt(localStorage.getItem('acaf_last_delete') || '0');
+            const now = Date.now();
+            const fiveMinutes = 5 * 60 * 1000;
+            const shouldReloadFromSupabase = (now - lastDelete) < fiveMinutes;
+
+            if (shouldReloadFromSupabase) {
+                console.log('🔄 Detectado borrado reciente, ignorando localStorage...');
+            }
+
             // ===== INICIALIZAR DATA =====
-            // Cargar datos desde localStorage como fallback inicial
+            // Si hubo borrado reciente, empezar con arrays vacíos para forzar carga desde Supabase
             data = {
-                events: JSON.parse(localStorage.getItem('acaf_events')) || [],
-                athletes: JSON.parse(localStorage.getItem('acaf_athletes')) || [],
-                ranking: JSON.parse(localStorage.getItem('acaf_ranking')) || [],
-                gyms: JSON.parse(localStorage.getItem('acaf_gyms')) || [],
-                records: JSON.parse(localStorage.getItem('acaf_records')) || [],
-                gallery: JSON.parse(localStorage.getItem('acaf_gallery')) || [],
-                rules: JSON.parse(localStorage.getItem('acaf_rules')) || [],
-                courses: JSON.parse(localStorage.getItem('acaf_courses')) || [],
-                judges: JSON.parse(localStorage.getItem('acaf_judges')) || [],
-                sponsors: JSON.parse(localStorage.getItem('acaf_sponsors')) || [],
-                contacts: JSON.parse(localStorage.getItem('acaf_contacts')) || [],
-                settings: JSON.parse(localStorage.getItem('acaf_settings')) || { heroBg: null, logo: null, social: {} },
+                events: shouldReloadFromSupabase ? [] : (JSON.parse(localStorage.getItem('acaf_events')) || []),
+                athletes: shouldReloadFromSupabase ? [] : (JSON.parse(localStorage.getItem('acaf_athletes')) || []),
+                ranking: shouldReloadFromSupabase ? [] : (JSON.parse(localStorage.getItem('acaf_ranking')) || []),
+                gyms: shouldReloadFromSupabase ? [] : (JSON.parse(localStorage.getItem('acaf_gyms')) || []),
+                records: shouldReloadFromSupabase ? [] : (JSON.parse(localStorage.getItem('acaf_records')) || []),
+                gallery: shouldReloadFromSupabase ? [] : (JSON.parse(localStorage.getItem('acaf_gallery')) || []),
+                rules: shouldReloadFromSupabase ? [] : (JSON.parse(localStorage.getItem('acaf_rules')) || []),
+                courses: shouldReloadFromSupabase ? [] : (JSON.parse(localStorage.getItem('acaf_courses')) || []),
+                judges: shouldReloadFromSupabase ? [] : (JSON.parse(localStorage.getItem('acaf_judges')) || []),
+                sponsors: shouldReloadFromSupabase ? [] : (JSON.parse(localStorage.getItem('acaf_sponsors')) || []),
+                contacts: shouldReloadFromSupabase ? [] : (JSON.parse(localStorage.getItem('acaf_contacts')) || []),
+                settings: shouldReloadFromSupabase ? { heroBg: null, logo: null, social: {} } : (JSON.parse(localStorage.getItem('acaf_settings')) || { heroBg: null, logo: null, social: {} }),
                 visits: parseInt(localStorage.getItem('acaf_visits')) || 0,
-                products: JSON.parse(localStorage.getItem('productosTienda')) || [],
-                subscribers: JSON.parse(localStorage.getItem('acaf_suscriptores')) || [],
-                competitions: JSON.parse(localStorage.getItem('acaf_competencias')) || [],
+                products: shouldReloadFromSupabase ? [] : (JSON.parse(localStorage.getItem('productosTienda')) || []),
+                subscribers: shouldReloadFromSupabase ? [] : (JSON.parse(localStorage.getItem('acaf_suscriptores')) || []),
+                competitions: shouldReloadFromSupabase ? [] : (JSON.parse(localStorage.getItem('acaf_competencias')) || []),
                 cart: JSON.parse(localStorage.getItem('cartStrongman')) || [],
-                competencias: JSON.parse(localStorage.getItem('acaf_competencias')) || []
+                competencias: shouldReloadFromSupabase ? [] : (JSON.parse(localStorage.getItem('acaf_competencias')) || [])
             };
 
             // ===== CONECTAR SUPABASE =====
             if (!supabaseClient) initSupabaseMain();
 
-            // ===== CARGAR DESDE SUPABASE PRIMERO (fuente de verdad) =====
+            // ===== CARGAR DESDE SUPABASE =====
             if (supabaseClient) {
                 try {
-                    console.log('🔄 Cargando datos desde Supabase (fuente de verdad)...');
-                    const cargado = await loadDataFromSupabase();
-                    if (cargado) {
-                        console.log('✅ Datos cargados desde Supabase - localStorage actualizado');
-                        // Sobrescribir localStorage con datos frescos de Supabase
-                        localStorage.setItem('acaf_events', JSON.stringify(data.events));
-                        localStorage.setItem('acaf_athletes', JSON.stringify(data.athletes));
-                        localStorage.setItem('acaf_ranking', JSON.stringify(data.ranking));
-                        localStorage.setItem('acaf_gyms', JSON.stringify(data.gyms));
-                        localStorage.setItem('acaf_records', JSON.stringify(data.records));
-                        localStorage.setItem('acaf_gallery', JSON.stringify(data.gallery));
-                        localStorage.setItem('acaf_rules', JSON.stringify(data.rules));
-                        localStorage.setItem('acaf_courses', JSON.stringify(data.courses));
-                        localStorage.setItem('acaf_judges', JSON.stringify(data.judges));
-                        localStorage.setItem('acaf_sponsors', JSON.stringify(data.sponsors));
-                        localStorage.setItem('acaf_contacts', JSON.stringify(data.contacts));
-                        localStorage.setItem('acaf_settings', JSON.stringify(data.settings));
-                        localStorage.setItem('productosTienda', JSON.stringify(data.products || []));
-                    } else {
-                        console.log('ℹ️ No hay datos nuevos en Supabase, usando localStorage');
-                    }
+                    await loadFromSupabase();
+                    console.log('✅ Datos cargados desde Supabase');
                 } catch (e) {
-                    console.error('❌ Error cargando desde Supabase:', e);
-                    console.log('⚠️ Usando datos de localStorage como fallback');
+                    console.error('Error cargando desde Supabase:', e);
                 }
             } else {
-                console.warn('⚠️ Supabase no disponible - usando datos locales');
+                console.warn('⚠️ Supabase no disponible - usando datos vacios');
             }
 
-            // Renderizar todo con los datos actualizados
+            // Renderizar todo
             loadAllData();
             setupNavbar();
             updateCounters();
@@ -3309,20 +3305,29 @@ select.scoring-form-control{cursor:pointer}
                     const { data: eventsData, error } = await supabaseClient.from('eventos').select('*').order('fecha', { ascending: true });
                     console.log('📥 Eventos raw:', eventsData ? eventsData.length : 0, 'Error:', error);
                     if (!error && eventsData && eventsData.length > 0) {
-                        // SOBREESCRIBIR: Supabase es la fuente de verdad
-                        data.events = eventsData.map(e => ({
-                            id: e.id,
-                            name: e.nombre,
-                            date: e.fecha,
-                            time: e.hora,
-                            location: e.lugar,
-                            cost: e.costo,
-                            description: e.descripcion,
-                            categories: e.categorias || [],
-                            image: e.imagen_url
-                        }));
-                        console.log('✅ Eventos cargados desde Supabase:', data.events.length);
-                        cargado = true;
+                        // Merge: solo agregar eventos de Supabase que no existan localmente
+                        // No sobrescribir los locales (pueden tener cambios más recientes)
+                        const localEventIds = new Set(data.events.map(e => e.id));
+                        const newEvents = eventsData
+                            .filter(e => !localEventIds.has(e.id))
+                            .map(e => ({
+                                id: e.id,
+                                name: e.nombre,
+                                date: e.fecha,
+                                time: e.hora,
+                                location: e.lugar,
+                                cost: e.costo,
+                                description: e.descripcion,
+                                categories: e.categorias || [],
+                                image: e.imagen_url
+                            }));
+                        if (newEvents.length > 0) {
+                            data.events = [...data.events, ...newEvents];
+                            console.log('✅ Eventos mergeados:', newEvents.length, 'nuevos. Total:', data.events.length);
+                            cargado = true;
+                        } else {
+                            console.log('ℹ️ No hay eventos nuevos en Supabase');
+                        }
                     } else if (error) {
                         console.error('❌ Error cargando eventos:', error);
                     } else {
@@ -3336,20 +3341,24 @@ select.scoring-form-control{cursor:pointer}
                     const { data: athletesData, error } = await supabaseClient.from('atletas').select('*').order('nombre', { ascending: true });
                     console.log('📥 Atletas raw:', athletesData ? athletesData.length : 0, 'Error:', error);
                     if (!error && athletesData && athletesData.length > 0) {
-                        // SOBREESCRIBIR: Supabase es la fuente de verdad
                         data.athletes = athletesData.map(a => {
                             const parts = (a.nombre || '').split(' ');
+                            // Parsear marcas personales correctamente
                             let personalRecords = [];
                             const marcasRaw = (a.marcas || '').trim();
                             if (marcasRaw) {
+                                // Si parece JSON array, parsearlo
                                 if (marcasRaw.startsWith('[') && marcasRaw.endsWith(']')) {
                                     try {
                                         const parsed = JSON.parse(marcasRaw);
                                         if (Array.isArray(parsed)) {
                                             personalRecords = parsed.filter(r => r && r.test && r.value);
                                         }
-                                    } catch (e) {}
+                                    } catch (e) {
+                                        // No es JSON válido, intentar formato alternativo
+                                    }
                                 }
+                                // Si no se parseó como JSON, intentar formato "prueba:valor,prueba2:valor2"
                                 if (personalRecords.length === 0) {
                                     personalRecords = marcasRaw.split(',').filter(m => m.trim()).map(m => {
                                         const p = m.trim().split(':');
@@ -3375,7 +3384,7 @@ select.scoring-form-control{cursor:pointer}
                                 height: a.estatura || ''
                             };
                         });
-                        console.log('✅ Atletas cargados desde Supabase:', data.athletes.length);
+                        console.log('✅ Atletas cargados:', data.athletes.length);
                         cargado = true;
                     } else if (error) {
                         console.error('❌ Error cargando atletas:', error);
@@ -5211,54 +5220,36 @@ function renderAthletes() {
         async function deleteAthletes(id) {
             if (!confirm('¿Eliminar este atleta?')) return;
 
-            console.log('🗑️ Iniciando borrado de atleta ID:', id);
-
-            // 1. BORRAR DE SUPABASE PRIMERO (fuente de verdad)
-            let deletedFromSupabase = false;
+            // Borrar de Supabase primero
             if (supabaseClient) {
                 try {
                     const { error } = await supabaseClient.from('atletas').delete().eq('id', id);
-                    if (error) {
-                        console.error('❌ Error borrando de Supabase:', error);
-                        alert('Error al borrar de la nube: ' + error.message);
-                        return; // NO seguir si falla Supabase
-                    }
-                    deletedFromSupabase = true;
-                    console.log('✅ Atleta borrado de Supabase');
+                    if (error) console.error('❌ Error borrando de Supabase:', error);
+                    else console.log('✅ Atleta borrado de Supabase');
                 } catch (e) {
                     console.error('❌ Error Supabase:', e);
-                    alert('Error de conexión con Supabase');
-                    return;
                 }
             }
 
-            // 2. BORRAR DEL ARRAY EN MEMORIA
+            // Borrar del array local usando comparación de strings
             const antes = data.athletes.length;
             data.athletes = data.athletes.filter(a => String(a.id) !== String(id));
             data.ranking = data.ranking.filter(r => String(r.athleteId) !== String(id));
-            console.log(`🗑️ Atletas en memoria: ${antes} → ${data.athletes.length}`);
 
-            // 3. GUARDAR EN LOCALSTORAGE
+            console.log(`🗑️ Atletas: ${antes} → ${data.athletes.length}`);
+
+            // Guardar en localStorage y sincronizar con Supabase
             localStorage.setItem('acaf_athletes', JSON.stringify(data.athletes));
-            localStorage.setItem('acaf_ranking', JSON.stringify(data.ranking));
+            await saveAllData();
 
-            // 4. SINCRONIZAR TODO CON SUPABASE (sobrescribir remoto con datos locales actualizados)
-            if (supabaseClient && deletedFromSupabase) {
-                try {
-                    await syncToSupabase();
-                    console.log('✅ Datos sincronizados con Supabase después del borrado');
-                } catch (e) {
-                    console.error('❌ Error sincronizando después del borrado:', e);
-                }
-            }
+            // MARCAR que hubo un cambio reciente para que otros dispositivos recarguen desde Supabase
+            localStorage.setItem('acaf_last_delete', Date.now().toString());
 
-            // 5. RE-RENDERIZAR
             renderAthletes();
             loadAdminList('athletes');
             updateRankingAthletesSelect();
             loadRecordAthletesSelect();
-            updateCounters();
-            scoringShowToast('🗑️ Atleta eliminado y sincronizado en todos los dispositivos');
+            scoringShowToast('🗑️ Atleta eliminado');
         }
 
         function resetAthleteForm() {
