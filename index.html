@@ -1603,10 +1603,6 @@ select.scoring-form-control{cursor:pointer}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <base target="_blank">
 <base target="_blank">
-<base target="_blank">
-<base target="_blank">
-<base target="_blank">
-<base target="_blank">
 </head>
 <body>
     <div class="menu-overlay" id="menuOverlay" onclick="closeMenu()"></div>
@@ -6395,11 +6391,15 @@ function renderAthletes() {
             // Recolectar imágenes de los previews (sin duplicados, sin vacías)
             const imagenes = [];
             const seen = new Set();
-            document.querySelectorAll('#productPreview img, #preview1 img, #preview2 img, #preview3 img').forEach(img => { 
-                if (img.src && img.src.length > 10 && !img.src.includes('placehold.co') && !img.src.endsWith(window.location.href) && !img.src.endsWith('/') && !seen.has(img.src)) {
-                    imagenes.push(img.src);
-                    seen.add(img.src);
-                } 
+            ['preview1', 'preview2', 'preview3'].forEach(pid => {
+                const prevDiv = document.getElementById(pid);
+                if (prevDiv) {
+                    const img = prevDiv.querySelector('img');
+                    if (img && img.src && img.src.length > 10 && !img.src.includes('placehold.co') && !img.src.endsWith(window.location.href) && !img.src.endsWith('/') && !seen.has(img.src)) {
+                        imagenes.push(img.src);
+                        seen.add(img.src);
+                    }
+                }
             });
             console.log('📸 Imágenes encontradas:', imagenes.length, imagenes);
 
@@ -6514,14 +6514,19 @@ function renderAthletes() {
             document.getElementById('productDesc').value = p.descripcion || '';
             document.getElementById('productStock').value = p.stock || 0;
 
-            const preview = document.getElementById('productPreview');
-            if (preview) {
-                preview.innerHTML = '';
-                const imgs = p.imagenes || [];
-                imgs.forEach(img => { 
-                    if (img) preview.innerHTML += `<img src="${img}" class="product-preview-img" onclick="changeProductImage(this)">`; 
-                });
-            }
+            // Mostrar imágenes en preview1, preview2, preview3
+            const imgs = p.imagenes || [];
+            ['preview1', 'preview2', 'preview3'].forEach((pid, idx) => {
+                const prevDiv = document.getElementById(pid);
+                if (prevDiv) {
+                    prevDiv.innerHTML = '';
+                    prevDiv.style.display = 'none';
+                    if (imgs[idx]) {
+                        prevDiv.innerHTML = `<img src="${imgs[idx]}" style="width: 100%; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--gold); cursor: pointer;" onclick="changeProductImage(this)">`;
+                        prevDiv.style.display = 'block';
+                    }
+                }
+            });
 
             scoringShowToast('✏️ Editando: ' + p.nombre);
         }
@@ -6585,7 +6590,7 @@ function renderAthletes() {
         }
 
         function previewImage(input, previewId) {
-            const preview = document.getElementById(previewId || 'productPreview');
+            const preview = document.getElementById(previewId);
             if (!preview) {
                 console.error('❌ Preview no encontrado:', previewId);
                 return;
@@ -6597,8 +6602,7 @@ function renderAthletes() {
                     preview.innerHTML = ''; // Limpiar preview anterior
                     const img = document.createElement('img');
                     img.src = e.target.result;
-                    img.className = 'product-preview-img';
-                    img.style = 'width:80px;height:80px;object-fit:cover;border-radius:8px;margin:5px;cursor:pointer;';
+                    img.style = 'width: 100%; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--gold); cursor: pointer;';
                     img.onclick = function() { changeProductImage(this); };
                     preview.appendChild(img);
                     console.log('✅ Imagen cargada en preview:', previewId);
@@ -6628,16 +6632,20 @@ function renderAthletes() {
             if (pds) pds.value = '';
             const pst = document.getElementById('productStock');
             if (pst) pst.value = '';
-            const pprv = document.getElementById('productPreview');
-            if (pprv) pprv.innerHTML = '';
-            const pim = document.getElementById('productImage');
-            if (pim) pim.value = '';
+            // Limpiar inputs file
+            const pim1 = document.getElementById('productImage1');
+            if (pim1) pim1.value = '';
+            const pim2 = document.getElementById('productImage2');
+            if (pim2) pim2.value = '';
+            const pim3 = document.getElementById('productImage3');
+            if (pim3) pim3.value = '';
+            // Limpiar previews
             const pv1 = document.getElementById('preview1');
-            if (pv1) pv1.innerHTML = '';
+            if (pv1) { pv1.innerHTML = ''; pv1.style.display = 'none'; }
             const pv2 = document.getElementById('preview2');
-            if (pv2) pv2.innerHTML = '';
+            if (pv2) { pv2.innerHTML = ''; pv2.style.display = 'none'; }
             const pv3 = document.getElementById('preview3');
-            if (pv3) pv3.innerHTML = '';
+            if (pv3) { pv3.innerHTML = ''; pv3.style.display = 'none'; }
         }
 
         document.addEventListener('click', function(e) {
