@@ -1947,7 +1947,7 @@ select.scoring-form-control{cursor:pointer}
     <div id="confirmacionSubModal" class="modal">
         <div class="modal-content" style="max-width: 450px; text-align: center;">
             <div class="modal-header" style="background: var(--success);">
-                <button onclick="closeShopModal()" style="position:absolute;right:1rem;top:1rem;background:none;border:none;color:var(--gold);font-size:1.5rem;cursor:pointer;z-index:100;">✕</button><h2><i class="fas fa-check-circle"></i> ¡Suscripción exitosa!</h2>
+                <h2><i class="fas fa-check-circle"></i> ¡Suscripción exitosa!</h2>
             </div>
             <div class="modal-body" style="padding: 2rem;">
                 <div style="font-size: 4rem; margin-bottom: 1rem;">✅</div>
@@ -6400,14 +6400,16 @@ function renderAthletes() {
             const stock = parseInt(document.getElementById('productStock').value) || 0;
             if (!nombre || isNaN(precio)) { scoringShowToast('Completa nombre y precio'); return; }
 
-            // Recolectar imágenes de los previews (sin duplicados, sin vacías)
+            // Recolectar imágenes de preview1, preview2, preview3 (en orden)
             const imagenes = [];
-            const seen = new Set();
-            document.querySelectorAll('#productPreview img, #preview1 img, #preview2 img, #preview3 img').forEach(img => { 
-                if (img.src && img.src.length > 10 && !img.src.includes('placehold.co') && !img.src.endsWith(window.location.href) && !img.src.endsWith('/') && !seen.has(img.src)) {
-                    imagenes.push(img.src);
-                    seen.add(img.src);
-                } 
+            ['preview1', 'preview2', 'preview3'].forEach(pid => {
+                const prevDiv = document.getElementById(pid);
+                if (prevDiv) {
+                    const img = prevDiv.querySelector('img');
+                    if (img && img.src && img.src.length > 10 && !img.src.includes('placehold.co') && !img.src.endsWith(window.location.href) && !img.src.endsWith('/')) {
+                        imagenes.push(img.src);
+                    }
+                }
             });
             console.log('📸 Imágenes encontradas:', imagenes.length, imagenes);
 
@@ -6522,14 +6524,19 @@ function renderAthletes() {
             document.getElementById('productDesc').value = p.descripcion || '';
             document.getElementById('productStock').value = p.stock || 0;
 
-            const preview = document.getElementById('productPreview');
-            if (preview) {
-                preview.innerHTML = '';
-                const imgs = p.imagenes || [];
-                imgs.forEach(img => { 
-                    if (img) preview.innerHTML += `<img src="${img}" class="product-preview-img" onclick="changeProductImage(this)">`; 
-                });
-            }
+            // Mostrar imágenes en preview1, preview2, preview3
+            const imgs = p.imagenes || [];
+            ['preview1', 'preview2', 'preview3'].forEach((pid, idx) => {
+                const prevDiv = document.getElementById(pid);
+                if (prevDiv) {
+                    prevDiv.innerHTML = '';
+                    prevDiv.style.display = 'none';
+                    if (imgs[idx]) {
+                        prevDiv.innerHTML = `<img src="${imgs[idx]}" style="width: 100%; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--gold); cursor: pointer;" onclick="changeProductImage(this)">`;
+                        prevDiv.style.display = 'block';
+                    }
+                }
+            });
 
             scoringShowToast('✏️ Editando: ' + p.nombre);
         }
@@ -6636,16 +6643,20 @@ function renderAthletes() {
             if (pds) pds.value = '';
             const pst = document.getElementById('productStock');
             if (pst) pst.value = '';
-            const pprv = document.getElementById('productPreview');
-            if (pprv) pprv.innerHTML = '';
-            const pim = document.getElementById('productImage');
-            if (pim) pim.value = '';
+            // Limpiar inputs file
+            const pim1 = document.getElementById('productImage1');
+            if (pim1) pim1.value = '';
+            const pim2 = document.getElementById('productImage2');
+            if (pim2) pim2.value = '';
+            const pim3 = document.getElementById('productImage3');
+            if (pim3) pim3.value = '';
+            // Limpiar previews visuales
             const pv1 = document.getElementById('preview1');
-            if (pv1) pv1.innerHTML = '';
+            if (pv1) { pv1.innerHTML = ''; pv1.style.display = 'none'; }
             const pv2 = document.getElementById('preview2');
-            if (pv2) pv2.innerHTML = '';
+            if (pv2) { pv2.innerHTML = ''; pv2.style.display = 'none'; }
             const pv3 = document.getElementById('preview3');
-            if (pv3) pv3.innerHTML = '';
+            if (pv3) { pv3.innerHTML = ''; pv3.style.display = 'none'; }
         }
 
         document.addEventListener('click', function(e) {
