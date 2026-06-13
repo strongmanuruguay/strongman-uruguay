@@ -3476,7 +3476,7 @@ select.scoring-form-control{cursor:pointer}
                 // ===== CURSOS (integer) =====
                 try {
                     console.log('🔄 Cargando cursos...');
-                    const { data: coursesData, error } = await supabaseClient.from('cursos').select('*').order('id', { ascending: true });
+                    const { data: coursesData, error } = await supabaseClient.from('cursos').select('*').order('fecha', { ascending: true });
                     if (!error && coursesData && coursesData.length > 0) {
                         data.courses = coursesData.map(c => ({
                             id: c.id,
@@ -5506,7 +5506,7 @@ function renderAthletes() {
         }
 
         // CURSOS ADMIN
-        function saveCourse(e) {
+        async function saveCourse(e) {
             e.preventDefault();
             const id = document.getElementById('courseId').value;
             const courseData = {
@@ -5518,6 +5518,8 @@ function renderAthletes() {
                 cost: document.getElementById('courseCost').value,
                 description: document.getElementById('courseDesc').value
             };
+
+            // Guardar en localStorage primero
             if (id) {
                 const index = data.courses.findIndex(c => c.id === parseInt(id));
                 if (index !== -1) data.courses[index] = courseData;
@@ -5525,10 +5527,45 @@ function renderAthletes() {
                 data.courses.push(courseData);
             }
             saveAllData();
+
+            // ✅ Guardar directamente en Supabase
+            if (supabaseClient) {
+                try {
+                    if (id) {
+                        // Actualizar existente
+                        const { error } = await supabaseClient.from('cursos').update({
+                            title: courseData.title,
+                            description: courseData.description,
+                            date: courseData.date,
+                            time: courseData.time,
+                            location: courseData.location,
+                            cost: courseData.cost
+                        }).eq('id', parseInt(id));
+                        if (error) console.error('❌ Error actualizando curso:', error);
+                        else console.log('✅ Curso actualizado en Supabase');
+                    } else {
+                        // Insertar nuevo
+                        const { error } = await supabaseClient.from('cursos').insert({
+                            id: courseData.id,
+                            title: courseData.title,
+                            description: courseData.description,
+                            date: courseData.date,
+                            time: courseData.time,
+                            location: courseData.location,
+                            cost: courseData.cost
+                        });
+                        if (error) console.error('❌ Error insertando curso:', error);
+                        else console.log('✅ Curso insertado en Supabase');
+                    }
+                } catch (err) {
+                    console.error('❌ Error Supabase cursos:', err);
+                }
+            }
+
             renderCourses();
             loadAdminList('courses');
             resetCourseForm();
-            alert('Curso guardado correctamente');
+            scoringShowToast('✅ Curso guardado correctamente');
         }
 
         function editCourses(id) {
@@ -5543,12 +5580,25 @@ function renderAthletes() {
             document.getElementById('courseDesc').value = course.description || '';
         }
 
-        function deleteCourses(id) {
+        async function deleteCourse(id) {
             if (!confirm('¿Eliminar este curso?')) return;
-            data.courses = data.courses.filter(c => String(c.id) !== String(id));
+
+            // Borrar de Supabase primero
+            if (supabaseClient) {
+                try {
+                    const { error } = await supabaseClient.from('cursos').delete().eq('id', parseInt(id));
+                    if (error) console.error('❌ Error borrando curso de Supabase:', error);
+                    else console.log('✅ Curso borrado de Supabase');
+                } catch (err) {
+                    console.error('❌ Error:', err);
+                }
+            }
+
+            data.courses = data.courses.filter(c => c.id !== parseInt(id));
             saveAllData();
             renderCourses();
             loadAdminList('courses');
+            scoringShowToast('🗑️ Curso eliminado');
         }
 
         function resetCourseForm() {
