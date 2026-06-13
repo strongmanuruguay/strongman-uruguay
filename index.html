@@ -3476,16 +3476,16 @@ select.scoring-form-control{cursor:pointer}
                 // ===== CURSOS (integer) =====
                 try {
                     console.log('🔄 Cargando cursos...');
-                    const { data: coursesData, error } = await supabaseClient.from('cursos').select('*').order('fecha', { ascending: true });
+                    const { data: coursesData, error } = await supabaseClient.from('cursos').select('*').order('id', { ascending: true });
                     if (!error && coursesData && coursesData.length > 0) {
                         data.courses = coursesData.map(c => ({
                             id: c.id,
-                            title: c.nombre,
-                            date: c.fecha,
-                            time: c.duracion,
-                            location: '',
-                            cost: c.precio,
-                            description: c.descripcion
+                            title: c.title || '',
+                            description: c.description || '',
+                            date: c.date || '',
+                            time: c.time || '',
+                            location: c.location || '',
+                            cost: c.cost || ''
                         }));
                         console.log('✅ Cursos cargados:', data.courses.length);
                         cargado = true;
@@ -3795,13 +3795,13 @@ select.scoring-form-control{cursor:pointer}
 
                 // ===== CURSOS =====
                 await syncTable('cursos', data.courses, course => ({
-                    titulo: course.title || '',
-                    descripcion: course.description || '',
-                    instructor: course.instructor || '',
-                    duracion: course.duration || '',
-                    precio: course.price || '',
-                    imagen: course.image || '',
-                    nivel: course.level || 'principiante'
+                    id: course.id,
+                    title: course.title || '',
+                    description: course.description || '',
+                    date: course.date || '',
+                    time: course.time || '',
+                    location: course.location || '',
+                    cost: course.cost || ''
                 }));
 
                 // ===== JUECES =====
@@ -5510,7 +5510,7 @@ function renderAthletes() {
             e.preventDefault();
             const id = document.getElementById('courseId').value;
             const courseData = {
-                id: id ? parseInt(id) : generateIdForTable('reglas'),
+                id: id ? parseInt(id) : generateIdForTable('cursos'),
                 title: document.getElementById('courseTitle').value,
                 date: document.getElementById('courseDate').value,
                 time: document.getElementById('courseTime').value,
@@ -6313,7 +6313,7 @@ function renderAthletes() {
             mensaje += `%0ATotal: $${total} UYU%0A%0AGracias!`;
             window.open(`https://wa.me/${numeroWhatsApp}?text=${mensaje}`, '_blank');
 
-            // ✅ Vaciar carrito después de enviar pedido
+            // Vaciar carrito después de enviar pedido
             cart = [];
             localStorage.removeItem('cartStrongman');
             updateCartUI();
