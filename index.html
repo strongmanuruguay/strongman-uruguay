@@ -5116,7 +5116,7 @@ function renderAthletes() {
             }
         }
 
-        async function finishSaveAthlete(athleteData, id) {
+        function finishSaveAthlete(athleteData, id) {
             // Asegurar que personalRecords sea array válido
             if (!athleteData.personalRecords) {
                 athleteData.personalRecords = [];
@@ -5127,8 +5127,8 @@ function renderAthletes() {
             // Filtrar solo registros válidos
             athleteData.personalRecords = athleteData.personalRecords.filter(r => r && r.test && r.value);
 
-            // Guardar en datos locales
             if (id) {
+                // Buscar por comparación de strings para soportar IDs string y number
                 const index = data.athletes.findIndex(a => String(a.id) === String(id));
                 if (index !== -1) {
                     data.athletes[index] = athleteData;
@@ -5140,71 +5140,13 @@ function renderAthletes() {
                 data.athletes.push(athleteData);
                 console.log('✅ Nuevo atleta agregado');
             }
-
-            // Guardar en localStorage
-            localStorage.setItem('acaf_athletes', JSON.stringify(data.athletes));
-
-            // ✅ Guardar directamente en Supabase
-            if (supabaseClient) {
-                try {
-                    const marcasStr = JSON.stringify((athleteData.personalRecords || []).filter(r => r && r.test && r.value));
-                    const atletaData = {
-                        nombre: `${athleteData.name} ${athleteData.lastName}`.trim(),
-                        documento: athleteData.doc || '',
-                        telefono: athleteData.phone || '',
-                        categoria: athleteData.gender || '',
-                        anos: athleteData.years || null,
-                        numero: athleteData.number || null,
-                        carne: athleteData.hasCard ? 'SI' : '',
-                        imagen: athleteData.photo || '',
-                        marcas: marcasStr,
-                        biografia: athleteData.bio || '',
-                        instagram: athleteData.instagram || '',
-                        peso: athleteData.weight || null,
-                        estatura: athleteData.height || null
-                    };
-
-                    if (id) {
-                        console.log('🔄 Actualizando atleta en Supabase, id:', id);
-                        const { data: updatedData, error } = await supabaseClient.from('atletas').update(atletaData).eq('id', id).select();
-                        if (error) {
-                            console.error('❌ Error actualizando atleta:', error);
-                            scoringShowToast('❌ Error: ' + error.message);
-                        } else {
-                            console.log('✅ Atleta actualizado en Supabase:', updatedData);
-                            scoringShowToast('✅ Atleta actualizado');
-                        }
-                    } else {
-                        console.log('🔄 Insertando atleta nuevo en Supabase');
-                        const { data: insertedData, error } = await supabaseClient.from('atletas').insert(atletaData).select();
-                        if (error) {
-                            console.error('❌ Error insertando atleta:', error);
-                            scoringShowToast('❌ Error: ' + error.message);
-                        } else {
-                            console.log('✅ Atleta insertado en Supabase:', insertedData);
-                            if (insertedData && insertedData.length > 0 && insertedData[0].id) {
-                                athleteData.id = insertedData[0].id;
-                                const localIdx = data.athletes.findIndex(a => String(a.id) === String(id) || (!id && a === athleteData));
-                                if (localIdx !== -1) {
-                                    data.athletes[localIdx].id = insertedData[0].id;
-                                    localStorage.setItem('acaf_athletes', JSON.stringify(data.athletes));
-                                    console.log('🔄 ID local actualizado:', insertedData[0].id);
-                                }
-                            }
-                            scoringShowToast('✅ Atleta guardado en la nube');
-                        }
-                    }
-                } catch (err) {
-                    console.error('❌ Error Supabase atletas:', err);
-                    scoringShowToast('❌ Error de conexión');
-                }
-            }
-
+            saveAllData();
             renderAthletes();
             loadAdminList('athletes');
             updateRankingAthletesSelect();
             loadRecordAthletesSelect();
             resetAthleteForm();
+            scoringShowToast('✅ Atleta guardado correctamente');
         }
 
         function addRecordField() {
@@ -5259,37 +5201,30 @@ function renderAthletes() {
             }
         }
 
-        async async function deleteAthletes(id) {
+        async function deleteAthletes(id) {
             if (!confirm('¿Eliminar este atleta?')) return;
-
-            console.log('🗑️ Borrando atleta ID:', id);
 
             // Borrar de Supabase primero
             if (supabaseClient) {
                 try {
                     const { error } = await supabaseClient.from('atletas').delete().eq('id', id);
-                    if (error) {
-                        console.error('❌ Error borrando de Supabase:', error);
-                        scoringShowToast('❌ Error al borrar: ' + error.message);
-                        return;
-                    }
-                    console.log('✅ Atleta borrado de Supabase');
+                    if (error) console.error('❌ Error borrando de Supabase:', error);
+                    else console.log('✅ Atleta borrado de Supabase');
                 } catch (e) {
                     console.error('❌ Error Supabase:', e);
-                    scoringShowToast('❌ Error de conexión');
-                    return;
                 }
             }
 
-            // Borrar del array local
+            // Borrar del array local usando comparación de strings
             const antes = data.athletes.length;
             data.athletes = data.athletes.filter(a => String(a.id) !== String(id));
             data.ranking = data.ranking.filter(r => String(r.athleteId) !== String(id));
 
             console.log(`🗑️ Atletas: ${antes} → ${data.athletes.length}`);
 
-            // Guardar en localStorage
+            // Guardar en localStorage y sincronizar con Supabase
             localStorage.setItem('acaf_athletes', JSON.stringify(data.athletes));
+            await saveAllData();
 
             renderAthletes();
             loadAdminList('athletes');
