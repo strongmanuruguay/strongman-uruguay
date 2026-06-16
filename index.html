@@ -5608,7 +5608,7 @@ function renderAthletes() {
             document.getElementById('courseDesc').value = course.description || '';
         }
 
-        async function deleteCourse(id) {
+        async function deleteCourses(id) {
             if (!confirm('¿Eliminar este curso?')) return;
 
             // Borrar de Supabase primero
