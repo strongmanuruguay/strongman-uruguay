@@ -5611,21 +5611,34 @@ function renderAthletes() {
         async function deleteCourses(id) {
             if (!confirm('¿Eliminar este curso?')) return;
 
-            // Borrar de Supabase primero
+            const numericId = parseInt(id);
+            console.log('🗑️ Borrando curso ID:', numericId);
+
+            // 1. Borrar de Supabase
             if (supabaseClient) {
                 try {
-                    const { error } = await supabaseClient.from('cursos').delete().eq('id', parseInt(id));
-                    if (error) console.error('❌ Error borrando curso de Supabase:', error);
-                    else console.log('✅ Curso borrado de Supabase');
+                    const { error } = await supabaseClient.from('cursos').delete().eq('id', numericId);
+                    if (error) {
+                        console.error('❌ Error borrando curso de Supabase:', error);
+                        scoringShowToast('❌ Error al borrar: ' + error.message);
+                        return;
+                    }
+                    console.log('✅ Curso borrado de Supabase');
                 } catch (err) {
                     console.error('❌ Error:', err);
+                    scoringShowToast('❌ Error de conexión');
+                    return;
                 }
             }
 
-            data.courses = data.courses.filter(c => c.id !== parseInt(id));
-            saveAllData();
+            // 2. Actualizar datos locales
+            data.courses = data.courses.filter(c => c.id !== numericId);
+            localStorage.setItem('acaf_courses', JSON.stringify(data.courses));
+
+            // 3. Renderizar
             renderCourses();
             loadAdminList('courses');
+            updateCounters();
             scoringShowToast('🗑️ Curso eliminado');
         }
 
