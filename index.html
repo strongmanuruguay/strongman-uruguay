@@ -5530,7 +5530,7 @@ function renderAthletes() {
                 localId = generateIdForTable('cursos');
                 data.courses.push({ ...courseData, id: localId });
             }
-            saveAllData();
+            localStorage.setItem('acaf_courses', JSON.stringify(data.courses));
 
             // ✅ Guardar directamente en Supabase
             if (supabaseClient) {
@@ -5575,7 +5575,7 @@ function renderAthletes() {
                                 const localIdx = data.courses.findIndex(c => c.id === localId);
                                 if (localIdx !== -1) {
                                     data.courses[localIdx].id = supabaseId;
-                                    saveAllData();
+                                    localStorage.setItem('acaf_courses', JSON.stringify(data.courses));
                                     console.log('🔄 ID local actualizado:', localId, '→', supabaseId);
                                 }
                             }
