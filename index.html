@@ -3286,7 +3286,7 @@ select.scoring-form-control{cursor:pointer}
                 // ===== EVENTOS (uuid) =====
                 try {
                     console.log('🔄 Cargando eventos...');
-                    const { data: eventsData, error } = await supabaseClient.from('eventos').select('*').order('fecha', { ascending: true });
+                    const { data: eventsData, error } = await supabaseClient.from('eventos').select('*').order('id', { ascending: true });
                     console.log('📥 Eventos raw:', eventsData ? eventsData.length : 0, 'Error:', error);
                     if (!error && eventsData && eventsData.length > 0) {
                         // Merge: solo agregar eventos de Supabase que no existan localmente
@@ -3476,7 +3476,7 @@ select.scoring-form-control{cursor:pointer}
                 // ===== CURSOS (integer) =====
                 try {
                     console.log('🔄 Cargando cursos...');
-                    const { data: coursesData, error } = await supabaseClient.from('cursos').select('*').order('fecha', { ascending: true });
+                    const { data: coursesData, error } = await supabaseClient.from('cursos').select('*').order('id', { ascending: true });
                     if (!error && coursesData && coursesData.length > 0) {
                         data.courses = coursesData.map(c => ({
                             id: c.id,
@@ -4066,7 +4066,7 @@ select.scoring-form-control{cursor:pointer}
                     const { data: eventosData, error } = await supabaseClient
                         .from('eventos')
                         .select('*')
-                        .order('fecha', { ascending: true });
+                        .order('id', { ascending: true });
 
                     if (!error && eventosData && eventosData.length > 0) {
                         data.events = eventosData.map(e => ({
@@ -5611,7 +5611,7 @@ function renderAthletes() {
             e.preventDefault();
             const id = document.getElementById('judgeId').value;
             const judgeData = {
-                id: id ? parseInt(id) : generateIdForTable('cursos'),
+                id: id ? parseInt(id) : generateIdForTable('jueces'),
                 name: document.getElementById('judgeName').value,
                 lastName: document.getElementById('judgeLastName').value,
                 doc: document.getElementById('judgeDoc').value,
@@ -5679,7 +5679,7 @@ function renderAthletes() {
             e.preventDefault();
             const id = document.getElementById('sponsorId').value;
             const sponsorData = {
-                id: id ? parseInt(id) : generateIdForTable('jueces'),
+                id: id ? parseInt(id) : generateIdForTable('sponsors'),
                 name: document.getElementById('sponsorName').value,
                 link: document.getElementById('sponsorLink').value,
                 logo: null
