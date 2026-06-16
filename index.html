@@ -8306,7 +8306,114 @@ function openCountdownConfigModal() {
 
 
 
-</script>
+
+        // ============================================
+        // SINCRONIZACIÓN AUTOMÁTICA (POLLING)
+        // Consulta Supabase cada 30 segundos para mantener datos actualizados
+        // ============================================
+        let autoSyncInterval = null;
+
+        function startAutoSync() {
+            if (autoSyncInterval) return; // Ya está corriendo
+            console.log('🔄 Iniciando sincronización automática cada 30 segundos');
+            autoSyncInterval = setInterval(async () => {
+                if (supabaseClient && !document.hidden) { // Solo si la pestaña está visible
+                    console.log('🔄 Auto-sync: consultando Supabase...');
+                    await syncFromSupabase();
+                }
+            }, 30000); // 30 segundos
+        }
+
+        function stopAutoSync() {
+            if (autoSyncInterval) {
+                clearInterval(autoSyncInterval);
+                autoSyncInterval = null;
+                console.log('🛑 Sincronización automática detenida');
+            }
+        }
+
+        // Sincronizar solo datos que cambian frecuentemente (cursos, productos, etc.)
+        async function syncFromSupabase() {
+            if (!supabaseClient) return;
+            try {
+                // Cursos
+                const { data: coursesData } = await supabaseClient.from('cursos').select('*').order('id', { ascending: true });
+                if (coursesData) {
+                    const oldCount = data.courses.length;
+                    data.courses = coursesData.map(c => ({
+                        id: c.id,
+                        title: c.title || '',
+                        description: c.description || '',
+                        date: c.date || '',
+                        time: c.time || '',
+                        location: c.location || '',
+                        cost: c.cost || ''
+                    }));
+                    if (data.courses.length !== oldCount) {
+                        console.log('🔄 Cursos actualizados:', oldCount, '→', data.courses.length);
+                        renderCourses();
+                        if (document.getElementById('admin').classList.contains('active')) {
+                            loadAdminList('courses');
+                        }
+                        localStorage.setItem('acaf_courses', JSON.stringify(data.courses));
+                    }
+                }
+
+                // Productos
+                const { data: productsData } = await supabaseClient.from('productos').select('*').order('id', { ascending: true });
+                if (productsData) {
+                    const oldCount = data.products ? data.products.length : 0;
+                    data.products = productsData.map(p => ({
+                        id: p.id,
+                        nombre: p.nombre || '',
+                        precio: p.precio || 0,
+                        descripcion: p.descripcion || '',
+                        stock: p.stock || 0,
+                        imagenes: p.imagenes || []
+                    }));
+                    if (data.products.length !== oldCount) {
+                        console.log('🔄 Productos actualizados:', oldCount, '→', data.products.length);
+                        loadProducts();
+                        if (document.getElementById('admin').classList.contains('active')) {
+                            loadProductsList();
+                        }
+                        localStorage.setItem('acaf_products', JSON.stringify(data.products));
+                    }
+                }
+
+                // Eventos
+                const { data: eventsData } = await supabaseClient.from('eventos').select('*').order('fecha', { ascending: true });
+                if (eventsData) {
+                    data.events = eventsData.map(e => ({
+                        id: e.id,
+                        name: e.nombre || '',
+                        date: e.fecha || '',
+                        location: e.ubicacion || '',
+                        description: e.descripcion || '',
+                        image: e.imagen || '',
+                        category: e.categoria || 'general',
+                        status: e.estado || 'activo'
+                    }));
+                    renderEvents();
+                    localStorage.setItem('acaf_events', JSON.stringify(data.events));
+                }
+
+            } catch (err) {
+                console.error('❌ Error en auto-sync:', err);
+            }
+        }
+
+        // Pausar sync cuando la pestaña no está visible (ahorro de datos)
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                console.log('👁️ Pestaña oculta - pausando sync');
+            } else {
+                console.log('👁️ Pestaña visible - reanudando sync');
+                syncFromSupabase(); // Sincronizar inmediatamente al volver
+            }
+        });
+
+    </script>
 
     <!-- BOTÓN FLOTANTE CARRITO -->
     <div class="cart-float-btn" onclick="openCart()" title="Ver carrito">
