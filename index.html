@@ -1366,7 +1366,8 @@ select.scoring-form-control{cursor:pointer}
     max-width: 700px;
     text-align: center;
     backdrop-filter: blur(10px);
-    display: none;
+    display: block;
+    animation: fadeInUp 0.8s ease;
 }
 .countdown-hero-container.active {
     display: block;
@@ -1599,8 +1600,23 @@ select.scoring-form-control{cursor:pointer}
                 white-space: nowrap;
             }
         }
+
+.countdown-hero-placeholder {
+    padding: 1rem;
+    text-align: center;
+}
+
+.countdown-hero-placeholder i {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.1); }
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<base target="_blank">
 <base target="_blank">
 <base target="_blank">
 </head>
@@ -1684,6 +1700,11 @@ select.scoring-form-control{cursor:pointer}
                         <div class="countdown-hero-value" id="cdSeconds">00</div>
                         <div class="countdown-hero-unit">Segundos</div>
                     </div>
+                </div>
+                <div class="countdown-hero-placeholder" id="cdPlaceholder" style="display:none;">
+                    <i class="fas fa-dumbbell" style="font-size: 2rem; color: var(--gold); margin-bottom: 0.5rem;"></i>
+                    <div style="color: var(--gold); font-family: 'Oswald', sans-serif; font-size: 1.2rem;">Próximo Evento</div>
+                    <div style="color: #aaa; font-size: 0.9rem; margin-top: 0.3rem;">Muy pronto anunciaremos la fecha</div>
                 </div>
                 <div class="countdown-hero-live" id="cdLiveMsg" style="display:none;"><i class="fas fa-play-circle"></i> ¡EVENTO EN CURSO!</div>
             </div>
@@ -3131,6 +3152,9 @@ select.scoring-form-control{cursor:pointer}
                 document.getElementById('scPrbCombinadaDesc').style.display = this.checked ? 'block' : 'none';
             });
             scoringLoadFromStorage();
+
+            // ===== SINCRONIZACION AUTOMATICA =====
+            startAutoSync();
             scoringRenderPublicSection();
 
             // Contador regresivo
@@ -8176,8 +8200,19 @@ function initCountdown() {
     const container = document.getElementById('countdownHero');
     if (!container) return;
 
+    // Siempre mostrar el contenedor
+    container.style.display = 'block';
+
     if (!config || !config.fecha) {
-        container.classList.remove('active');
+        // Estado por defecto: mostrar mensaje atractivo
+        document.getElementById('cdEventName').textContent = 'Próximo Evento';
+        document.getElementById('cdEventDate').textContent = 'Muy pronto...';
+        document.querySelector('.countdown-hero-label').innerHTML = '<i class="fas fa-calendar-alt"></i> Esperando confirmación';
+        document.querySelector('.countdown-hero-display').style.display = 'none';
+        document.getElementById('cdLiveMsg').style.display = 'none';
+        // Mostrar mensaje placeholder
+        const placeholder = document.getElementById('cdPlaceholder');
+        if (placeholder) placeholder.style.display = 'block';
         return;
     }
 
@@ -8195,9 +8230,13 @@ function initCountdown() {
         return;
     }
 
-    container.classList.add('active');
+    // Ocultar placeholder si existe
+    const placeholder = document.getElementById('cdPlaceholder');
+    if (placeholder) placeholder.style.display = 'none';
+
     document.getElementById('cdEventName').textContent = config.nombre || 'Próximo Evento';
     document.getElementById('cdEventDate').textContent = formatCountdownDate(eventDate) + (config.lugar ? ' | 📍 ' + config.lugar : '');
+    document.querySelector('.countdown-hero-label').innerHTML = '<i class="fas fa-clock"></i> Tiempo restante';
     document.querySelector('.countdown-hero-display').style.display = 'flex';
     document.getElementById('cdLiveMsg').style.display = 'none';
 
@@ -8334,10 +8373,65 @@ function openCountdownConfigModal() {
 
         // Sincronizar solo datos que cambian frecuentemente (cursos, productos, etc.)
         async function syncFromSupabase() {
-            if (!supabaseClient) return;
-            try {
-                // Cursos
-                const { data: coursesData } = await supabaseClient.from('cursos').select('*').order('id', { ascending: true });
+            if (!supabaseClient) {
+                console.log('⚠️ Supabase no disponible para sync');
+                return;
+            }
+            console.log('🔄 [AUTO-SYNC] Sincronizando desde Supabase...');
+
+            const tablas = [
+                { nombre: 'eventos', local: 'acaf_events', mapper: e => ({ id: e.id, name: e.nombre, date: e.fecha, time: e.hora, location: e.lugar, cost: e.costo, description: e.descripcion, categories: e.categorias || [], image: e.imagen_url }) },
+                { nombre: 'atletas', local: 'acaf_athletes', mapper: a => {
+                    const parts = (a.nombre || '').split(' ');
+                    let personalRecords = [];
+                    try { personalRecords = JSON.parse(a.marcas || '[]'); } catch(e) {}
+                    return { id: a.id, name: parts[0] || '', lastName: parts.slice(1).join(' ') || '', doc: a.documento || '', phone: a.telefono || '', gender: a.categoria || '', years: a.anos || '', number: a.numero || '', hasCard: a.carne === 'SI', photo: a.imagen || '', personalRecords: personalRecords };
+                }},
+                { nombre: 'ranking_nacional', local: 'acaf_ranking', mapper: r => ({ id: r.id, athleteName: r.nombre, gender: r.genero, category: r.categoria, position: r.posicion, points: r.puntos }) },
+                { nombre: 'records', local: 'acaf_records', mapper: r => ({ id: r.id, test: r.categoria || r.prueba, holder: r.atleta, mark: r.marca, date: r.fecha }) },
+                { nombre: 'gimnasios', local: 'acaf_gyms', mapper: g => ({ id: g.id, name: g.nombre, address: g.direccion, phone: g.telefono, photo: g.imagen }) },
+                { nombre: 'galeria', local: 'acaf_gallery', mapper: g => ({ id: g.id, type: g.categoria, src: g.imagen, title: g.titulo }) },
+                { nombre: 'reglas', local: 'acaf_rules', mapper: r => ({ id: r.id, category: r.categoria, name: r.titulo, description: r.contenido }) },
+                { nombre: 'cursos', local: 'acaf_courses', mapper: c => ({ id: c.id, title: c.title, description: c.description, date: c.date, time: c.time, location: c.location, cost: c.cost }) },
+                { nombre: 'jueces', local: 'acaf_judges', mapper: j => ({ id: j.id, name: j.nombre, level: j.nivel, photo: j.imagen }) },
+                { nombre: 'sponsors', local: 'acaf_sponsors', mapper: s => ({ id: s.id, name: s.nombre, link: s.url, logo: s.logo }) },
+                { nombre: 'productos', local: 'productosTienda', mapper: p => ({ id: p.id, nombre: p.nombre, precio: p.precio, descripcion: p.descripcion, stock: p.stock, categoria: p.categoria, imagenes: [p.imagen, p.imagen2, p.imagen3].filter(Boolean) }) },
+            ];
+
+            tablas.forEach(async (tabla) => {
+                try {
+                    const { data: remoteData, error } = await supabaseClient.from(tabla.nombre).select('*');
+                    if (!error && remoteData && remoteData.length > 0) {
+                        const localData = JSON.parse(localStorage.getItem(tabla.local)) || [];
+                        const merged = [...localData];
+                        remoteData.forEach(remote => {
+                            const mapped = tabla.mapper(remote);
+                            const idx = merged.findIndex(l => String(l.id) === String(mapped.id));
+                            if (idx >= 0) merged[idx] = mapped;
+                            else merged.push(mapped);
+                        });
+                        localStorage.setItem(tabla.local, JSON.stringify(merged));
+                        console.log(`✅ [AUTO-SYNC] ${tabla.nombre}: ${remoteData.length} registros`);
+                    }
+                } catch (e) {
+                    console.warn(`⚠️ [AUTO-SYNC] Error en ${tabla.nombre}:`, e.message);
+                }
+            });
+
+            data.events = JSON.parse(localStorage.getItem('acaf_events')) || [];
+            data.athletes = JSON.parse(localStorage.getItem('acaf_athletes')) || [];
+            data.ranking = JSON.parse(localStorage.getItem('acaf_ranking')) || [];
+            data.gyms = JSON.parse(localStorage.getItem('acaf_gyms')) || [];
+            data.records = JSON.parse(localStorage.getItem('acaf_records')) || [];
+            data.gallery = JSON.parse(localStorage.getItem('acaf_gallery')) || [];
+            data.rules = JSON.parse(localStorage.getItem('acaf_rules')) || [];
+            data.courses = JSON.parse(localStorage.getItem('acaf_courses')) || [];
+            data.judges = JSON.parse(localStorage.getItem('acaf_judges')) || [];
+            data.sponsors = JSON.parse(localStorage.getItem('acaf_sponsors')) || [];
+            data.products = JSON.parse(localStorage.getItem('productosTienda')) || [];
+
+            console.log('✅ [AUTO-SYNC] Completado');
+        } = await supabaseClient.from('cursos').select('*').order('id', { ascending: true });
                 if (coursesData) {
                     const oldCount = data.courses.length;
                     data.courses = coursesData.map(c => ({
@@ -8414,12 +8508,6 @@ function openCountdownConfigModal() {
         });
 
     </script>
-
-    <!-- BOTÓN FLOTANTE CARRITO -->
-    <div class="cart-float-btn" onclick="openCart()" title="Ver carrito">
-        <i class="fas fa-shopping-cart" style="font-size: 1.5rem; color: #000;"></i>
-        <span class="cart-count" id="cartCount" style="display:none;"></span>
-    </div>
 
     <!-- MODAL CARRITO -->
     <div 
