@@ -5510,7 +5510,6 @@ function renderAthletes() {
             e.preventDefault();
             const id = document.getElementById('courseId').value;
             const courseData = {
-                id: id ? parseInt(id) : generateIdForTable('cursos'),
                 title: document.getElementById('courseTitle').value,
                 date: document.getElementById('courseDate').value,
                 time: document.getElementById('courseTime').value,
@@ -5519,12 +5518,17 @@ function renderAthletes() {
                 description: document.getElementById('courseDesc').value
             };
 
+            console.log('💾 Guardando curso:', courseData);
+
             // Guardar en localStorage primero
+            let localId;
             if (id) {
-                const index = data.courses.findIndex(c => c.id === parseInt(id));
-                if (index !== -1) data.courses[index] = courseData;
+                localId = parseInt(id);
+                const index = data.courses.findIndex(c => c.id === localId);
+                if (index !== -1) data.courses[index] = { ...courseData, id: localId };
             } else {
-                data.courses.push(courseData);
+                localId = generateIdForTable('cursos');
+                data.courses.push({ ...courseData, id: localId });
             }
             saveAllData();
 
@@ -5533,39 +5537,63 @@ function renderAthletes() {
                 try {
                     if (id) {
                         // Actualizar existente
-                        const { error } = await supabaseClient.from('cursos').update({
+                        console.log('🔄 Actualizando curso en Supabase, id:', parseInt(id));
+                        const { data: updatedData, error } = await supabaseClient.from('cursos').update({
                             title: courseData.title,
                             description: courseData.description,
                             date: courseData.date,
                             time: courseData.time,
                             location: courseData.location,
                             cost: courseData.cost
-                        }).eq('id', parseInt(id));
-                        if (error) console.error('❌ Error actualizando curso:', error);
-                        else console.log('✅ Curso actualizado en Supabase');
+                        }).eq('id', parseInt(id)).select();
+                        if (error) {
+                            console.error('❌ Error actualizando curso:', error);
+                            scoringShowToast('❌ Error: ' + error.message);
+                        } else {
+                            console.log('✅ Curso actualizado en Supabase:', updatedData);
+                            scoringShowToast('✅ Curso actualizado');
+                        }
                     } else {
-                        // Insertar nuevo
-                        const { error } = await supabaseClient.from('cursos').insert({
-                            id: courseData.id,
+                        // Insertar nuevo - NO enviar id, dejar que Supabase genere
+                        console.log('🔄 Insertando curso nuevo en Supabase');
+                        const { data: insertedData, error } = await supabaseClient.from('cursos').insert({
                             title: courseData.title,
                             description: courseData.description,
                             date: courseData.date,
                             time: courseData.time,
                             location: courseData.location,
                             cost: courseData.cost
-                        });
-                        if (error) console.error('❌ Error insertando curso:', error);
-                        else console.log('✅ Curso insertado en Supabase');
+                        }).select();
+                        if (error) {
+                            console.error('❌ Error insertando curso:', error);
+                            scoringShowToast('❌ Error: ' + error.message);
+                        } else {
+                            console.log('✅ Curso insertado en Supabase:', insertedData);
+                            // Actualizar el ID local con el de Supabase
+                            if (insertedData && insertedData.length > 0) {
+                                const supabaseId = insertedData[0].id;
+                                const localIdx = data.courses.findIndex(c => c.id === localId);
+                                if (localIdx !== -1) {
+                                    data.courses[localIdx].id = supabaseId;
+                                    saveAllData();
+                                    console.log('🔄 ID local actualizado:', localId, '→', supabaseId);
+                                }
+                            }
+                            scoringShowToast('✅ Curso guardado en la nube');
+                        }
                     }
                 } catch (err) {
                     console.error('❌ Error Supabase cursos:', err);
+                    scoringShowToast('❌ Error de conexión');
                 }
+            } else {
+                console.warn('⚠️ Supabase no disponible, curso solo en local');
+                scoringShowToast('⚠️ Guardado solo localmente');
             }
 
             renderCourses();
             loadAdminList('courses');
             resetCourseForm();
-            scoringShowToast('✅ Curso guardado correctamente');
         }
 
         function editCourses(id) {
