@@ -1600,20 +1600,6 @@ select.scoring-form-control{cursor:pointer}
                 white-space: nowrap;
             }
         }
-
-.countdown-hero-placeholder {
-    padding: 1rem;
-    text-align: center;
-}
-
-.countdown-hero-placeholder i {
-    animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.7; transform: scale(1.1); }
-}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <base target="_blank">
@@ -4162,6 +4148,7 @@ select.scoring-form-control{cursor:pointer}
             }
             // Asegurar que cada elemento tenga test y value
             athlete.personalRecords = athlete.personalRecords.filter(r => r && r.test && r.value);
+        }
         }
 
 function renderAthletes() {
@@ -8198,10 +8185,10 @@ function initCountdown() {
     container.style.display = 'block';
 
     if (!config || !config.fecha) {
-        document.getElementById('cdEventName').textContent = 'Próximo Evento';
+        document.getElementById('cdEventName').textContent = 'Proximo Evento';
         document.getElementById('cdEventDate').textContent = 'Muy pronto...';
         const label = document.querySelector('.countdown-hero-label');
-        if (label) label.innerHTML = '<i class="fas fa-calendar-alt"></i> Esperando confirmación';
+        if (label) label.innerHTML = '<i class="fas fa-calendar-alt"></i> Esperando confirmacion';
         const display = document.querySelector('.countdown-hero-display');
         if (display) display.style.display = 'none';
         const liveMsg = document.getElementById('cdLiveMsg');
@@ -8223,14 +8210,11 @@ function initCountdown() {
         return;
     }
 
+    container.classList.add('active');
     document.getElementById('cdEventName').textContent = config.nombre || 'Próximo Evento';
     document.getElementById('cdEventDate').textContent = formatCountdownDate(eventDate) + (config.lugar ? ' | 📍 ' + config.lugar : '');
-    const label2 = document.querySelector('.countdown-hero-label');
-    if (label2) label2.innerHTML = '<i class="fas fa-clock"></i> Tiempo restante';
-    const display2 = document.querySelector('.countdown-hero-display');
-    if (display2) display2.style.display = 'flex';
-    const liveMsg2 = document.getElementById('cdLiveMsg');
-    if (liveMsg2) liveMsg2.style.display = 'none';
+    document.querySelector('.countdown-hero-display').style.display = 'flex';
+    document.getElementById('cdLiveMsg').style.display = 'none';
 
     updateCountdown(eventDate);
     if (countdownInterval) clearInterval(countdownInterval);
@@ -8444,8 +8428,13 @@ function openCountdownConfigModal() {
             }
         });
 
-    }
     </script>
+
+    <!-- BOTÓN FLOTANTE CARRITO -->
+    <div class="cart-float-btn" onclick="openCart()" title="Ver carrito">
+        <i class="fas fa-shopping-cart" style="font-size: 1.5rem; color: #000;"></i>
+        <span class="cart-count" id="cartCount" style="display:none;"></span>
+    </div>
 
     <!-- MODAL CARRITO -->
     <div 
