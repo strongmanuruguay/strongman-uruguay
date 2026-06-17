@@ -1366,8 +1366,7 @@ select.scoring-form-control{cursor:pointer}
     max-width: 700px;
     text-align: center;
     backdrop-filter: blur(10px);
-    display: block;
-    animation: fadeInUp 0.8s ease;
+    display: none;
 }
 .countdown-hero-container.active {
     display: block;
@@ -1602,7 +1601,6 @@ select.scoring-form-control{cursor:pointer}
         }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<base target="_blank">
 <base target="_blank">
 <base target="_blank">
 </head>
@@ -3133,9 +3131,6 @@ select.scoring-form-control{cursor:pointer}
                 document.getElementById('scPrbCombinadaDesc').style.display = this.checked ? 'block' : 'none';
             });
             scoringLoadFromStorage();
-
-            // ===== SINCRONIZACION AUTOMATICA =====
-            startAutoSync();
             scoringRenderPublicSection();
 
             // Contador regresivo
@@ -4148,7 +4143,6 @@ select.scoring-form-control{cursor:pointer}
             }
             // Asegurar que cada elemento tenga test y value
             athlete.personalRecords = athlete.personalRecords.filter(r => r && r.test && r.value);
-        }
         }
 
 function renderAthletes() {
@@ -8182,17 +8176,8 @@ function initCountdown() {
     const container = document.getElementById('countdownHero');
     if (!container) return;
 
-    container.style.display = 'block';
-
     if (!config || !config.fecha) {
-        document.getElementById('cdEventName').textContent = 'Proximo Evento';
-        document.getElementById('cdEventDate').textContent = 'Muy pronto...';
-        const label = document.querySelector('.countdown-hero-label');
-        if (label) label.innerHTML = '<i class="fas fa-calendar-alt"></i> Esperando confirmacion';
-        const display = document.querySelector('.countdown-hero-display');
-        if (display) display.style.display = 'none';
-        const liveMsg = document.getElementById('cdLiveMsg');
-        if (liveMsg) liveMsg.style.display = 'none';
+        container.classList.remove('active');
         return;
     }
 
