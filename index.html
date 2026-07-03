@@ -1604,6 +1604,7 @@ select.scoring-form-control{cursor:pointer}
 <base target="_blank">
 <base target="_blank">
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
     <div class="menu-overlay" id="menuOverlay" onclick="closeMenu()"></div>
@@ -3014,7 +3015,6 @@ select.scoring-form-control{cursor:pointer}
     </div>
             
        <script>
-
         // ===== UUID GENERATOR (para tablas con id uuid) =====
         function generateUUID() {
             return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -3146,7 +3146,10 @@ select.scoring-form-control{cursor:pointer}
                 });
             }
 
-        });
+        
+            // Iniciar sincronización automática con Supabase
+            startAutoSync();
+});
 
         
 
@@ -8417,20 +8420,12 @@ function openCountdownConfigModal() {
     </script>
 
     <!-- BOTÓN FLOTANTE CARRITO -->
-    <div class="cart-float-btn" onclick="openCart()" title="Ver carrito">
-        <i class="fas fa-shopping-cart" style="font-size: 1.5rem; color: #000;"></i>
-        <span class="cart-count" id="cartCount" style="display:none;"></span>
-    </div>
-
-    <!-- MODAL CARRITO -->
-    <div 
-
-    <!-- BOTÓN FLOTANTE CARRITO -->
     <div class="cart-float-btn" id="cartFloatBtn" onclick="openCart()" title="Ver carrito">
         <i class="fas fa-shopping-cart" style="font-size: 1.5rem; color: #000;"></i>
         <span class="cart-count" id="cartCount" style="display:none;"></span>
     </div>
 
+    <!-- MODAL CARRITO -->
     <div id="cartModal" class="modal">
         <div class="modal-content cart-drawer">
             <div class="modal-header" style="background: var(--gold); color: #000;">
