@@ -5292,12 +5292,12 @@ function renderAthletes() {
         function editRanking(id) {
             const item = data.ranking.find(r => r.id === id);
             if (!item) return;
-            document.getElementById('rankingId').value = item.id;
-            document.getElementById('rankingAthlete').value = item.athleteId;
-            document.getElementById('rankingGender').value = item.gender;
-            document.getElementById('rankingCategory').value = item.category;
-            document.getElementById('rankingPosition').value = item.position;
-            document.getElementById('rankingPoints').value = item.points;
+            document.getElementById('rankingId').value = item.id || '';
+            document.getElementById('rankingAthlete').value = item.athleteId || '';
+            document.getElementById('rankingGender').value = item.gender || '';
+            document.getElementById('rankingCategory').value = item.category || '';
+            document.getElementById('rankingPosition').value = item.position || '';
+            document.getElementById('rankingPoints').value = item.points || '';
         }
 
         function deleteRanking(id) {
@@ -5357,10 +5357,10 @@ function renderAthletes() {
         function editGyms(id) {
             const gym = data.gyms.find(g => String(g.id) === String(id));
             if (!gym) return;
-            document.getElementById('gymId').value = gym.id;
-            document.getElementById('gymName').value = gym.name;
-            document.getElementById('gymAddress').value = gym.address;
-            document.getElementById('gymPhone').value = gym.phone;
+            document.getElementById('gymId').value = gym.id || '';
+            document.getElementById('gymName').value = gym.name || '';
+            document.getElementById('gymAddress').value = gym.address || '';
+            document.getElementById('gymPhone').value = gym.phone || '';
         }
 
         function deleteGyms(id) {
@@ -5490,10 +5490,10 @@ function renderAthletes() {
         function editRules(id) {
             const rule = data.rules.find(r => String(r.id) === String(id));
             if (!rule) return;
-            document.getElementById('ruleId').value = rule.id;
-            document.getElementById('ruleCategory').value = rule.category;
-            document.getElementById('ruleName').value = rule.name;
-            document.getElementById('ruleDesc').value = rule.description;
+            document.getElementById('ruleId').value = rule.id || '';
+            document.getElementById('ruleCategory').value = rule.category || '';
+            document.getElementById('ruleName').value = rule.name || '';
+            document.getElementById('ruleDesc').value = rule.description || '';
         }
 
         function deleteRules(id) {
@@ -5698,12 +5698,12 @@ function renderAthletes() {
         function editJudges(id) {
             const judge = data.judges.find(j => String(j.id) === String(id));
             if (!judge) return;
-            document.getElementById('judgeId').value = judge.id;
-            document.getElementById('judgeName').value = judge.name;
-            document.getElementById('judgeLastName').value = judge.lastName;
-            document.getElementById('judgeDoc').value = judge.doc;
-            document.getElementById('judgePhone').value = judge.phone;
-            document.getElementById('judgeLevel').value = judge.level;
+            document.getElementById('judgeId').value = judge.id || '';
+            document.getElementById('judgeName').value = judge.name || '';
+            document.getElementById('judgeLastName').value = judge.lastName || '';
+            document.getElementById('judgeDoc').value = judge.doc || '';
+            document.getElementById('judgePhone').value = judge.phone || '';
+            document.getElementById('judgeLevel').value = judge.level || '';
         }
 
         function deleteJudges(id) {
