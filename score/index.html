@@ -3,10 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>StrongScore Pro V3 - Strongman Uruguay</title>
+<title>StrongScore Pro V3.1 — Vista previa</title>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-<style>:root{--p:#0a0a0f;--s:#1a1a2e;--a:#0066cc;--al:#0088ff;--g:#ffd700;--b:#cd7f32;--t:#fff;--tm:#a0a0b0;--d:#dc3545;--ok:#28a745;--w:#ffc107;}
+<style>
+:root{--p:#0a0a0f;--s:#1a1a2e;--a:#0066cc;--al:#0088ff;--g:#ffd700;--b:#cd7f32;--t:#fff;--tm:#a0a0b0;--d:#dc3545;--ok:#28a745;--w:#ffc107;}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Roboto',sans-serif;background:var(--p);color:var(--t);overflow-x:hidden;line-height:1.6}
 h1,h2,h3,h4{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:2px}
@@ -208,11 +209,44 @@ select.fc option{background:#1a1a2e;color:white}
 #mdlCopyPrb .mdl-c{max-width:95vw!important}
 #copyStep1 .g2{grid-template-columns:1fr}
 }
+
 </style>
-<base target="_blank">
+<script>
+// ============================================
+// StrongScore Pro V3.1 — Configuración
+// Editá este archivo con tus datos.
+// ============================================
+
+// --- Supabase (nube) ---
+// IMPORTANTE: activá Row Level Security en la tabla 'competencias'
+// desde el dashboard de Supabase si este código va a ser público.
+window.SUPABASE_URL = 'https://kiojyhfqwjaoppgwoyjt.supabase.co';
+window.SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtpb2p5aGZxd2phb3BwZ3dveWp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NzY3MjgsImV4cCI6MjA5NTQ1MjcyOH0.Nd24E0kQJKjcypjz45MELtPD-eq91URunn6UVL2PL4Y';
+
+// --- URL pública (vista del público) ---
+// Es donde el público escanea el QR para ver resultados en vivo.
+// Si la subís a GitHub Pages en https://tusuario.github.io/strongscore/,
+// poné acá: 'https://tusuario.github.io/strongscore/publico.html'
+// Si la dejás vacía, se usa automáticamente la misma carpeta del index.html.
+window.STRONGSCORE_CONFIG = {
+    PUBLIC_URL: ''   // ej: 'https://strongmanuruguay.github.io/strongscore/publico.html'
+};
+
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <base target="_blank">
-<base target="_blank">
+</head>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StrongScore Pro V3 - Strongman Uruguay</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 <div class="c">
@@ -222,6 +256,7 @@ select.fc option{background:#1a1a2e;color:white}
 <div style="margin-top:1rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center;">
 <span class="live" id="hLive"><i class="fas fa-circle"></i> EN VIVO</span>
 <span style="color:var(--tm);font-size:0.9rem;" id="hStats"></span>
+<span style="color:var(--tm);font-size:0.9rem;" id="hSave">—</span>
 </div>
 </div>
 <div class="tabs">
@@ -281,6 +316,8 @@ select.fc option{background:#1a1a2e;color:white}
 <button class="btn btn-ok" onclick="saveCfg()"><i class="fas fa-save"></i> Guardar</button>
 <button class="btn btn-ol" onclick="loadDemo()"><i class="fas fa-play"></i> Demo</button>
 <button class="btn btn-dg" onclick="resetAll()"><i class="fas fa-trash"></i> Reiniciar</button>
+<button class="btn btn-ol" onclick="exportarJSON()"><i class="fas fa-download"></i> Exportar</button>
+<button class="btn btn-ol" onclick="importarJSON()"><i class="fas fa-upload"></i> Importar</button>
 </div>
 </div>
 </div>
@@ -649,7 +686,7 @@ select.fc option{background:#1a1a2e;color:white}
 <div id="qrBroadcast" style="margin:1rem auto;width:200px;height:200px;background:white;border-radius:12px;padding:10px;display:flex;align-items:center;justify-content:center">
 <div style="color:#333;font-size:0.8rem;text-align:center">
 <i class="fas fa-qrcode" style="font-size:4rem;color:#333;display:block;margin-bottom:0.5rem"></i>
-QR se genera al abrir broadcast
+QR de la vista pública
 </div>
 </div>
 <p style="color:var(--tm);font-size:0.8rem;margin-top:1rem">Escaneá para ver en vivo desde tu celular</p>
@@ -789,6 +826,7 @@ QR se genera al abrir broadcast
 <script>
 // ===== STRONGSCORE PRO V3 =====
 // Sistema con soporte completo de categorías separadas
+// StrongScore Pro V3.1 - Versión app independiente
 let T={
     nom:'',fec:'',lug:'',des:'primeros',sys:'auto',cst:{},est:'activo',cantPruebas:0,
     cat:[],atl:[],prb:[],res:{}
@@ -799,6 +837,12 @@ let currentTiroFilter='all';
 let currentRonda=1;
 let currentAtlCatFilter='all',currentPrbCatFilter='all',currentRankCatFilter='all',currentPubCatFilter='all';
 let tiroOrder=[];
+let lastSaveTime=null;
+function updSaveIndicator(){const el=$('hSave');if(!el)return;el.textContent=lastSaveTime?('💾 Guardado '+lastSaveTime.toLocaleTimeString('es-UY',{hour:'2-digit',minute:'2-digit'})):'—';}
+// Autosave silencioso cada 2 minutos
+setInterval(()=>{if(!document.hidden&&T.atl.length>0){saveStg(true);}},120000);
+// Guardar al cerrar/recargar la página
+window.addEventListener('beforeunload',()=>{try{localStorage.setItem('ssv3',JSON.stringify(T));}catch(e){}});
 
 function $(id){return document.getElementById(id)}
 function flag(cc,cl){if(!cc||cc.length!==2)return'';return`<img src="https://flagcdn.com/w40/${cc.toLowerCase()}.png" class="${cl||'fg'}" onerror="this.style.display='none'">`}
@@ -820,7 +864,7 @@ function swTab(t){
 }
 
 // Persistencia
-function saveStg(){localStorage.setItem('ssv3',JSON.stringify(T));toast('💾 Guardado')}
+function saveStg(silent){localStorage.setItem('ssv3',JSON.stringify(T));lastSaveTime=new Date();updSaveIndicator();if(!silent)toast('💾 Guardado')}
 function loadStg(){
     const s=localStorage.getItem('ssv3');
     if(s){
@@ -2833,6 +2877,7 @@ function exportarExcel(){
 // ===== EXPORTAR IMAGEN PROFESIONAL =====
 function exportarImagen(){
     if(T.atl.length===0){toast('No hay atletas para exportar','err');return;}
+    if(typeof html2canvas==='undefined'){toast('❌ Requiere internet (html2canvas no cargado)','err');return;}
 
     toast('📸 Generando imagen profesional...', 'warn');
 
@@ -3020,6 +3065,7 @@ function exportarImagen(){
 
 // ===== EXPORTAR IMAGEN DE UNA CATEGORÍA =====
 function exportarImagenCategoria(catId){
+    if(typeof html2canvas==='undefined'){toast('❌ Requiere internet (html2canvas no cargado)','err');return;}
     if(!catId){toast('Seleccioná una categoría primero','err');return;}
     const c = T.cat.find(x => x.id === catId);
     if(!c){toast('Categoría no encontrada','err');return;}
@@ -3685,6 +3731,12 @@ function abrirBroadcastTV(forcedMode) {
     toast('📡 Broadcast iniciado. Presioná F11 en la ventana para pantalla completa.');
 }
 
+function getPublicUrl(){
+    if(window.STRONGSCORE_CONFIG && window.STRONGSCORE_CONFIG.PUBLIC_URL) return window.STRONGSCORE_CONFIG.PUBLIC_URL;
+    let base=location.href;
+    if(!base.endsWith('/')){base=base.substring(0,base.lastIndexOf('/')+1);}
+    return base+'publico.html';
+}
 function generarBroadcastData() {
     const data = {
         config: broadcastConfig,
@@ -3699,6 +3751,7 @@ function generarBroadcastData() {
         atletas: T.atl,
         pruebas: T.prb,
         resultados: T.res,
+        publicUrl: getPublicUrl(),
         timestamp: Date.now()
     };
     return data;
@@ -3751,6 +3804,7 @@ function generarHTMLBroadcast(initialData) {
 <title>StrongScore TV - ${esc(initialData.torneo.nom || 'En Vivo')}</title>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Oswald',sans-serif;background:#0a0a0f;color:#fff;overflow:hidden;height:100vh;width:100vw}
@@ -4197,48 +4251,77 @@ window.addEventListener('message', function(e) {
     }
 });
 
-// Generar QR simple
+// QR REAL: apunta a la vista pública (publico.html) para el público remoto
 const qrDiv = document.getElementById('broadcastQR');
 if (qrDiv) {
-    // Crear un canvas simple con el QR
-    const canvas = document.createElement('canvas');
-    canvas.width = 100;
-    canvas.height = 100;
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(0, 0, 100, 100);
-    ctx.fillStyle = '#000';
-    // Dibujar un patrón QR-like
-    for (let i = 0; i < 10; i++) {
-        for (let j = 0; j < 10; j++) {
-            if (Math.random() > 0.5) {
-                ctx.fillRect(i * 10, j * 10, 10, 10);
-            }
-        }
-    }
-    // Esquinas del QR
-    ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, 30, 30);
-    ctx.fillRect(70, 0, 30, 30);
-    ctx.fillRect(0, 70, 30, 30);
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(5, 5, 20, 20);
-    ctx.fillRect(75, 5, 20, 20);
-    ctx.fillRect(5, 75, 20, 20);
-    ctx.fillStyle = '#000';
-    ctx.fillRect(10, 10, 10, 10);
-    ctx.fillRect(80, 10, 10, 10);
-    ctx.fillRect(10, 80, 10, 10);
-
     qrDiv.innerHTML = '';
-    qrDiv.appendChild(canvas);
-    canvas.style.width = '100%';
-    canvas.style.height = '100%';
-    canvas.style.borderRadius = '4px';
+    const url = currentData.publicUrl || '';
+    if (url && typeof QRCode !== 'undefined') {
+        new QRCode(qrDiv, {text: url, width: 96, height: 96, correctLevel: QRCode.CorrectLevel.M});
+    } else {
+        qrDiv.innerHTML = '<i class="fas fa-qrcode" style="color:#333;font-size:1.5rem"></i>';
+    }
 }
 <\/script>
 </body>
 </html>`;
+}
+
+// ===== QR REAL EN PANEL ADMIN =====
+let qrLibLoading=false;
+function ensureQrLib(cb){
+    if(typeof QRCode!=='undefined'){cb();return;}
+    if(qrLibLoading){setTimeout(()=>ensureQrLib(cb),300);return;}
+    qrLibLoading=true;
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+    s.onload=cb;
+    s.onerror=()=>{qrLibLoading=false;};
+    document.head.appendChild(s);
+}
+function updBroadcastQR(){
+    const el=$('qrBroadcast');
+    if(!el)return;
+    ensureQrLib(()=>{
+        el.innerHTML='';
+        el.style.background='#fff';
+        new QRCode(el,{text:getPublicUrl(),width:180,height:180,correctLevel:QRCode.CorrectLevel.M});
+    });
+}
+
+// ===== EXPORTAR / IMPORTAR TORNEO (backup JSON) =====
+function exportarJSON(){
+    const blob=new Blob([JSON.stringify(T,null,2)],{type:'application/json'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=((T.nom||'torneo').replace(/[^a-z0-9áéíóúñü]+/gi,'_'))+'.strongscore.json';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+    toast('📦 Torneo exportado como JSON');
+}
+function importarJSON(){
+    const inp=document.createElement('input');
+    inp.type='file';inp.accept='.json,application/json';
+    inp.onchange=()=>{
+        const f=inp.files[0];if(!f)return;
+        const r=new FileReader();
+        r.onload=()=>{
+            try{
+                const d=JSON.parse(r.result);
+                if(!d||!Array.isArray(d.atl)||!Array.isArray(d.prb)||!Array.isArray(d.cat))throw new Error('formato');
+                if(!confirm(`¿Importar torneo "${d.nom||'sin nombre'}"?\n\nSe reemplazarán TODOS los datos actuales.`))return;
+                T=d;
+                if(!T.cat)T.cat=[];if(!T.res)T.res={};if(!T.cst)T.cst={};
+                T.atl.forEach(a=>{if(!a.catId)a.catId='';});
+                T.prb.forEach(p=>{if(!p.cats)p.cats=[];});
+                eA=null;eP=null;eC=null;currentRonda=1;tiroOrder=[];
+                applyCfg();renderAll();saveStg();
+                toast('📥 Torneo importado correctamente');
+            }catch(e){toast('❌ Archivo inválido','err');}
+        };
+        r.readAsText(f);
+    };
+    inp.click();
 }
 
 // ===== ACTUALIZAR SELECTORES DE BROADCAST =====
@@ -4273,14 +4356,16 @@ swTab = function(t) {
     if (t === 'envivo') {
         updBroadcastCatSel();
         updBroadcastPrbSel();
+        updBroadcastQR();
     }
 };
 
 
 
 // ===== SUPABASE INTEGRATION =====
-const SUPABASE_URL = 'https://kiojyhfqwjaoppgwoyjt.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtpb2p5aGZxd2phb3BwZ3dveWp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4NzY3MjgsImV4cCI6MjA5NTQ1MjcyOH0.Nd24E0kQJKjcypjz45MELtPD-eq91URunn6UVL2PL4Y';
+// Credenciales en js/config.js (no edites acá)
+const SUPABASE_URL = window.SUPABASE_URL || '';
+const SUPABASE_KEY = window.SUPABASE_KEY || '';
 let supabaseClient = null;
 
 function initSupabase() {
@@ -4448,8 +4533,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // ===== MODIFICAR saveStg PARA ENVIAR DATOS A BROADCAST =====
 const originalSaveStg = saveStg;
-saveStg = function() {
-    originalSaveStg();
+saveStg = function(silent) {
+    originalSaveStg(silent);
     enviarDatosABroadcast();
 
     // ===== SUPABASE: Guardar en la nube =====
@@ -4495,7 +4580,7 @@ loadStg();
 
 renderAll();
 
-
 </script>
 </body>
+</html>
 </html>
